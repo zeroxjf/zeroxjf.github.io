@@ -51,8 +51,8 @@ gpg --batch --yes --armor --detach-sign --output Release.asc Release
 
 echo "Repo updated successfully."
 
-# Force-add entire debs directory (override .gitignore)
-git add -f debs
+# Force-add all .deb files explicitly (override .gitignore)
+git add -f debs/*.deb
 
 # Then stage all other changes (additions, deletions, modifications)
 git add -A .

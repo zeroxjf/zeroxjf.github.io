@@ -7,8 +7,10 @@ Architectures: iphoneos-arm64
 Components: main
 Description: zeroxjf's repo for jailbreak tweaks
 MD5Sum:
- 3bc0801aed78d6909a3164f8d6cf3d35 0 Packages
- 4059d198768f9f8dc9372dc1c54bc3c3 0 Packages.bz2
+ 3bc0801aed78d6909a3164f8d6cf3d35 1835 Packages
+ 54afebf62616672f64d010a2a0e83155 1105 Packages.bz2
+ 34de4acd626ea94743fae9d671eb8532 1022 Packages.gz
 SHA256:
- 598f39a34f089b808ceabc2da601ea9de72f92ba184df97d6453275fc4ee124b 0 Packages
- d3dda84eb03b9738d118eb2be78e246106900493c0ae07819ad60815134a8058 0 Packages.bz2
+ 598f39a34f089b808ceabc2da601ea9de72f92ba184df97d6453275fc4ee124b 1835 Packages
+ f1bbaaecdaa7eeb40c73dc0c96abcf75ded2f0111729075dc18c22234c19f64b 1105 Packages.bz2
+ f99ba9832ff9bbc36e61db314dedc06c03f9ac068acd4e050d0dbce08af852a2 1022 Packages.gz

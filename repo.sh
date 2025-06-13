@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 # Ensure script runs from its own directory
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit 1
+# Sync remote changes before generating files
+git pull --rebase origin main
 set -euo pipefail
 
-# Clean up any existing index, release, signature, and archive files
-rm -f Packages* Release Release.asc debs.tar.gz debs.tar.gz.asc
+# Cleanup old indices and signatures
+rm -f Packages* Release Release.asc
 
-# Generate Packages index in multiple formats
+# Generate Packages index with full descriptions
 dpkg-scanpackages -m debs/ > Packages
+
+# Compress Packages in multiple formats (overwrite)
 bzip2 -kf Packages
 gzip -kf Packages
 zstd -19 -kf Packages
 echo "Generated Packages, Packages.bz2, Packages.gz, and Packages.zst"
 
-# Build a new Release file with metadata headers
+# Build Release file with metadata
 cat > Release <<EOF
 Origin:    ZeroXJF Repo
 Label:     ZeroXJF Repo
@@ -24,51 +28,32 @@ Components: main
 Architectures: iphoneos-arm iphoneos-arm64
 EOF
 
-# Verify Release file exists
-if [ ! -s Release ]; then
-  echo "Error: Release file not found or empty" >&2
-  exit 1
-fi
+# Append checksums
+{
+  echo "MD5Sum:"
+  for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+    size=$(ls -l "$f" | awk '{print $5" "$9}')
+    md5=$(md5sum "$f" | awk '{print $1}')
+    echo " $md5 $size"
+  done
 
-# Append MD5 checksums
-echo "MD5Sum:" >> Release
-for f in Packages Packages.bz2 Packages.gz Packages.zst; do
-  size=$(ls -l "$f" | awk '{print $5,$9}')
-  md5=$(md5 -r "$f" | awk '{print $1}')
-  echo " $md5 $size" >> Release
-done
+  echo "SHA256:"
+  for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+    size=$(ls -l "$f" | awk '{print $5" "$9}')
+    sha=$(sha256sum "$f" | awk '{print $1}')
+    echo " $sha $size"
+  done
+} >> Release
 
-# Append SHA256 checksums
-echo "SHA256:" >> Release
-for f in Packages Packages.bz2 Packages.gz Packages.zst; do
-  size=$(ls -l "$f" | awk '{print $5,$9}')
-  sha256=$(shasum -a 256 "$f" | awk '{print $1}')
-  echo " $sha256 $size" >> Release
-done
-
-# Sign the Release file, producing an ASCII-armored detached signature
+# Sign Release file (detached ASCII)
 gpg --batch --yes --armor --detach-sign --output Release.asc Release
+echo "Signed Release -> Release.asc"
 
-echo "Repo updated successfully."
-
-# Force-add all .deb files explicitly (override .gitignore)
-git add -f debs/*.deb
-
-# Then stage all other changes (additions, deletions, modifications)
+# Git: integrate remote, stage all, commit, push
 git add -A .
-
-# Debug: list staged .deb files
-echo "Contents of debs directory:"
-ls -l debs
-echo "Staged .deb files for commit:"
-git diff --cached --name-only | grep '^debs/.*\.deb' || echo "  (none)"
-echo "Current git status:"
-git status --short
-
-# Always commit, even if no other changes
 git commit --allow-empty -m "Repo update on $(date -uR)"
-
-# Integrate remote changes to avoid push rejection
-git pull --rebase origin main
-
 git push origin main
+
+echo "Repo update complete."
+# Push all changes to GitHub
+git push https://github.com/zeroxjf/zeroxjf.github.io.git main

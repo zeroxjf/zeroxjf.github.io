@@ -45,6 +45,7 @@ else
 Origin: ZeroXJF Repo
 Label: ZeroXJF Repo
 Suite: stable
+Version: 1.0
 Architectures: iphoneos-arm iphoneos-arm64
 Components: main
 Description: zeroxjf's personal jailbreak repo

@@ -55,6 +55,12 @@ echo "Repo updated successfully."
 git add -A .
 git add -f debs/*.deb
 
+# Debug: list staged .deb files
+echo "Staged .deb files for commit:"
+git diff --cached --name-only | grep '^debs/.*\.deb' || echo "  (none)"
+echo "Current git status:"
+git status --short
+
 # Always commit, even if no other changes
 git commit --allow-empty -m "Repo update on $(date -uR)"
 git push origin main

@@ -53,9 +53,12 @@ echo "Repo updated successfully."
 
 # Stage all changes including debs
 git add -A .
-git add -f debs/*.deb
+# Force-add all files in debs directory
+git add -f -A debs
 
 # Debug: list staged .deb files
+echo "Contents of debs directory:"
+ls -l debs
 echo "Staged .deb files for commit:"
 git diff --cached --name-only | grep '^debs/.*\.deb' || echo "  (none)"
 echo "Current git status:"

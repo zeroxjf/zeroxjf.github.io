@@ -14,7 +14,7 @@ Description: Meet TypeMillennium, the prodigal son of TypeCentury. Adds a system
 Author: zeroxjf
 Name: TypeMillennium
 
-Package: com.zeroxjf.spoofgpt
+Package: com.zeroxjf.spoofgpt	
 Version: 1.0.0
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf

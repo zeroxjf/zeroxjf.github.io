@@ -9,7 +9,7 @@ set -euo pipefail
 rm -f Packages* Release Release.asc
 
 # Generate Packages index with full descriptions
-dpkg-scanpackages -m debs/ > Packages
+dpkg-scanpackages -m debs/ /dev/null > Packages
 
 # Compress Packages in multiple formats (overwrite)
 bzip2 -kf Packages
@@ -49,8 +49,6 @@ EOF
 gpg --batch --yes --armor --detach-sign --output Release.asc Release
 echo "Signed Release -> Release.asc"
 
-# Force-add .deb files to ensure updated packages are committed
-git add -f debs/*.deb
 # Git: integrate remote, stage all, commit, push
 git add -A .
 git commit --allow-empty -m "Repo update on $(date -uR)"

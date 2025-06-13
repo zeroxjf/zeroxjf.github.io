@@ -1,29 +1,61 @@
-rm -rf Packages Packages.bz2 Packages.gz Packages.zst Release
-dpkg-scanpackages -m debs > Packages
-bzip2 -k Packages
-gzip -k Packages
-zstd -19 Packages
-cp Release
-packages_size=$(ls -l Packages | awk '{print $5,$9}')
-packages_md5=$(md5 -r Packages | awk '{print $1}')
-packages_sha256=$(sha256sum Packages | awk '{print $1}')
-packagesbz2_size=$(ls -l Packages.bz2 | awk '{print $5,$9}')
-packagesbz2_md5=$(md5 -r Packages.bz2 | awk '{print $1}')
-packagesbz2_sha256=$(sha256sum Packages.bz2 | awk '{print $1}')
-packagesgz_size=$(ls -l Packages.gz | awk '{print $5,$9}')
-packagesgz_md5=$(md5 -r Packages.gz | awk '{print $1}')
-packagesgz_sha256=$(sha256sum Packages.gz | awk '{print $1}')
-packageszst_size=$(ls -l Packages.zst | awk '{print $5,$9}')
-packageszst_md5=$(md5 -r Packages.zst | awk '{print $1}')
-packageszst_sha256=$(sha256sum Packages.zst | awk '{print $1}')
+#!/usr/bin/env bash
+# Ensure script runs from its own directory
+cd "$(dirname "$0")"
+set -euo pipefail
+
+# Clean up any existing index, release, signature, and archive files
+rm -f Packages* Release Release.asc debs.tar.gz debs.tar.gz.asc
+
+# Generate Packages index in multiple formats
+dpkg-scanpackages -m debs/ > Packages
+bzip2 -kf Packages
+gzip -kf Packages
+zstd -19 -kf Packages
+echo "Generated Packages, Packages.bz2, Packages.gz, and Packages.zst"
+
+# Build a new Release file with metadata headers
+cat > Release <<EOF
+Origin:    ZeroXJF Repo
+Label:     ZeroXJF Repo
+Suite:     stable
+Codename:  zeroxjf
+Date:      $(date -uR)
+Components: main
+Architectures: iphoneos-arm iphoneos-arm64
+EOF
+
+# Verify Release file exists
+if [ ! -s Release ]; then
+  echo "Error: Release file not found or empty" >&2
+  exit 1
+fi
+
+# Append MD5 checksums
 echo "MD5Sum:" >> Release
-echo " $packages_md5 $packages_size" >> Release
-echo " $packagesbz2_md5 $packagesbz2_size" >> Release
-echo " $packagesgz_md5 $packagesgz_size" >> Release
-echo " $packageszst_md5 $packageszst_size" >> Release
+for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+  size=$(ls -l "$f" | awk '{print $5,$9}')
+  md5=$(md5 -r "$f" | awk '{print $1}')
+  echo " $md5 $size" >> Release
+done
+
+# Append SHA256 checksums
 echo "SHA256:" >> Release
-echo " $packages_sha256 $packages_size" >> Release
-echo " $packagesbz2_sha256 $packagesbz2_size" >> Release
-echo " $packagesgz_sha256 $packagesgz_size" >> Release
-echo " $packageszst_sha256 $packageszst_size" >> Release
-echo "Done"
+for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+  size=$(ls -l "$f" | awk '{print $5,$9}')
+  sha256=$(shasum -a 256 "$f" | awk '{print $1}')
+  echo " $sha256 $size" >> Release
+done
+
+# Sign the Release file, producing an ASCII-armored detached signature
+gpg --batch --yes --armor --detach-sign --output Release.asc Release
+
+echo "Repo updated successfully."
+
+# Stage all changes, including deletions and additions
+git add -A .
+if git commit -m "Repo update on $(date -uR)"; then
+  echo "Committed changes."
+else
+  echo "No changes to commit."
+fi
+git push origin main

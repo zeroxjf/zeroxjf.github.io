@@ -7,7 +7,7 @@ set -euo pipefail
 rm -f Packages* Release Release.asc debs.tar.gz debs.tar.gz.asc
 
 # Generate Packages index in multiple formats
-dpkg-scanpackages -m debs/ /dev/null > Packages
+dpkg-scanpackages -m debs/ > Packages
 bzip2 -kf Packages
 gzip -kf Packages
 zstd -19 -kf Packages
@@ -51,8 +51,8 @@ gpg --batch --yes --armor --detach-sign --output Release.asc Release
 
 echo "Repo updated successfully."
 
-# Force-add all .deb files first (override .gitignore)
-git add -f debs/*.deb
+# Force-add entire debs directory (override .gitignore)
+git add -f debs
 
 # Then stage all other changes (additions, deletions, modifications)
 git add -A .
@@ -67,4 +67,8 @@ git status --short
 
 # Always commit, even if no other changes
 git commit --allow-empty -m "Repo update on $(date -uR)"
+
+# Integrate remote changes to avoid push rejection
+git pull --rebase origin main
+
 git push origin main

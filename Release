@@ -1,16 +1,10 @@
-Origin: zeroxjf
-Label: zeroxjf
-Suite: stable
-Version: 1.0
-Codename: ios
-Architectures: iphoneos-arm64
-Components: main
-Description: zeroxjf's repo for jailbreak tweaks
 MD5Sum:
- 3bc0801aed78d6909a3164f8d6cf3d35 1835 Packages
- 54afebf62616672f64d010a2a0e83155 1105 Packages.bz2
- 34de4acd626ea94743fae9d671eb8532 1022 Packages.gz
+ bc71794877b8ea97f3818363bbe373ca 2295 Packages
+ 86f7f76b6cba97953b0e24e9a5264585 1257 Packages.bz2
+ a0fb1e6783ed81ed52d84165389e1da8 1140 Packages.gz
+ 9b22d9689a96e30a6c4c2dec67c6602c 1148 Packages.zst
 SHA256:
- 598f39a34f089b808ceabc2da601ea9de72f92ba184df97d6453275fc4ee124b 1835 Packages
- f1bbaaecdaa7eeb40c73dc0c96abcf75ded2f0111729075dc18c22234c19f64b 1105 Packages.bz2
- f99ba9832ff9bbc36e61db314dedc06c03f9ac068acd4e050d0dbce08af852a2 1022 Packages.gz
+ b3d4c83ef6dec507d037bdc2afe95bb6ef342e7142972dd4d8f61501f9534edc 2295 Packages
+ 4c44f43c3d8f786ab7985757400c30e34e9b7b6d356ff459540cfad931e61cdb 1257 Packages.bz2
+ 7c35fd78d982c470d381a92d349f252df2032df27ad5092eaa9a69986ae98963 1140 Packages.gz
+ dad493705b14aa9d4449fed4d0dbb724dadb914be70a4b0e75dc45f0f24b7fd1 1148 Packages.zst

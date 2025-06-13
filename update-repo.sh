@@ -45,8 +45,55 @@ else
 Origin: ZeroXJF Repo
 Label: ZeroXJF Repo
 Suite: stable
+Architectures: iphoneos-arm iphoneos-arm64
+Components: main
 Description: zeroxjf's personal jailbreak repo
 EOF
+
+  # — Append checksums to Release —
+  echo "MD5Sum:" >> "$OUTPUT_DIR/Release"
+  for f in Packages Packages.gz Packages.bz2 Packages.xz; do
+    if [[ -f "$OUTPUT_DIR/$f" ]]; then
+      # Determine file size (portable)
+      if stat -c%s "$OUTPUT_DIR/$f" >/dev/null 2>&1; then
+        size=$(stat -c%s "$OUTPUT_DIR/$f")
+      else
+        size=$(wc -c < "$OUTPUT_DIR/$f" | tr -d ' ')
+      fi
+      # Determine MD5 sum (portable)
+      if command -v md5sum >/dev/null 2>&1; then
+        sum=$(md5sum "$OUTPUT_DIR/$f" | awk '{print $1}')
+      elif command -v md5 >/dev/null 2>&1; then
+        sum=$(md5 -q "$OUTPUT_DIR/$f")
+      else
+        echo "Warning: no MD5 tool found" >&2
+        sum=""
+      fi
+      echo " $sum $size $f" >> "$OUTPUT_DIR/Release"
+    fi
+  done
+
+  echo "SHA256:" >> "$OUTPUT_DIR/Release"
+  for f in Packages Packages.gz Packages.bz2 Packages.xz; do
+    if [[ -f "$OUTPUT_DIR/$f" ]]; then
+      # Determine file size (portable)
+      if stat -c%s "$OUTPUT_DIR/$f" >/dev/null 2>&1; then
+        size=$(stat -c%s "$OUTPUT_DIR/$f")
+      else
+        size=$(wc -c < "$OUTPUT_DIR/$f" | tr -d ' ')
+      fi
+      # Determine SHA256 sum (portable)
+      if command -v sha256sum >/dev/null 2>&1; then
+        sum=$(sha256sum "$OUTPUT_DIR/$f" | awk '{print $1}')
+      elif command -v shasum >/dev/null 2>&1; then
+        sum=$(shasum -a 256 "$OUTPUT_DIR/$f" | awk '{print $1}')
+      else
+        echo "Warning: no SHA256 tool found" >&2
+        sum=""
+      fi
+      echo " $sum $size $f" >> "$OUTPUT_DIR/Release"
+    fi
+  done
 fi
 
 # — STEP 3: Sign the Release for authenticity —

@@ -19,7 +19,7 @@ Version: 1.0.0
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Installed-Size: 352
-Depends: mobilesubstrate (>= 0.9.5000)
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3)
 Filename: ./debs/com.zeroxjf.spoofgpt_1.0.0_iphoneos-arm64.deb
 Size: 15852
 MD5sum: 129026885ae2950acfcc35cda1939ae2

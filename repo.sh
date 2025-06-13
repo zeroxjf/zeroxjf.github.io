@@ -53,8 +53,8 @@ echo "Repo updated successfully."
 
  # Stage all changes
 git add -A .
-# Force-add debs directory to include .deb files ignored by .gitignore
-git add -f debs/
+# Force-add all .deb files in debs directory (ignoring .gitignore)
+git add -f debs/*.deb
 
 if git commit -m "Repo update on $(date -uR)"; then
   echo "Committed changes."

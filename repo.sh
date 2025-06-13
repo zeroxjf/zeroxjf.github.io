@@ -51,8 +51,11 @@ gpg --batch --yes --armor --detach-sign --output Release.asc Release
 
 echo "Repo updated successfully."
 
-# Stage all changes, including deletions and additions
+ # Stage all changes
 git add -A .
+# Force-add debs directory to include .deb files ignored by .gitignore
+git add -f debs/
+
 if git commit -m "Repo update on $(date -uR)"; then
   echo "Committed changes."
 else

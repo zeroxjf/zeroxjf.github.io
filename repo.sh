@@ -49,6 +49,8 @@ EOF
 gpg --batch --yes --armor --detach-sign --output Release.asc Release
 echo "Signed Release -> Release.asc"
 
+# Force-add .deb files to ensure updated packages are committed
+git add -f debs/*.deb
 # Git: integrate remote, stage all, commit, push
 git add -A .
 git commit --allow-empty -m "Repo update on $(date -uR)"

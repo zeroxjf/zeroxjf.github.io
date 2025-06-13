@@ -1,17 +1,21 @@
 Origin:    ZeroXJF Repo
 Label:     ZeroXJF Repo
 Suite:     stable
+Version:   20250613160808
 Codename:  zeroxjf
-Date:      Fri, 13 Jun 2025 16:08:03 +0000
+Date:      Fri, 13 Jun 2025 16:08:08 +0000
 Components: main
 Architectures: iphoneos-arm iphoneos-arm64
+Description: A repo for my tweaks
 MD5Sum:
  10afd0d6e9c6a9916f93f71e3a350721 1454 Packages
  3cfc9ad860026034f3e0349d1cfe023e 935 Packages.bz2
- a5c416e15a61b5b341779e9b9c0b4ac7 878 Packages.gz
+ ffd8e4ac14df773d7f26b511d0e11cc7 878 Packages.gz
+ b7e4b9a8c24fc1d0dd8be7001e3cd718 968 Packages.xz
  28e28d3c6f517755d1c24f5489ef4837 878 Packages.zst
 SHA256:
  4340d07bea6b3cb64b8aa590911939af5bf6e9b8136d62212dabc4920c852a85 1454 Packages
  5440b4f1fd98bc336c9d7a815bd167909a50f62397a8d7530fcd604e75f05a3a 935 Packages.bz2
- 6d7f1d39f7d5eafdf4fe8dd72b9ec108cabd4537249a1f6aaeaac0a6bb23448e 878 Packages.gz
+ 29b0983382c5c481951f08ea544c3b15bad398cc2580505bc395c6da4ccf5af9 878 Packages.gz
+ ea0045fc15aa41eb70c0d740cad6ebffac9f33109c5d91e782ae4c711bf112b2 968 Packages.xz
  5737ad9b91e793e60022f2d1a5a9d885cebfb2283834eb0ded2b19b1a3343a60 878 Packages.zst

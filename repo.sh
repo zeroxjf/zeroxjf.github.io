@@ -14,31 +14,34 @@ dpkg-scanpackages -m debs/ /dev/null > Packages
 # Compress Packages in multiple formats (overwrite)
 bzip2 -kf Packages
 gzip -kf Packages
+xz -kf Packages
 zstd -19 -kf Packages
-echo "Generated Packages, Packages.bz2, Packages.gz, and Packages.zst"
+echo "Generated Packages, Packages.bz2, Packages.gz, Packages.xz, and Packages.zst"
 
 # Build Release file with metadata
 cat > Release <<EOF
 Origin:    ZeroXJF Repo
 Label:     ZeroXJF Repo
 Suite:     stable
+Version:   $(date -u +%Y%m%d%H%M%S)
 Codename:  zeroxjf
 Date:      $(date -uR)
 Components: main
 Architectures: iphoneos-arm iphoneos-arm64
+Description: A repo for my tweaks
 EOF
 
 # Append checksums
 {
   echo "MD5Sum:"
-  for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+  for f in Packages Packages.bz2 Packages.gz Packages.xz Packages.zst; do
     size=$(ls -l "$f" | awk '{print $5" "$9}')
     md5=$(md5sum "$f" | awk '{print $1}')
     echo " $md5 $size"
   done
 
   echo "SHA256:"
-  for f in Packages Packages.bz2 Packages.gz Packages.zst; do
+  for f in Packages Packages.bz2 Packages.gz Packages.xz Packages.zst; do
     size=$(ls -l "$f" | awk '{print $5" "$9}')
     sha=$(sha256sum "$f" | awk '{print $1}')
     echo " $sha $size"

@@ -1,4 +1,5 @@
 Package: com.zeroxjf.bartype
+Name: TypeMillennium
 Version: 1.0.1
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
@@ -12,9 +13,9 @@ SHA256: 23cc15a75e087513dab7b213b7ae79056fac6f3bc7b05b0460cbbf07d137ff1f
 Section: Tweaks
 Description: Meet TypeMillennium, the prodigal son of TypeCentury. Adds a system-wide dynamic typing indicator just below the notch (Dynamic Island support coming soon) when someone is typing to you in iMessage. Tapping the indicator opens the conversation, or swipe to dismiss it. Works in the stock Messages app. No refunds. Currently supports iOS 16, tested on iPhone 13 Pro. More device and version support is on the way. I may need testers for other devices and iOS versions—please reach out to me on X (@zeroxjf) to report bugs or submit feedback.
 Author: zeroxjf
-Name: TypeMillennium
 
-Package: com.zeroxjf.spoofgpt	
+Package: com.zeroxjf.spoofgpt
+Name: SpoofGPT
 Version: 1.0.0
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
@@ -28,5 +29,3 @@ SHA256: 87c65b2b03dddbe3e35020f105ae04266530e2c456e7a44c875dff15932830db
 Section: Tweaks
 Description: Simple tweak to enable use of the last compatible ChatGPT app on versions < iOS 17.0. In order for this to work, you must be running ChatGPT version 1.2024.200! Check out Settings for a quick and easy way to download that version. I am still exploring ways to enable use of the most recent builds, but this is a good start for now.
 Author: zeroxjf
-Name: SpoofGPT
-

@@ -26,11 +26,46 @@
     a:hover {
       text-decoration: underline;
     }
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      margin: 0.5rem;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+    .button-link:hover {
+      background-color: #f0f0f0;
+    }
+    .button-link img {
+      height: 24px;
+      width: 24px;
+    }
   </style>
 </head>
 <body>
   <h1>Welcome to zeroxjf's Repo</h1>
   <p><a href="https://twitter.com/zeroxjf" target="_blank">Follow me on Twitter</a></p>
   <p><a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank">Buy me a coffee (or several)</a></p>
+  <p>
+    <a class="button-link" href="sileo://source/https://zeroxjf.github.io" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Icon_Sileo.png" alt="Sileo Logo">
+      Add to Sileo
+    </a>
+    <a class="button-link" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Cydia_logo.png" alt="Cydia Logo">
+      Add to Cydia
+    </a>
+    <a class="button-link" href="zbra://sources/add/https://zeroxjf.github.io" target="_blank">
+      <img src="https://getzbra.com/assets/img/icon.png" alt="Zebra Logo">
+      Add to Zebra
+    </a>
+  </p>
 </body>
 </html>

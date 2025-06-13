@@ -1,32 +1,18 @@
 Package: com.zeroxjf.bartype
-Version: 1.0.1
-Architecture: iphoneos-arm64
-Maintainer: zeroxjf
-Installed-Size: 680
-Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), ws.hbang.common (>= 2.0)
 Filename: debs/com.zeroxjf.bartype_1.0.1_iphoneos-arm64.deb
-Size: 161738
-MD5sum: 4c6c18ce2d92d5e10bd5d7713852c47b
-SHA1: 3ff5f77462b3a6343a3b04991e77d46400431134
-SHA256: f7b5852580750ead6f4e9cac1a7700117333132cdcc8173ccc25fb926ad8523f
-Section: Tweaks
-Description: Meet TypeMillennium, the prodigal son of TypeCentury. Adds a system-wide dynamic typing indicator just below the notch (Dynamic Island support coming soon) when someone is typing to you in iMessage. Tapping the indicator opens the conversation, or swipe to dismiss it. Works in the stock Messages app. No refunds. Currently supports iOS 16, tested on iPhone 13 Pro. More device and version support is on the way. I may need testers for other devices and iOS versions—please reach out to me on X (@zeroxjf) to report bugs or submit feedback. Warning: This tweak has only been tested on iOS 16; compatibility with iOS 14 or 15 is unconfirmed. If you experience success or failure on those versions, please submit feedback in Settings and include crash reports if applicable.
-Author: zeroxjf
+Size: 161794
+MD5sum: ff2a8170c818fd1849b80f9f4d3213cc
+SHA1: 57cc86f5b5c78510f2c45369d017a1bf821a0f19
+SHA256: e5b11a0c6a34e7e8d8f078f33e75462f86ac1895440647f8fe7efd7d1b11cb6d
+Description: Meet TypeMillennium, the prodigal son of TypeCentury. Adds a system-wide dynamic typing indicator just below the notch (Dynamic Island support coming soon) when someone is typing to you in iMessage. Tapping the indicator opens the conversation, or swipe to dismiss it. Works in the stock Messages app. Currently supports iOS 16, tested on iPhone 13 Pro. More device and version support is on the way. I may need testers for other devices and iOS versions—please reach out to me on X (@zeroxjf) to report bugs or submit feedback.
 Name: TypeMillennium
 
 Package: com.zeroxjf.spoofgpt
-Version: 1.0.0
-Architecture: iphoneos-arm64
-Maintainer: zeroxjf
-Installed-Size: 352
-Depends: mobilesubstrate (>= 0.9.5000)
 Filename: debs/com.zeroxjf.spoofgpt_1.0.0_iphoneos-arm64.deb
-Size: 15968
-MD5sum: 9d862d59578233e8c82f93e0c62be11e
-SHA1: 0ddb0090d90d39cb3e5aa76f70beb5cca4087cfa
-SHA256: 6d52290162bfbe495f55b1e72cdb4de95856a079fd2f3d035a678e497c93064e
-Section: Tweaks
-Description: Simple tweak to enable use of the last compatible ChatGPT app on versions < iOS 17.0. In order for this to work, you must be running ChatGPT version 1.2024.200! Check out Settings for a quick and easy way to download that version. I am still exploring ways to enable use of the most recent builds, but this is a good start for now. Warning: This tweak has only been tested on iOS 16; compatibility with iOS 14 or 15 is unconfirmed. If you experience success or failure on those versions, please submit feedback in Settings and include crash reports if applicable.
-Author: zeroxjf
+Size: 16060
+MD5sum: 3950da8fecceae1144b67bd66d2c9b8f
+SHA1: d524e0fdc765f168dba064a921b110a5fd3f0fe2
+SHA256: a2d2fa5744ff77f34237c944afc3c65b2a7a7a244b9ba13bc91e6100c3ef5925
+Description: Simple tweak to enable use of the last compatible ChatGPT app on versions < iOS 17.0. In order for this to work, you must be running ChatGPT version 1.2024.200! Check out Settings for a quick and easy way to download that version. I am still exploring ways to enable use of the most recent builds, but this is a good start for now.
 Name: SpoofGPT
 

@@ -7,7 +7,7 @@ set -euo pipefail
 rm -f Packages* Release Release.asc debs.tar.gz debs.tar.gz.asc
 
 # Generate Packages index in multiple formats
-dpkg-scanpackages -m debs/ > Packages
+dpkg-scanpackages -m debs/ /dev/null > Packages
 bzip2 -kf Packages
 gzip -kf Packages
 zstd -19 -kf Packages
@@ -51,10 +51,11 @@ gpg --batch --yes --armor --detach-sign --output Release.asc Release
 
 echo "Repo updated successfully."
 
-# Stage all changes including debs
+# Force-add all .deb files first (override .gitignore)
+git add -f debs/*.deb
+
+# Then stage all other changes (additions, deletions, modifications)
 git add -A .
-# Force-add all files in debs directory
-git add -f -A debs
 
 # Debug: list staged .deb files
 echo "Contents of debs directory:"

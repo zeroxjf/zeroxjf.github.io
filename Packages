@@ -15,16 +15,16 @@ Author: zeroxjf
 Name: TypeMillennium
 
 Package: com.zeroxjf.spoofgpt
-Version: 1.0.0
+Version: 1.0.1
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
-Installed-Size: 352
+Installed-Size: 508
 Depends: mobilesubstrate (>= 0.9.5000)
-Filename: debs/com.zeroxjf.spoofgpt_1.0.0_iphoneos-arm64.deb
-Size: 15922
-MD5sum: 942e503ca07b28c8fd5a7afd5f403f88
-SHA1: 6429dd0b183e282c53aa510fd923194367c1d6f6
-SHA256: 386ab61f932c105f71704c1b6146af922822888583ef91fabbf236f27343b4d7
+Filename: debs/com.zeroxjf.spoofgpt_1.0.1_iphoneos-arm64.deb
+Size: 153840
+MD5sum: 6206dc4467087c958bbbd6194fa5ae90
+SHA1: 9859ae4d64c0c11e09a139a087040f1bc4116016
+SHA256: b8b4eb4639f35924d16c1769d0b9e68d261ecf46e839f9b2a4a4e4640bc4aa23
 Section: Tweaks
 Description: Enable last compatible ChatGPT on iOS <17.0. Provides a simple tweak to run ChatGPT version 1.2024.200. Configuration via Settings for easy download of that version. Tested on iOS 16; compatibility with iOS 14 and 15 unconfirmed. Submit feedback or crash reports in Settings. Contact me on X (https://twitter.com/zeroxjf). Buy me a coffee: https://paypal.me/JohnFranks224
 Author: zeroxjf

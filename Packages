@@ -18,13 +18,13 @@ Package: com.zeroxjf.spoofgpt
 Version: 1.0.4
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
-Installed-Size: 364
+Installed-Size: 360
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader
 Filename: debs/com.zeroxjf.spoofgpt_1.0.4_iphoneos-arm64.deb
-Size: 25312
-MD5sum: 17d6649db924340768e95df267ee9d8d
-SHA1: 3037e1f91d0e481d52ec6c4816b383894c046488
-SHA256: 84f87daebe07b820dda4ad90319babd2e0f79218a10162322ccb0907960abdc7
+Size: 23226
+MD5sum: e24c36b13a2204ae667f818e247df6d8
+SHA1: d186a65cc4567411fe22334701169cb2d5844c8e
+SHA256: 9e85d649c571af003ac5bd9579e14b24885ae98eccafa5ca2da4520b0b5ad345
 Section: Tweaks
 Description: Enable voice chat and iOS15 preference-bundle fix
 Author: zeroxjf

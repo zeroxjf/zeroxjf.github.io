@@ -16,27 +16,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "SpoofGPT enables voice chat and works around the iOS 15 preference-bundle loader error by providing stub implementations for ARC return-value helpers. Configure it in Settings to choose your preferred ChatGPT version."
-        },
-        {
-          "class": "DepictionSubheaderView",
-          "useBoldText": true,
-          "useBottomMargin": false,
-          "title": "Features"
-        },
-        {
-          "class": "DepictionMarkdownView",
-          "markdown": "- Voice-chat toggle\n- iOS 15 compatibility stubs\n- Easy version selection in Settings"
-        },
-        {
-          "class": "DepictionSubheaderView",
-          "useBoldText": true,
-          "useBottomMargin": false,
-          "title": "Preferences"
-        },
-        {
-          "class": "DepictionMarkdownView",
-          "markdown": "- **Enable**: Turn SpoofGPT on/off.\n- **Observer**: Prevent double-observer crashes.\n- **Receipt**: Generate fake receipts.\n- **Sideloaded Apps**: Support for non-App Store apps."
+          "markdown": "v1.0.2 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf as that is the easiest way for me to gather feedback and communicate."
         },
         {
           "class": "DepictionSubheaderView",
@@ -46,7 +26,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "- May not work on all DRM systems.\n- Reports of occasional crashes on A12+."
+          "markdown": "- Chat function currently not working; I'm investigating a fix. Thanks for your patience."
         },
         {
           "class": "DepictionSeparatorView"
@@ -106,17 +86,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "- Stub ARC return-value helpers for iOS 15 support\n- Fix crash in preference bundle"
-        },
-        {
-          "class": "DepictionSubheaderView",
-          "useBoldText": true,
-          "useBottomMargin": false,
-          "title": "1.0.1"
-        },
-        {
-          "class": "DepictionMarkdownView",
-          "markdown": "- Initial public release"
+          "markdown": "- v1.0.2 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf."
         }
       ]
     }

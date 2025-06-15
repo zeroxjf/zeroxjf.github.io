@@ -15,18 +15,21 @@ Author: zeroxjf
 Name: TypeMillennium
 
 Package: com.zeroxjf.spoofgpt
-Version: 1.0.1
+Version: 1.0.2
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
-Installed-Size: 508
-Depends: mobilesubstrate (>= 0.9.5000)
-Filename: debs/com.zeroxjf.spoofgpt_1.0.1_iphoneos-arm64.deb
-Size: 153840
-MD5sum: 6206dc4467087c958bbbd6194fa5ae90
-SHA1: 9859ae4d64c0c11e09a139a087040f1bc4116016
-SHA256: b8b4eb4639f35924d16c1769d0b9e68d261ecf46e839f9b2a4a4e4640bc4aa23
+Installed-Size: 360
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader
+Filename: debs/com.zeroxjf.spoofgpt_1.0.2_iphoneos-arm64.deb
+Size: 20242
+MD5sum: c3d211ed65f571e0592acdca569fdc54
+SHA1: 8903667fd3c02ce3b90b11de7ab727a8f1ef3e0f
+SHA256: 776eba20bd6e5c0670f270fd318137320e1ab242cdf5a140c48d995ce7206d3a
 Section: Tweaks
-Description: Enable last compatible ChatGPT on iOS <17.0. Provides a simple tweak to run ChatGPT version 1.2024.200. Configuration via Settings for easy download of that version. Tested on iOS 16; compatibility with iOS 14 and 15 unconfirmed. Submit feedback or crash reports in Settings. Contact me on X (https://twitter.com/zeroxjf). Buy me a coffee: https://paypal.me/JohnFranks224
+Description: Enable voice chat and iOS15 preference-bundle fix
 Author: zeroxjf
+Depiction: https://pinpal.github.io/Sileo-Depiction-WebViews/?json=https://zeroxjf.github.io/depictions/SpoofGPT.json&name=SpoofGPT&dev=zeroxjf
+Icon: https://zeroxjf.github.io/icons/SpoofGPT.png
 Name: SpoofGPT
+Sileodepiction: https://zeroxjf.github.io/depictions/SpoofGPT.json
 

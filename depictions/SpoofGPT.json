@@ -16,7 +16,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "v1.0.2 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf as that is the easiest way for me to gather feedback and communicate."
+          "markdown": "v1.0.4 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf as that is the easiest way for me to gather feedback and communicate."
         },
         {
           "class": "DepictionSubheaderView",
@@ -45,7 +45,7 @@
         {
           "class": "DepictionTableTextView",
           "title": "Version",
-          "text": "1.0.2"
+          "text": "1.0.4"
         },
         {
           "class": "DepictionTableTextView",
@@ -82,11 +82,11 @@
           "class": "DepictionSubheaderView",
           "useBoldText": true,
           "useBottomMargin": false,
-          "title": "1.0.2"
+          "title": "1.0.4"
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "- v1.0.2 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf."
+          "markdown": "- v1.0.4 should enable voice chat and fix the preference bundle error for iOS 15 users. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf."
         }
       ]
     }

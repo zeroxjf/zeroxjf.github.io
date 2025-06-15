@@ -1,0 +1,124 @@
+{
+  "minVersion": "0.1",
+  "class": "DepictionTabView",
+  "tintColor": "#CBA0DD",
+  "headerImage": "https://yourdomain.com/images/SpoofGPTHeader.png",
+  "tabs": [
+    {
+      "tabname": "Details",
+      "class": "DepictionStackView",
+      "views": [
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": true,
+          "title": "Description"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "SpoofGPT enables voice chat and works around the iOS 15 preference-bundle loader error by providing stub implementations for ARC return-value helpers. Configure it in Settings to choose your preferred ChatGPT version."
+        },
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "Features"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Voice-chat toggle\n- iOS 15 compatibility stubs\n- Easy version selection in Settings"
+        },
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "Preferences"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- **Enable**: Turn SpoofGPT on/off.\n- **Observer**: Prevent double-observer crashes.\n- **Receipt**: Generate fake receipts.\n- **Sideloaded Apps**: Support for non-App Store apps."
+        },
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "Known Issues"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- May not work on all DRM systems.\n- Reports of occasional crashes on A12+."
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "Information"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Developer",
+          "text": "John Franks"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Version",
+          "text": "1.0.2"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Compatibility",
+          "text": "iOS 14.0 – 17.0"
+        },
+        {
+          "class": "DepictionSpacerView",
+          "spacing": 16
+        },
+        {
+          "class": "DepictionStackView",
+          "views": [
+            {
+              "class": "DepictionTableButtonView",
+              "title": "Source Code",
+              "action": "https://github.com/YourRepo/SpoofGPT",
+              "openExternal": true
+            }
+          ]
+        },
+        {
+          "class": "DepictionSpacerView",
+          "spacing": 16
+        }
+      ]
+    },
+    {
+      "tabname": "Change Log",
+      "class": "DepictionStackView",
+      "tintColor": "#CBA0DD",
+      "views": [
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "1.0.2"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Stub ARC return-value helpers for iOS 15 support\n- Fix crash in preference bundle"
+        },
+        {
+          "class": "DepictionSubheaderView",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "title": "1.0.1"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Initial public release"
+        }
+      ]
+    }
+  ]
+}

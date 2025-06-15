@@ -15,16 +15,16 @@ Author: zeroxjf
 Name: TypeMillennium
 
 Package: com.zeroxjf.spoofgpt
-Version: 1.0.4
+Version: 1.0.5
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
 Installed-Size: 360
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader
-Filename: debs/com.zeroxjf.spoofgpt_1.0.4_iphoneos-arm64.deb
-Size: 23226
-MD5sum: e24c36b13a2204ae667f818e247df6d8
-SHA1: d186a65cc4567411fe22334701169cb2d5844c8e
-SHA256: 9e85d649c571af003ac5bd9579e14b24885ae98eccafa5ca2da4520b0b5ad345
+Filename: debs/com.zeroxjf.spoofgpt_1.0.5_iphoneos-arm64.deb
+Size: 23260
+MD5sum: 09f67988e3f86ccef80d5f7ce059980a
+SHA1: 00ca8d44657cdc6921e6ab8a2dcdaad03cd202d2
+SHA256: 3a7ac9f8a3d0a33f1764393e7af89f63898d6df66d94c00e602556bd62a5f7a6
 Section: Tweaks
 Description: Enable voice chat and iOS15 preference-bundle fix
 Author: zeroxjf

@@ -21,12 +21,12 @@ Maintainer: zeroxjf <zeroxjf@repo>
 Installed-Size: 364
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader, firmware (>= 16.0), firmware (<< 17.0)
 Filename: debs/com.zeroxjf.spoofgpt_1.0.6_iphoneos-arm64.deb
-Size: 27290
-MD5sum: cf90a37005ef043f8c5fa07bb5ff6127
-SHA1: fd0753202d530638430fa726dd042d52f9c395bd
-SHA256: 87fc32a97976904c380ce605d71b1499d0ead5628b8d687ca87da7afbed7727d
+Size: 27262
+MD5sum: 9a8956c62c3636f5bc1d99f495c94a75
+SHA1: 91f50fc5cedd131ede2bc29134ba289b479adfde
+SHA256: 9ad824228eb30477d26cdb9d79bf887ca522623569f71b1ca33e8da81cbd50bd
 Section: Tweaks
-Description: Enable voice chat and iOS15 preference-bundle fix
+Description: Use ChatGPT app on unsupported iOS 16 versions
 Author: zeroxjf
 Depiction: https://pinpal.github.io/Sileo-Depiction-WebViews/?json=https://zeroxjf.github.io/depictions/SpoofGPT.json&name=SpoofGPT&dev=zeroxjf
 Icon: https://zeroxjf.github.io/icons/SpoofGPT.png

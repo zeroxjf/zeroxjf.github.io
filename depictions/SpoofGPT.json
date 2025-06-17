@@ -16,7 +16,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "v1.0.6 enables voice chat. This tweak now requires iOS 16.x (>= 16.0 and < 17.0). If you encounter issues, please reach out on Twitter @zeroxjf."
+          "markdown": "v1.0.6 should enable voice chat. iOS 15 support is less likely at this point, as the app itself was only ever built for iOS 16.1 onward. However, I am still investigating a workaround. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf as that is the easiest way for me to gather feedback and communicate."
         },
         {
           "class": "DepictionSubheaderView",
@@ -86,7 +86,7 @@
         },
         {
           "class": "DepictionMarkdownView",
-          "markdown": "v1.0.6 should enable voice chat. iOS 15 support is less likely at this point, as the app was only ever built for iOS 16.1 onward. However, I am still investigating a workaround. Also, it is no longer required to be on 1.2024.200. The latest compatible version (1.2025.140) is sufficient. If you encounter issues, please reach out on Twitter @zeroxjf as that is the easiest way for me to gather feedback and communicate."
+          "markdown": "v1.0.6 enables voice chat. This tweak now requires iOS 16.x (>= 16.0 and < 17.0). If you encounter issues, please reach out on Twitter @zeroxjf."
         }
       ]
     }

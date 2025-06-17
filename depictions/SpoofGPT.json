@@ -20,8 +20,8 @@
         },
         {
           "class": "DepictionSubheaderView",
-          "useBoldText": true,
-          "useBottomMargin": false,
+          "useBoldText": true
+          ,"useBottomMargin": false,
           "title": "Known Issues"
         },
         {

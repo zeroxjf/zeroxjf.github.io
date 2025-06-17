@@ -5,7 +5,7 @@
   "headerImage": "https://yourdomain.com/images/SpoofGPTHeader.png",
   "tabs": [
     {
-      "tabName": "Details",
+      "tabname": "Details",
       "class": "DepictionStackView",
       "views": [
         {
@@ -74,7 +74,7 @@
       ]
     },
     {
-      "tabName": "Change Log",
+      "tabname": "Change Log",
       "class": "DepictionStackView",
       "tintColor": "#CBA0DD",
       "views": [

@@ -97,19 +97,25 @@ EOF
   done
 fi
 
-# — STEP 3: Sign the Release for authenticity —
-echo "→ Signing Release (GPG key: $GPG_KEY)..."
-gpg --default-key "$GPG_KEY" \
-    --detach-sign --armor \
-    -o "$OUTPUT_DIR/Release.gpg" \
-    "$OUTPUT_DIR/Release"
+# — STEP 3: Sign the Release for authenticity (optional) —
+if command -v gpg >/dev/null 2>&1 && [[ "$GPG_KEY" != "YOUR_KEY_ID" ]]; then
+  echo "→ Signing Release (GPG key: $GPG_KEY)..."
+  gpg --default-key "$GPG_KEY" \
+      --detach-sign --armor \
+      -o "$OUTPUT_DIR/Release.gpg" \
+      "$OUTPUT_DIR/Release"
 
-gpg --default-key "$GPG_KEY" \
-    --clearsign \
-    -o "$OUTPUT_DIR/InRelease" \
-    "$OUTPUT_DIR/Release"
-
-echo "✓ Repository metadata updated and signed!"
+  gpg --default-key "$GPG_KEY" \
+      --clearsign \
+      -o "$OUTPUT_DIR/InRelease" \
+      "$OUTPUT_DIR/Release"
+  echo "✓ Repository metadata updated and signed!"
+else
+  echo "→ Skipping GPG signing (gpg not found or GPG_KEY not configured)"
+  # Create empty/placeholder files so repo still works unsigned
+  cp "$OUTPUT_DIR/Release" "$OUTPUT_DIR/InRelease"
+  echo "✓ Repository metadata updated (unsigned)"
+fi
 echo "Now upload the whole tree (./debs, ./dists, plus any icons/depictions) to your web host."
 
 # — STEP 4: Commit and push to Git —

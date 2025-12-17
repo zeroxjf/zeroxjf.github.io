@@ -1,6 +1,3 @@
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
-
 Origin: ZeroXJF Repo
 Label: ZeroXJF Repo
 Suite: stable
@@ -9,28 +6,12 @@ Architectures: iphoneos-arm iphoneos-arm64
 Components: main
 Description: zeroxjf's personal jailbreak repo
 MD5Sum:
- 06900ddf3a794d9521fd9e3f7ffb581a 1960 Packages
- e7722a47ac7837ac76c402e26457574a 1007 Packages.gz
- f25a3cf406ccfd79016eacbc7aef5324 1121 Packages.bz2
- 84e3aeaf58d90c457516a9f579f7a538 1088 Packages.xz
+ 30688c4889f737be9dcbcafe4a1c74b1 2390 Packages
+ 2c0c21bb8fa6f79c66ae69023a31e6fb 1135 Packages.gz
+ b286cad8e60d26604c37a5c501a40af9 1280 Packages.bz2
+ e2dd50ede83f43f96ffb5a6d803fa123 1212 Packages.xz
 SHA256:
- 711b1c2f05904f721c0f9d27798ec701061c8c6545f0276fd09fc850d9a720b0 1960 Packages
- 799160697ea225386566e691508f5601e719abac9b6eb4201dd0c2894eba1472 1007 Packages.gz
- c79384595df9e28b7af13152933558a54868db8fe6667b60d64f573b8a1093b1 1121 Packages.bz2
- 7101c674de18d3ad63e6c04b719fb5cca566740b081a067d168e6989d3aeb4f9 1088 Packages.xz
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEkmVhqGZuv7PhBgnhzMUjnn4ZN7UFAmhRgZEACgkQzMUjnn4Z
-N7XooRAAnJQZ8uJjCtY4IkPm5Qg0PBfBxk+QzctXPl8VYg2mtz90h9/8rX0bwXbS
-PaoRmmwplwCVl5d2fFBc9D7w9zStaMuAapdC4ZPC/JOo2n8R44wjCovkt5t29HjK
-Ye7Grk1mjpp8cLyuoBOM7wvB72+2/0ibALBroIXQghCnU/okBBoZiQGxfNi2f/uF
-aOofnGVOCzsJYnJvQCAxFLdToXl41R+mXuj1q9ovBln01fBOkDGHKtTK3oXlX2Nl
-SxaCc+HKwxGQZY5MsEYBtSYgLB0LD0zS89fqv6MP6Up9SQQDenYQYiQs+J6zOikp
-0GV0VSOZpad4mXeLaKI1izGpHPe/XLx8n8fnbXdMQ581DGT/ebjvVh9LqECpo3T+
-b8tbbQvdGmk5jrLgnwRXzr5hF+f86EXo++gyckQ8vNhFRlG9W8xk0gvjN9rGt1DC
-eDQlNBZp2vBadFBhLbQLB+ouiBCo6uUEYE+gdHCiv+2RwSiNNFV/saeTFzHG7O7r
-mivG8cEYwb8bQAOMj6CFYkv2UyAqSwETJnmZCCuqpjsHXbDN7F0MjaYe3sjR1C4F
-4WqhvRhP7Xe5fOF0wvLJGPK0pIpb8Ug+8u4Y1Vt6m+jQl6h+8IIESPJ6OCehqAKk
-6IOtqWancUVb2fqbXt7tTjApkuXzWqWtiX7pzZ1lLnRKt6AgRmg=
-=Umn0
------END PGP SIGNATURE-----
+ 8e0e59943882c549e8a22ece234f6351d5212b5474c047434ff7f4004bd4998c 2390 Packages
+ 0f2cbc285168c7ce2cc814e949e83427aa1d13fef776d32641283cd360f288a6 1135 Packages.gz
+ cc8c480436206def6143f5fa0102ab019c50f219210becd082b6129188a71acb 1280 Packages.bz2
+ c264aacee6c3059fa616860a091880ace7eb3b0eee2285f8de01f8e9a0576ee8 1212 Packages.xz

@@ -6,12 +6,12 @@ Architectures: iphoneos-arm iphoneos-arm64 iphoneos-arm64e
 Components: main
 Description: zeroxjf's personal jailbreak repo
 MD5Sum:
- ff37d42d9b67b230b6783103fe566bcb 2440 Packages
- 407f9aee4311479667eb4064bb9e4821 1183 Packages.gz
- 172c34607912a2cec74bd4c58a351cdf 1319 Packages.bz2
- d16fe603ed33ef0b48ec9ba05b6c9609 1272 Packages.xz
+ edcd4ec2c9be262e0abe4e7a0f7ba636 2440 Packages
+ 3b703945d9f57e39597d4a379a538403 1184 Packages.gz
+ 6b0e9d8dc9303daa67865420c8734a99 1315 Packages.bz2
+ cc6ccc4bc2ea6204c8a3de4144c626bd 1272 Packages.xz
 SHA256:
- 5cc5ef13ba2930891e7203afa1829a85c7fd630eba6866f3f96e8035c4e5b836 2440 Packages
- 587bf3546cbec53efccf3b51c83e5f3be4cf71574dcb4d81bd42cdfc28b0b061 1183 Packages.gz
- 497906ca4098f09c76a8ace3d8e17790e67285fff3147bbf6569dce0e42c3a44 1319 Packages.bz2
- 5c481e5dc1a56fb0989cce2cd12aa634e7625ad2323a09cc367621d9b4f7ed8c 1272 Packages.xz
+ 81057ccb84f583b3b7853c6625f1dd374c7df2a9b4d31d6149f3a49d32939210 2440 Packages
+ 9266a8cc5c3bf5b4e9fa1a49e3f117681a7d32d8c358eadd37acf66fac580a93 1184 Packages.gz
+ 7baeaa83e6ed4bc5a3b7814385fcec4643b263a399437dcac97882ef24aadb68 1315 Packages.bz2
+ 9b068a4dbbd4f471ca8c3ae8ac60c6605b948a5a82bb6751c40e5935d500dcf5 1272 Packages.xz

@@ -1,14 +1,14 @@
 Package: com.local.webkitcompat
-Version: 1.2.8
+Version: 1.2.9
 Architecture: iphoneos-arm64
 Maintainer: Local
 Installed-Size: 420
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3)
-Filename: debs/com.local.webkitcompat_1.2.8_iphoneos-arm64.deb
-Size: 31194
-MD5sum: 452e7101a36ce3097bfaadb70734bf3f
-SHA1: 1cadcdddb6ec8d5c21db9a97d3ed175cebce1e1b
-SHA256: b70792c707a2f6cbfe55d5cf6241cbe7f4540322b63183d90a127026dcb549ea
+Filename: debs/com.local.webkitcompat_1.2.9_iphoneos-arm64.deb
+Size: 31244
+MD5sum: 54d1421627df54c40d24472db5c75a7d
+SHA1: e419f340c5db73dd94e040673b37524fa5fba9fd
+SHA256: 9e672359a3f7a3a31ec12130fb0a2bca86625bf79c0717dcfde9a242ddc78b99
 Section: Tweaks
 Description: Fixes iOS 16.3 JavaScript compatibility issues by transpiling class static blocks to older syntax. Now includes extensive logging and settings to export debug logs.
 Author: Local

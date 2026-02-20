@@ -1,0 +1,118 @@
+{
+  "minVersion": "0.1",
+  "headerImage": "",
+  "tintColor": "#5B9FFF",
+  "tabs": [
+    {
+      "tabname": "Details",
+      "views": [
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "**By zeroxjf** | The prodigal son of TypeCentury\n\nA system-wide typing indicator for iMessage that shows a sleek banner just below the notch or Dynamic Island whenever someone is typing to you.\n\n**Tap** the banner to jump straight into the conversation, or **swipe** to dismiss. Configurable via Settings with a built-in test button.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Features"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- System-wide typing indicator banner below the status bar\n- Dynamic Island\u2013aware positioning\n- Tap banner to open the conversation\n- Swipe left or right to dismiss\n- Dark mode and light mode support\n- Multi-person typing detection (\u201cSeveral people are typing\u2026\u201d)\n- Test button in Settings to preview the banner\n- Enable/disable toggle with automatic respring",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "How It Works"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "TypeMillennium hooks into the Messages app to detect typing indicators from ChatKit. When someone starts typing, it writes the contact info to a shared file and posts a Darwin notification to SpringBoard, which displays a compact pill-shaped banner. The banner auto-dismisses after 3 seconds if the typing state goes stale.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Compatibility"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "iOS 16.0 \u2013 17.0 \u00a0|\u00a0 arm64 / arm64e \u00a0|\u00a0 Rootless (NathanLR)",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Credits"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Developer",
+          "text": "zeroxjf"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Inspired by",
+          "text": "TypeCentury"
+        },
+        {
+          "class": "DepictionTableButtonView",
+          "title": "Follow zeroxjf on Twitter",
+          "action": "https://x.com/zeroxjf",
+          "openExternal": true,
+          "tintColor": "#5B9FFF"
+        }
+      ],
+      "class": "DepictionStackView"
+    },
+    {
+      "tabname": "Changelog",
+      "views": [
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.1.1"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Fixed touch unresponsiveness caused by full-screen overlay window\n- Banner window now sized exactly to the pill \u2014 no more touch blocking",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.1.0"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- iOS 17.0 support (rootless / NathanLR)\n- Dynamic Island\u2013aware banner positioning\n- Test button in Settings to preview the banner\n- Improved UI with dark/light mode support",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.0.1"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Initial release\n- System-wide iMessage typing indicator with banner UI",
+          "useSpacing": true
+        }
+      ],
+      "class": "DepictionStackView"
+    }
+  ],
+  "class": "DepictionTabView"
+}

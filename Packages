@@ -25,18 +25,18 @@ Name: SpringCuts (Rootless)
 Sileodepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
 
 Package: com.zeroxjf.bartype
-Version: 1.0.1
+Version: 1.1.0
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
-Installed-Size: 680
-Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), ws.hbang.common (>= 2.0)
-Filename: debs/com.zeroxjf.bartype_1.0.1_iphoneos-arm64.deb
-Size: 161656
-MD5sum: 71654954890b7154a09f7d5a31cf87a7
-SHA1: aecf97efabe01c6c3c932e1b2101384822486ed4
-SHA256: ddbb92832cfba98cf6f3dd58d341e4224dbe082361d00f07bf8cf45901480521
+Installed-Size: 532
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), firmware (>= 14.0)
+Filename: debs/com.zeroxjf.bartype_1.1.0_iphoneos-arm64.deb
+Size: 28650
+MD5sum: 0f5b194e74d7ff034ecb195611f7259a
+SHA1: ffdcec85d34d8b80ac086bdcdfa8eceea82a0daa
+SHA256: d3fd047cbbe72a4ce7e15a529675f8ce6806ff4c9dd655f547ddd30d8006d798
 Section: Tweaks
-Description: System-wide dynamic typing indicator for Messages. Meet TypeMillennium, the prodigal son of TypeCentury. Adds a dynamic typing indicator just below the notch (Dynamic Island support coming soon). When someone is typing to you in Messages, the indicator appears. Tapping the indicator opens the conversation; swiping dismisses it. Works in the stock Messages app. Supports iOS 16 (tested on iPhone 13 Pro), with more device and version support on the way. Please submit feedback or crash reports via Settings or contact me on X (https://twitter.com/zeroxjf). Buy me a coffee: https://paypal.me/JohnFranks224
+Description: System-wide typing indicator for Messages. Shows a dynamic banner below the status bar when someone is typing. Tap to open the conversation, swipe to dismiss. Supports iOS 16-17.
 Author: zeroxjf
 Name: TypeMillennium
 

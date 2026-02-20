@@ -1,3 +1,23 @@
+Package: com.anthopak.springcuts-rootless
+Version: 1.5
+Architecture: iphoneos-arm64
+Maintainer: zeroxjf
+Depends: firmware (>=14.0), mobilesubstrate, firmware (>= 14.0)
+Filename: debs/com.anthopak.springcuts-rootless_1.5_arm64.deb
+Size: 33024
+MD5sum: 397187d86263746140d954f73178de2c
+SHA1: 53ff732ec6562cc2fd3ce08fffc75ac05edcbde8
+SHA256: f07e0e8961a928bda1bf2f63592833a6ada21217e3dc644c89d15cbba94abba7
+Section: Tweaks
+Homepage: https://repo.anthopak.dev
+Description: Run Shortcuts from SpringBoard (Support library, Activator actions, CLI command). Updated for NathanLR by zeroxjf: stripped arm64e slice (AMFI kills arm64e on CoreTrust-based semi-jailbreaks), re-signed arm64 with platform-application entitlements.
+Author: AnthoPak <anthopakdev@gmail.com>
+Depiction: https://repo.anthopak.dev/depiction/web/com.anthopak.springcuts-rootless.php
+Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png
+Moderndepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
+Name: SpringCuts (Rootless)
+Sileodepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
+
 Package: com.local.webkitcompat
 Version: 1.5.1
 Architecture: iphoneos-arm64

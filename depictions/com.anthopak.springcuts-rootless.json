@@ -1,0 +1,106 @@
+{
+  "minVersion": "0.1",
+  "headerImage": "",
+  "tintColor": "#FFB25B",
+  "tabs": [
+    {
+      "tabname": "Details",
+      "views": [
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "Run iOS Shortcuts from **SSH**, the **command line**, or **RemoteCompanion** \u2014 without ever opening the Shortcuts app.\n\nShortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run **fully and silently** in the background. Includes full RemoteCompanion integration with searchable shortcut picker and one-tap execution.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Usage"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "```\nspringcuts -r \"My Shortcut\"         # Run a shortcut\nspringcuts -r \"My Shortcut\" -i      # Run invisibly (no UI)\nspringcuts -r \"My Shortcut\" -w      # Wait for completion\nspringcuts -r \"My Shortcut\" -p \"X\"  # Run with text input\nspringcuts -l                        # List all shortcuts\nspringcuts -s                        # Stop running shortcuts\n```",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Compatibility"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "iOS 14.0 \u2013 17.0 \u00a0|\u00a0 arm64 / arm64e \u00a0|\u00a0 Rootless (NathanLR)",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Credits"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Original Tweak",
+          "text": "AnthoPak"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Rootless Patch",
+          "text": "zeroxjf"
+        },
+        {
+          "class": "DepictionTableButtonView",
+          "title": "Follow zeroxjf on Twitter",
+          "action": "https://x.com/zeroxjf",
+          "openExternal": true,
+          "tintColor": "#FFB25B"
+        }
+      ],
+      "class": "DepictionStackView"
+    },
+    {
+      "tabname": "Changelog",
+      "views": [
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.5.2"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- All shortcut execution routes through WorkflowKit \u2014 full multi-action support\n- RemoteCompanion uses Darwin notification dispatch instead of URL scheme\n- `-i` (invisible) and `-w` (wait) flags now functional\n- Refresh button works from within RemoteCompanion sandbox",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.5.1"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Shortcut list auto-populates on install\n- Pull-to-refresh and refresh button in RemoteCompanion\n- Direct shortcut firing from RemoteCompanion (bypasses broken TCP path)\n- Rootless path detection fix for SpringBoard",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.4"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Initial rootless port for NathanLR / iOS 17.0\n- Basic CLI and RemoteCompanion integration",
+          "useSpacing": true
+        }
+      ],
+      "class": "DepictionStackView"
+    }
+  ],
+  "class": "DepictionTabView"
+}

@@ -1,16 +1,22 @@
 Package: com.anthopak.springcuts-rootless
-Version: 1.7
+Version: 1.5.1
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Depends: firmware (>=14.0), mobilesubstrate, firmware (>= 14.0)
-Filename: debs/com.anthopak.springcuts-rootless_1.7_iphoneos-arm64.deb
-Size: 31340
-MD5sum: ed911fbfa1631e116655020e1de02ae3
-SHA1: dd39666be76807781e2d413ee6b2a6b3ee2cfb31
-SHA256: 00355b19ffb416dd3059d00e362c731b9e392a3d5c310bfb0481db384752f5b5
+Filename: debs/com.anthopak.springcuts-rootless_1.5.1_iphoneos-arm64.deb
+Size: 37160
+MD5sum: a7418d9e88d9566bbc97570ce407499d
+SHA1: 4b29ebf8de5bf07f9eea4bd12740e98a9a9c17a3
+SHA256: 4c7d000803d49edca601608f024f934257eb2865429a7cc4fc533ba632b494af
 Section: Tweaks
 Homepage: https://repo.anthopak.dev
-Description: Run Shortcuts from the command line or SSH. Updated for NathanLR by zeroxjf: rewrote CLI to query Shortcuts.sqlite directly and run shortcuts via URL scheme. v1.7: added SpringCutsRC.dylib that hooks RemoteCompanion app to load shortcuts in-process via SQLite (bypasses broken NSTask spawning).
+Description: Run Shortcuts from the command line, SSH, or RemoteCompanion. Patched for NathanLR on iOS 17.0 by zeroxjf.
+ .
+ What's new in 1.5.1:
+ - Shortcut list auto-populates on install; pull-to-refresh and refresh button in RemoteCompanion.
+ - Shortcuts fire directly from RemoteCompanion without the broken TCP path.
+ - NFC/button triggers run shortcuts headlessly via WorkflowKit — no Shortcuts app flash.
+ - Fixes rootless path detection so SpringBoard finds the springcuts binary.
 Author: AnthoPak <anthopakdev@gmail.com>
 Depiction: https://repo.anthopak.dev/depiction/web/com.anthopak.springcuts-rootless.php
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png

@@ -8,7 +8,7 @@
       "views": [
         {
           "class": "DepictionMarkdownView",
-          "markdown": "Run iOS Shortcuts from **SSH**, the **command line**, or **RemoteCompanion** \u2014 without ever opening the Shortcuts app.\n\nShortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run **fully and silently** in the background. Includes full RemoteCompanion integration with searchable shortcut picker and one-tap execution.",
+          "markdown": "**Patched by zeroxjf for NathanLR on iOS 17.0** | Original tweak by AnthoPak\n\nRun iOS Shortcuts from **SSH**, the **command line**, or **RemoteCompanion** \u2014 without ever opening the Shortcuts app.\n\nShortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run **fully and silently** in the background. Includes full RemoteCompanion integration with searchable shortcut picker and one-tap execution.",
           "useSpacing": true
         },
         {

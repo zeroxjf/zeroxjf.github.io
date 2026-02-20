@@ -1,16 +1,16 @@
 Package: com.anthopak.springcuts-rootless
-Version: 1.5
+Version: 1.6
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Depends: firmware (>=14.0), mobilesubstrate, firmware (>= 14.0)
-Filename: debs/com.anthopak.springcuts-rootless_1.5_arm64.deb
-Size: 33024
-MD5sum: 397187d86263746140d954f73178de2c
-SHA1: 53ff732ec6562cc2fd3ce08fffc75ac05edcbde8
-SHA256: f07e0e8961a928bda1bf2f63592833a6ada21217e3dc644c89d15cbba94abba7
+Filename: debs/com.anthopak.springcuts-rootless_1.6_arm64.deb
+Size: 27032
+MD5sum: 81930b7f1014c4853b8e9e51d11a954c
+SHA1: 8deae619447890eaf65af355bedcd4644fb43cdd
+SHA256: 89a244253123df738d3c0597153519c3f6a66e37b7c1b5df3390341b0a50f516
 Section: Tweaks
 Homepage: https://repo.anthopak.dev
-Description: Run Shortcuts from SpringBoard (Support library, Activator actions, CLI command). Updated for NathanLR by zeroxjf: stripped arm64e slice (AMFI kills arm64e on CoreTrust-based semi-jailbreaks), re-signed arm64 with platform-application entitlements.
+Description: Run Shortcuts from the command line or SSH. Updated for NathanLR by zeroxjf: rewrote CLI to query Shortcuts.sqlite directly and run shortcuts via URL scheme (NathanLR only injects into SpringBoard, not siriactionsd, so the original IPC-based CLI cannot work).
 Author: AnthoPak <anthopakdev@gmail.com>
 Depiction: https://repo.anthopak.dev/depiction/web/com.anthopak.springcuts-rootless.php
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png

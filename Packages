@@ -1,28 +1,32 @@
 Package: com.anthopak.springcuts-rootless
-Version: 1.5.1
+Version: 1.5.2
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
-Depends: firmware (>=14.0), mobilesubstrate, firmware (>= 14.0)
-Filename: debs/com.anthopak.springcuts-rootless_1.5.1_iphoneos-arm64.deb
-Size: 37160
-MD5sum: a7418d9e88d9566bbc97570ce407499d
-SHA1: 4b29ebf8de5bf07f9eea4bd12740e98a9a9c17a3
-SHA256: 4c7d000803d49edca601608f024f934257eb2865429a7cc4fc533ba632b494af
+Depends: firmware (>=14.0), mobilesubstrate
+Filename: debs/com.anthopak.springcuts-rootless_1.5.2_iphoneos-arm64.deb
+Size: 40124
+MD5sum: d3d90da43f273ba3d52758edc9382039
+SHA1: caed5a4729262a7b79739d547f8f417d45d8b367
+SHA256: f9f0c0a8b0c1ccf5fa900b61e67eedd96bebc1872d0f94e274e787025a48ddba
 Section: Tweaks
-Homepage: https://repo.anthopak.dev
-Description: Run Shortcuts from the command line, SSH, or RemoteCompanion. Patched for NathanLR on iOS 17.0 by zeroxjf.
+Homepage: https://zeroxjf.github.io
+Description: SpringCuts — run iOS Shortcuts from SSH, the command line, or RemoteCompanion without ever opening the Shortcuts app. Shortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run fully and silently. Patched for NathanLR / iOS 17.0 by zeroxjf.
+ .
+ What's new in 1.5.2:
+ - All shortcut execution now routes through WorkflowKit — full multi-action support
+ - RemoteCompanion dispatches via Darwin notification to SpringBoard instead of URL scheme
+ - -i flag (invisible/headless) and -w flag (wait) now functional
+ - Refresh button in RemoteCompanion now works from sandbox (delegates to SpringBoard)
  .
  What's new in 1.5.1:
- - Shortcut list auto-populates on install; pull-to-refresh and refresh button in RemoteCompanion.
- - Shortcuts fire directly from RemoteCompanion without the broken TCP path.
- - NFC/button triggers run shortcuts headlessly via WorkflowKit — no Shortcuts app flash.
- - Fixes rootless path detection so SpringBoard finds the springcuts binary.
-Author: AnthoPak <anthopakdev@gmail.com>
-Depiction: https://repo.anthopak.dev/depiction/web/com.anthopak.springcuts-rootless.php
+ - Shortcut list auto-populates on install; pull-to-refresh in RemoteCompanion
+ - Shortcuts fire directly from RemoteCompanion without the broken TCP path
+ - Fixes rootless path detection so SpringBoard finds the springcuts binary
+ .
+ Supported: iOS 14.0 - 17.0 (arm64 / arm64e, rootless)
+Author: zeroxjf
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png
-Moderndepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
 Name: SpringCuts (Rootless)
-Sileodepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
 
 Package: com.zeroxjf.bartype
 Version: 1.1.1

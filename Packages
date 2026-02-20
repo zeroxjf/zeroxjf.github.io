@@ -1,16 +1,16 @@
 Package: com.anthopak.springcuts-rootless
-Version: 1.6
+Version: 1.7
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Depends: firmware (>=14.0), mobilesubstrate, firmware (>= 14.0)
-Filename: debs/com.anthopak.springcuts-rootless_1.6_arm64.deb
-Size: 27032
-MD5sum: 81930b7f1014c4853b8e9e51d11a954c
-SHA1: 8deae619447890eaf65af355bedcd4644fb43cdd
-SHA256: 89a244253123df738d3c0597153519c3f6a66e37b7c1b5df3390341b0a50f516
+Filename: debs/com.anthopak.springcuts-rootless_1.7_iphoneos-arm64.deb
+Size: 31340
+MD5sum: ed911fbfa1631e116655020e1de02ae3
+SHA1: dd39666be76807781e2d413ee6b2a6b3ee2cfb31
+SHA256: 00355b19ffb416dd3059d00e362c731b9e392a3d5c310bfb0481db384752f5b5
 Section: Tweaks
 Homepage: https://repo.anthopak.dev
-Description: Run Shortcuts from the command line or SSH. Updated for NathanLR by zeroxjf: rewrote CLI to query Shortcuts.sqlite directly and run shortcuts via URL scheme (NathanLR only injects into SpringBoard, not siriactionsd, so the original IPC-based CLI cannot work).
+Description: Run Shortcuts from the command line or SSH. Updated for NathanLR by zeroxjf: rewrote CLI to query Shortcuts.sqlite directly and run shortcuts via URL scheme. v1.7: added SpringCutsRC.dylib that hooks RemoteCompanion app to load shortcuts in-process via SQLite (bypasses broken NSTask spawning).
 Author: AnthoPak <anthopakdev@gmail.com>
 Depiction: https://repo.anthopak.dev/depiction/web/com.anthopak.springcuts-rootless.php
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png

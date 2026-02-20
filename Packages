@@ -4,26 +4,43 @@ Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Depends: firmware (>=14.0), mobilesubstrate
 Filename: debs/com.anthopak.springcuts-rootless_1.5.2_iphoneos-arm64.deb
-Size: 40124
-MD5sum: d3d90da43f273ba3d52758edc9382039
-SHA1: caed5a4729262a7b79739d547f8f417d45d8b367
-SHA256: f9f0c0a8b0c1ccf5fa900b61e67eedd96bebc1872d0f94e274e787025a48ddba
+Size: 40240
+MD5sum: 6f8a8a6f5b90366702e2a3384bced0b1
+SHA1: b0aa99b105dddcbc23a6647998eafd4d1f8e179a
+SHA256: a740703766ab2188c630992ebab48d897f43e7a523726690209be1061afee6f1
 Section: Tweaks
 Homepage: https://zeroxjf.github.io
-Description: SpringCuts — run iOS Shortcuts from SSH, the command line, or RemoteCompanion without ever opening the Shortcuts app. Shortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run fully and silently. Patched for NathanLR / iOS 17.0 by zeroxjf.
+Description: Run iOS Shortcuts from SSH, the command line, or RemoteCompanion — without ever opening the Shortcuts app.
  .
- What's new in 1.5.2:
- - All shortcut execution now routes through WorkflowKit — full multi-action support
- - RemoteCompanion dispatches via Darwin notification to SpringBoard instead of URL scheme
- - -i flag (invisible/headless) and -w flag (wait) now functional
- - Refresh button in RemoteCompanion now works from sandbox (delegates to SpringBoard)
+ Shortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run fully and silently in the background. Includes full RemoteCompanion integration with searchable shortcut picker and one-tap execution.
  .
- What's new in 1.5.1:
- - Shortcut list auto-populates on install; pull-to-refresh in RemoteCompanion
- - Shortcuts fire directly from RemoteCompanion without the broken TCP path
- - Fixes rootless path detection so SpringBoard finds the springcuts binary
+ Usage:
+   springcuts -r "My Shortcut"         Run a shortcut
+   springcuts -r "My Shortcut" -i      Run invisibly (no UI)
+   springcuts -r "My Shortcut" -w      Run and wait for completion
+   springcuts -r "My Shortcut" -p "X"  Run with text input
+   springcuts -l                        List all shortcuts
+   springcuts -s                        Stop running shortcuts
  .
- Supported: iOS 14.0 - 17.0 (arm64 / arm64e, rootless)
+ -----------------------------------------------
+ Changelog
+ -----------------------------------------------
+ .
+ v1.5.2
+ ~ WorkflowKit headless execution for all shortcuts (full multi-action support)
+ ~ RemoteCompanion uses Darwin notification dispatch instead of URL scheme
+ ~ -i (invisible) and -w (wait) flags now functional
+ ~ Refresh button works from within RemoteCompanion sandbox
+ .
+ v1.5.1
+ ~ Shortcut list auto-populates on install
+ ~ Pull-to-refresh and refresh button in RemoteCompanion
+ ~ Direct shortcut firing from RemoteCompanion (bypasses broken TCP path)
+ ~ Rootless path detection fix for SpringBoard
+ .
+ -----------------------------------------------
+ iOS 14.0 - 17.0 | arm64 / arm64e | Rootless
+ Patched for NathanLR by zeroxjf
 Author: zeroxjf
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png
 Name: SpringCuts (Rootless)

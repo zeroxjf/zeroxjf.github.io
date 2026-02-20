@@ -31,10 +31,10 @@ Maintainer: zeroxjf <zeroxjf@repo>
 Installed-Size: 532
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), firmware (>= 14.0)
 Filename: debs/com.zeroxjf.bartype_1.1.0_iphoneos-arm64.deb
-Size: 28864
-MD5sum: eab3e7b72b92147ad06e5fe59adf13eb
-SHA1: b2f4efffff21074a20f5a3ef23b8b4485c2e471e
-SHA256: 72134c91a434c87e28460585bd0f01b6a8bf72bb1ee5f6f7c151d49ead3c8287
+Size: 28912
+MD5sum: ef78871b97eb82247b14831a508beeef
+SHA1: 46f6dc81e06b324cfb03039ac88fec0a0ffa4d9c
+SHA256: 8f3e8fa1d3e64dea21821d8ba64577b38ab7e7bf4733ef2a9b7cfa838bf00222
 Section: Tweaks
 Description: TypeMillennium — the prodigal son of TypeCentury. A system-wide typing indicator for iMessage that shows a sleek banner just below the notch or Dynamic Island whenever someone is typing to you. Tap the banner to jump straight into the conversation, or swipe to dismiss. Configurable via Settings with a built-in test button.
  .

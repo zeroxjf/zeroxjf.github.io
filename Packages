@@ -25,16 +25,16 @@ Name: SpringCuts (Rootless)
 Sileodepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
 
 Package: com.zeroxjf.bartype
-Version: 1.1.0
+Version: 1.1.1
 Architecture: iphoneos-arm64
 Maintainer: zeroxjf <zeroxjf@repo>
 Installed-Size: 532
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), firmware (>= 14.0)
-Filename: debs/com.zeroxjf.bartype_1.1.0_iphoneos-arm64.deb
-Size: 28912
-MD5sum: ef78871b97eb82247b14831a508beeef
-SHA1: 46f6dc81e06b324cfb03039ac88fec0a0ffa4d9c
-SHA256: 8f3e8fa1d3e64dea21821d8ba64577b38ab7e7bf4733ef2a9b7cfa838bf00222
+Filename: debs/com.zeroxjf.bartype_1.1.1_iphoneos-arm64.deb
+Size: 28416
+MD5sum: 761f59df13d80256a9fa7d51497c3082
+SHA1: 4e63201df3063c2293a84f2c269b3337196fb4eb
+SHA256: 52fcb582c795a45211ca6aef81476979c0effaf905042b2c24a9d5efab4d139c
 Section: Tweaks
 Description: TypeMillennium — the prodigal son of TypeCentury. A system-wide typing indicator for iMessage that shows a sleek banner just below the notch or Dynamic Island whenever someone is typing to you. Tap the banner to jump straight into the conversation, or swipe to dismiss. Configurable via Settings with a built-in test button.
  .

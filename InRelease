@@ -1,3 +1,6 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
 Origin: ZeroXJF Repo
 Label: ZeroXJF Repo
 Suite: stable
@@ -7,11 +10,27 @@ Components: main
 Description: zeroxjf's personal jailbreak repo
 MD5Sum:
  08d73efe7e499233e2fe781361f2edc1 3672 Packages
- 693f5858a42e150f49c4c4c581bca3b4 1675 Packages.gz
+ c2cc98f6695350a128c3ff32713f5ce7 1675 Packages.gz
  b7ec902e03c860e28abf1432c5fd831c 1815 Packages.bz2
  7633b5a0a464d41ace13030133b1d6e9 1740 Packages.xz
 SHA256:
  fa79dd01c7388b42f3a83ef046d0eeddaf86c9d01ade40602f5e5375e5ce8a86 3672 Packages
- 7575578a6e8d9af67deb7efe8a41485ce71ffe03f96db4efe268b1eda5149ac5 1675 Packages.gz
+ 0be08e4beef40fb53ef27b7e4ba6fc6283216b21216fad67a257316bb64be288 1675 Packages.gz
  ad551a69def5584a7a05d34fd7a172d95dd5f2d35c7964ee461567d3fc568407 1815 Packages.bz2
  6c2dd0d9f61d2f85971ee9f99160fcccca3c5b7dcaf52fca045fd0d552767f7e 1740 Packages.xz
+-----BEGIN PGP SIGNATURE-----
+
+iQIyBAEBCAAdFiEECUo+TETI6bfwoxseM8b56ZoyBFIFAmmX/EgACgkQM8b56Zoy
+BFKmVA/4hxDI0eFo5WVloEmUFnEWKHIIjsSvFXxisbAqnObIYQ+3DuQ41jmOM7b9
+Y2m6725vhEKLvn+PKoDzL2tNvZHC0c0wPUfO9JTrcsJ8boUgXmLxOUxgJGzm7xKs
++AnZIn2sPLLVJRhH6Uy1rAStWF3TMExv/FyMc27I/s8K3eTTKrKNwBUlRXxL0aHC
+qhbdjio7LiJ3g2/ByYrdKYWm29bm2NvCUuk7KfBrfUV57bH4M9ljcRCDwEuuX850
+sxzefc0VDeiMZPymc4RkHxeeZqTC6pxUGsdQsIMyXQUKJhsIk7/aiDigiUSUqjnh
+hpgePdMg1fvqEFanFVUs8RcKehzpfZqPk2UAcvDb0cmgN0C1EtzisRntnCpEat0/
+5pLF5zNWqb9UTzC3fRAa4m2MPrqczWF4zz7k/UOI8Nn6C6/pCr7w+Qi9VNsrhlUo
+Y5tGor5ogvrLzW6Hk4xgHGExDo8uxgw9/quJe5rNk2/aPvKBWhIDwaeHUCulWEs3
+ewl2f8NFJY2KdNHE4H6hWoNtsAh7BviNMIrbgxWk+v5vdJ1bvXeGvb2KP1xGPznB
+eEK6Nx56EbSQiG2kCxgH9OlPmufuyA+GpYBOzikRfjN+bFFkzmlkqMHOiPBjyEV8
+tqdd5FU80MC/6YYYqRjLaOrKJaRKD7NiYxyIXZFnN/uSthqwrw==
+=JJif
+-----END PGP SIGNATURE-----

@@ -21,7 +21,7 @@ fi
 # — CONFIGURATION — adjust these to your needs:
 DEB_DIR="debs"                  # where your .deb files live
 OUTPUT_DIR="."                  # place all metadata in repo root
-GPG_KEY="YOUR_KEY_ID"           # your GPG signing key ID
+GPG_KEY="DFCAC433302550D6"       # your GPG signing key ID
 
 # — PREPARE OUTPUT DIRECTORIES —
 # mkdir -p "$DIST_DIR/$COMPONENT/binary-$ARCH"
@@ -100,12 +100,13 @@ fi
 # — STEP 3: Sign the Release for authenticity (optional) —
 if command -v gpg >/dev/null 2>&1 && [[ "$GPG_KEY" != "YOUR_KEY_ID" ]]; then
   echo "→ Signing Release (GPG key: $GPG_KEY)..."
-  gpg --default-key "$GPG_KEY" \
+  rm -f "$OUTPUT_DIR/Release.gpg" "$OUTPUT_DIR/InRelease"
+  gpg --default-key "$GPG_KEY" --batch --pinentry-mode loopback \
       --detach-sign --armor \
       -o "$OUTPUT_DIR/Release.gpg" \
       "$OUTPUT_DIR/Release"
 
-  gpg --default-key "$GPG_KEY" \
+  gpg --default-key "$GPG_KEY" --batch --pinentry-mode loopback \
       --clearsign \
       -o "$OUTPUT_DIR/InRelease" \
       "$OUTPUT_DIR/Release"

@@ -18,38 +18,6 @@ Moderndepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springc
 Name: SpringCuts (Rootless)
 Sileodepiction: https://repo.anthopak.dev/depiction/native/com.anthopak.springcuts-rootless.json
 
-Package: com.local.webkitcompat
-Version: 1.5.1
-Architecture: iphoneos-arm64
-Maintainer: Local
-Installed-Size: 352
-Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3)
-Filename: debs/com.local.webkitcompat_1.5.1_iphoneos-arm64.deb
-Size: 18298
-MD5sum: 6d035c930f0411d8a78d7378bcfe4612
-SHA1: 8350f0f412c7e554c3860f42250741fffb7e2abd
-SHA256: b07d3dbf8688bdd2b18e9ae4125930d45fdebbe91f5174d6abba293219cfa647
-Section: Tweaks
-Description: Fixes iOS 16.3 JavaScript compatibility issues by transpiling class static blocks to older syntax. v1.3.7: VERBOSE LOGGING - logs every request, timing, headers, transpilation details to /var/mobile/Library/Preferences/com.local.webkitcompat.log
-Author: Local
-Name: WebKitCompat
-
-Package: com.local.webkitcompat.roothide
-Version: 1.1.0-roothide
-Architecture: iphoneos-arm64e
-Maintainer: Local
-Installed-Size: 204
-Depends: mobilesubstrate (>= 0.9.5000)
-Filename: debs/com.local.webkitcompat.roothide_1.1.0-roothide_iphoneos-arm64e.deb
-Size: 18946
-MD5sum: 1ce5e445d3319717230da68dd27bc570
-SHA1: ba7b42544103b1b0a966f16eb1ba6b806c0887e8
-SHA256: c9c1e8d87dc39c2dfb35015069b862e27a63827684546456de1bbeafbdeda648
-Section: Tweaks
-Description: Fixes iOS 16.3 JavaScript compatibility issues by transpiling class static blocks to older syntax. Also can simulate 16.3 on 16.4+ for testing. (ROOTHIDE VERSION)
-Author: Local
-Name: WebKitCompat (ROOTHIDE)
-
 Package: com.zeroxjf.bartype
 Version: 1.0.1
 Architecture: iphoneos-arm64

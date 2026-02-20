@@ -4,13 +4,23 @@ Architecture: iphoneos-arm64
 Maintainer: zeroxjf
 Depends: firmware (>=14.0), mobilesubstrate
 Filename: debs/com.anthopak.springcuts-rootless_1.5.2_iphoneos-arm64.deb
-Size: 40148
-MD5sum: c4b2b33b8daacda4ebdf66278992d43a
-SHA1: 0b2187e3223c996c0fccdadf0f3681abe7ddaadc
-SHA256: ed8fa4316128981a1ca8c9950290ea02ea203b1c67b8920e2043b33b46ef885a
+Size: 40268
+MD5sum: 23d91e1ac4172d1b9b7bd20381a78deb
+SHA1: 03ee15cb3d3817f67be7c9039d61fda2be32ce74
+SHA256: 738134322f269abb213427ea5b52dbc4ec675340bb1e2b72d83c9cbcf9d84496
 Section: Tweaks
 Homepage: https://zeroxjf.github.io
 Description: Run iOS Shortcuts from SSH, the command line, or RemoteCompanion without ever opening the Shortcuts app. Shortcuts execute headlessly via WorkflowKit in SpringBoard, so multi-action shortcuts run fully and silently.
+ .
+ Usage:
+   springcuts -r "My Shortcut"         Run a shortcut
+   springcuts -r "My Shortcut" -i      Run invisibly (no UI)
+   springcuts -r "My Shortcut" -w      Wait for completion
+   springcuts -r "My Shortcut" -p "X"  Run with text input
+   springcuts -l                        List all shortcuts
+   springcuts -s                        Stop running shortcuts
+ .
+ Changelog:
  .
  v1.5.2:
  - WorkflowKit headless execution (full multi-action support)
@@ -26,7 +36,7 @@ Description: Run iOS Shortcuts from SSH, the command line, or RemoteCompanion wi
  .
  iOS 14.0 - 17.0 | arm64 / arm64e | Rootless
  Original tweak by AnthoPak | Patched for NathanLR by zeroxjf
-Author: zeroxjf
+Author: AnthoPak <anthopakdev@gmail.com>
 Icon: https://repo.anthopak.dev/assets/com.anthopak.springcuts-rootless/icon.png
 Name: SpringCuts (Rootless)
 Sileodepiction: https://zeroxjf.github.io/depictions/com.anthopak.springcuts-rootless.json

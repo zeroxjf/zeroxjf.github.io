@@ -5,67 +5,540 @@
   <title>zeroxjf's Repo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 2.5rem 1.5rem 1.5rem;
       text-align: center;
-      padding: 2rem;
+      border-bottom: 1px solid #1a1a1a;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
     }
-    a {
-      display: inline-block;
-      margin: 0.5rem 0;
-      color: #007aff;
+
+    .header-links {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .header-links a {
+      color: #6eb5ff;
       text-decoration: none;
-      font-size: 1.1rem;
     }
-    a:hover {
-      text-decoration: underline;
+
+    .header-links a:hover { text-decoration: underline; }
+
+    .manager-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
     }
-    .button-link {
+
+    .manager-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      margin: 0.5rem;
-      background-color: #fff;
-      border: 1px solid #ccc;
+      gap: 0.4rem;
+      padding: 0.45rem 0.85rem;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
-      font-size: 1rem;
-      color: #333;
+      color: #ccc;
       text-decoration: none;
-      transition: background-color 0.2s ease;
+      font-size: 0.85rem;
+      transition: background 0.15s;
     }
-    .button-link:hover {
-      background-color: #f0f0f0;
+
+    .manager-btn:hover { background: #252525; }
+    .manager-btn img { height: 18px; width: 18px; }
+
+    .content { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 0.75rem;
     }
-    .button-link img {
-      height: 24px;
-      width: 24px;
+
+    /* Tweak cards */
+    .tweak-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .tweak-card {
+      background: #141414;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
+    }
+
+    .tweak-card:hover { background: #1a1a1a; border-color: #2a2a2a; }
+
+    .tweak-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tweak-card-info { flex: 1; min-width: 0; }
+
+    .tweak-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .tweak-desc {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tweak-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+
+    .tweak-version {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: #1e1e1e;
+      color: #999;
+    }
+
+    .tweak-arrow {
+      font-size: 0.85rem;
+      color: #444;
+      transition: transform 0.2s;
+    }
+
+    .tweak-card.open .tweak-arrow { transform: rotate(90deg); }
+
+    .tweak-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Depiction panel */
+    .depiction-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .tweak-card.open .depiction-panel { max-height: 3000px; }
+
+    .depiction-inner {
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid #1e1e1e;
+    }
+
+    /* Tabs */
+    .dep-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .dep-tab {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .dep-tab:hover { color: #aaa; }
+    .dep-tab.active { color: #fff; }
+
+    .dep-tab-content { display: none; }
+    .dep-tab-content.active { display: block; }
+
+    /* Depiction view classes */
+    .dep-header {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .dep-header:first-child { margin-top: 0; }
+
+    .dep-markdown {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .dep-markdown p { margin-bottom: 0.5rem; }
+    .dep-markdown p:last-child { margin-bottom: 0; }
+    .dep-markdown strong { color: #fff; font-weight: 600; }
+    .dep-markdown em { font-style: italic; }
+
+    .dep-markdown ul, .dep-markdown ol {
+      margin: 0.3rem 0 0.5rem 1.25rem;
+    }
+
+    .dep-markdown li {
+      margin-bottom: 0.25rem;
+    }
+
+    .dep-markdown code {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.82rem;
+      background: #1a1a1a;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      color: #ddd;
+    }
+
+    .dep-markdown pre {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+
+    .dep-markdown pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.8rem;
+      color: #bbb;
+    }
+
+    .dep-markdown a {
+      color: #6eb5ff;
+      text-decoration: none;
+    }
+
+    .dep-markdown a:hover { text-decoration: underline; }
+
+    .dep-separator {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      margin: 0.75rem 0;
+    }
+
+    .dep-table-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      font-size: 0.88rem;
+    }
+
+    .dep-table-title { color: #888; }
+    .dep-table-value { color: #ddd; font-weight: 500; }
+
+    .dep-button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: #fff;
+      transition: opacity 0.15s;
+    }
+
+    .dep-button:hover { opacity: 0.8; }
+
+    /* Loading */
+    .dep-loading {
+      text-align: center;
+      padding: 2rem;
+      color: #555;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 500px) {
+      .header { padding: 2rem 1rem 1.25rem; }
+      .content { padding: 1rem; }
+      .tweak-desc { display: none; }
+      .header-links { gap: 1rem; }
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to zeroxjf's Repo</h1>
-  <p><a href="https://twitter.com/zeroxjf" target="_blank">Follow me on Twitter</a></p>
-  <p><a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank">Buy me a coffee (or several)</a></p>
-  <p>
-    <a class="button-link" href="sileo://source/https://zeroxjf.github.io" target="_blank">
-      <img src="icons/sileo.png" alt="Sileo Logo">
-      Add to Sileo
-    </a>
-    <a class="button-link" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io" target="_blank">
-      <img src="icons/cydia.png" alt="Cydia Logo">
-      Add to Cydia
-    </a>
-    <a class="button-link" href="zbra://sources/add/https://zeroxjf.github.io" target="_blank">
-      <img src="icons/zebra.png" alt="Zebra Logo">
-      Add to Zebra
-    </a>
-  </p>
+  <div class="header">
+    <h1>zeroxjf's Repo</h1>
+    <div class="header-links">
+      <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
+      <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank">Donate</a>
+    </div>
+    <div class="manager-buttons">
+      <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io">
+        <img src="icons/sileo.png" alt="">Sileo
+      </a>
+      <a class="manager-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io">
+        <img src="icons/cydia.png" alt="">Cydia
+      </a>
+      <a class="manager-btn" href="zbra://sources/add/https://zeroxjf.github.io">
+        <img src="icons/zebra.png" alt="">Zebra
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-label">Packages</div>
+    <div class="tweak-list" id="tweak-list"></div>
+  </div>
+
+  <script>
+    const TWEAKS = [
+      {
+        name: 'TypeMillennium',
+        id: 'com.zeroxjf.bartype',
+        version: '1.1.1',
+        desc: 'System-wide iMessage typing indicator banner',
+        tint: '#5B9FFF',
+        depiction: 'depictions/com.zeroxjf.bartype.json'
+      },
+      {
+        name: 'Zoom5x',
+        id: 'com.zeroxjf.zoom5x',
+        version: '1.0.0',
+        desc: 'Adds a 5x zoom button to the Camera app',
+        tint: '#5B9FFF',
+        depiction: 'depictions/com.zeroxjf.zoom5x.json'
+      },
+      {
+        name: 'SpringCuts',
+        id: 'com.anthopak.springcuts-rootless',
+        version: '1.5.2',
+        desc: 'Run Shortcuts from SSH & CLI (rootless port)',
+        tint: '#FFB25B',
+        depiction: 'depictions/com.anthopak.springcuts-rootless.json'
+      }
+    ];
+
+    // Simple markdown-ish renderer (handles the subset used in depictions)
+    function renderMarkdown(md) {
+      // Code blocks first
+      let html = md.replace(/```([^`]*?)```/gs, (_, code) =>
+        '<pre><code>' + escapeHtml(code.trim()) + '</code></pre>'
+      );
+      // Inline code
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Bold
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic
+      html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+      // Links
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+      // Split into blocks by double newline
+      const blocks = html.split(/\n\n+/);
+      const out = [];
+
+      for (const block of blocks) {
+        const lines = block.split('\n');
+        // Check if it's a list
+        if (lines.every(l => l.match(/^- /) || l.trim() === '')) {
+          const items = lines.filter(l => l.startsWith('- ')).map(l => '<li>' + l.slice(2) + '</li>');
+          out.push('<ul>' + items.join('') + '</ul>');
+        } else if (block.startsWith('<pre>')) {
+          out.push(block);
+        } else {
+          // Treat single newlines as line items if they start with -
+          let processed = block;
+          if (processed.includes('\n- ')) {
+            const parts = processed.split('\n');
+            const result = [];
+            let listItems = [];
+            for (const p of parts) {
+              if (p.startsWith('- ')) {
+                listItems.push('<li>' + p.slice(2) + '</li>');
+              } else {
+                if (listItems.length) {
+                  result.push('<ul>' + listItems.join('') + '</ul>');
+                  listItems = [];
+                }
+                result.push('<p>' + p + '</p>');
+              }
+            }
+            if (listItems.length) result.push('<ul>' + listItems.join('') + '</ul>');
+            out.push(result.join(''));
+          } else {
+            out.push('<p>' + processed.replace(/\n/g, '<br>') + '</p>');
+          }
+        }
+      }
+      return out.join('');
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderDepictionView(view, tint) {
+      switch (view.class) {
+        case 'DepictionHeaderView':
+          return `<div class="dep-header">${escapeHtml(view.title)}</div>`;
+
+        case 'DepictionMarkdownView':
+          return `<div class="dep-markdown">${renderMarkdown(view.markdown)}</div>`;
+
+        case 'DepictionSeparatorView':
+          return '<hr class="dep-separator">';
+
+        case 'DepictionTableTextView':
+          return `<div class="dep-table-row">
+            <span class="dep-table-title">${escapeHtml(view.title)}</span>
+            <span class="dep-table-value">${escapeHtml(view.text)}</span>
+          </div>`;
+
+        case 'DepictionTableButtonView':
+          const color = view.tintColor || tint || '#6eb5ff';
+          return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank"
+            style="background:${color}22; color:${color}">${escapeHtml(view.title)}</a>`;
+
+        default:
+          return '';
+      }
+    }
+
+    function renderDepiction(data) {
+      const tint = data.tintColor || '#6eb5ff';
+      const tabs = data.tabs || [];
+
+      let tabsHtml = '<div class="dep-tabs">';
+      let contentsHtml = '';
+
+      tabs.forEach((tab, i) => {
+        const active = i === 0 ? ' active' : '';
+        tabsHtml += `<button class="dep-tab${active}" data-tab="${i}"
+          style="${i === 0 ? 'border-bottom-color:' + tint : ''}">${escapeHtml(tab.tabname)}</button>`;
+
+        const views = (tab.views || []).map(v => renderDepictionView(v, tint)).join('');
+        contentsHtml += `<div class="dep-tab-content${active}" data-tab="${i}">${views}</div>`;
+      });
+
+      tabsHtml += '</div>';
+      return tabsHtml + contentsHtml;
+    }
+
+    // Cache fetched depictions
+    const depictionCache = {};
+
+    async function loadDepiction(tweakId, depUrl, container, tint) {
+      if (depictionCache[tweakId]) {
+        container.innerHTML = renderDepiction(depictionCache[tweakId]);
+        bindTabs(container, tint);
+        return;
+      }
+
+      container.innerHTML = '<div class="dep-loading">Loading...</div>';
+
+      try {
+        const resp = await fetch(depUrl);
+        const data = await resp.json();
+        depictionCache[tweakId] = data;
+        container.innerHTML = renderDepiction(data);
+        bindTabs(container, tint);
+      } catch {
+        container.innerHTML = '<div class="dep-loading">Failed to load depiction</div>';
+      }
+    }
+
+    function bindTabs(container, tint) {
+      container.querySelectorAll('.dep-tab').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const idx = btn.dataset.tab;
+          container.querySelectorAll('.dep-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.borderBottomColor = 'transparent';
+          });
+          container.querySelectorAll('.dep-tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          btn.style.borderBottomColor = tint;
+          container.querySelector(`.dep-tab-content[data-tab="${idx}"]`).classList.add('active');
+        });
+      });
+    }
+
+    // Build the tweak list
+    const list = document.getElementById('tweak-list');
+
+    TWEAKS.forEach(tweak => {
+      const card = document.createElement('div');
+      card.className = 'tweak-card';
+      card.innerHTML = `
+        <div class="tweak-card-top">
+          <div class="tweak-card-info">
+            <div class="tweak-name">${escapeHtml(tweak.name)}</div>
+            <div class="tweak-desc">${escapeHtml(tweak.desc)}</div>
+          </div>
+          <div class="tweak-meta">
+            <span class="tweak-version">${tweak.version}</span>
+            <span class="tweak-dot" style="background:${tweak.tint}"></span>
+            <span class="tweak-arrow">&#x203A;</span>
+          </div>
+        </div>
+        <div class="depiction-panel">
+          <div class="depiction-inner"></div>
+        </div>
+      `;
+
+      card.addEventListener('click', e => {
+        if (e.target.closest('.dep-tab, .dep-button, a')) return;
+        const isOpen = card.classList.contains('open');
+        // Close all others
+        document.querySelectorAll('.tweak-card.open').forEach(c => c.classList.remove('open'));
+        if (!isOpen) {
+          card.classList.add('open');
+          const inner = card.querySelector('.depiction-inner');
+          if (!inner.children.length) {
+            loadDepiction(tweak.id, tweak.depiction, inner, tweak.tint);
+          }
+        }
+      });
+
+      list.appendChild(card);
+    });
+  </script>
 </body>
 </html>

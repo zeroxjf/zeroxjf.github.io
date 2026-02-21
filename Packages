@@ -78,3 +78,21 @@ Author: zeroxjf
 Name: TypeMillennium
 Sileodepiction: https://zeroxjf.github.io/depictions/com.zeroxjf.bartype.json
 
+Package: com.zeroxjf.zoom5x
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Maintainer: zeroxjf
+Installed-Size: 168
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 14.0)
+Filename: debs/com.zeroxjf.zoom5x_1.0.0_iphoneos-arm64.deb
+Size: 5090
+MD5sum: 07f2b713977190dadf96bf8b93b53bfd
+SHA1: da08e34dbf8444264d85bd8a6a16989d7dd2e204
+SHA256: 4e830e893ad5a5c38889b3bb9f5d113d43e228ddab39ce5841a8481028761f44
+Section: Tweaks
+Homepage: https://zeroxjf.github.io
+Description: Adds a 5x zoom button to the Camera app zoom platter, matching the look and feel of the native 0.5x, 1x, 2x, 3x buttons. On iPhone 15 Pro Max (5x optical), this is a no-op since 5x already exists natively. On iPhone 14 Pro, 15 Pro, and earlier, the 5x is digital zoom.
+Author: zeroxjf
+Name: Zoom5x
+Sileodepiction: https://zeroxjf.github.io/depictions/com.zeroxjf.zoom5x.json
+

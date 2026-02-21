@@ -1,0 +1,89 @@
+{
+  "minVersion": "0.1",
+  "headerImage": "",
+  "tintColor": "#5B9FFF",
+  "tabs": [
+    {
+      "tabname": "Details",
+      "views": [
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "**By zeroxjf** | 5x zoom for every iPhone\n\nAdds a **5x** zoom button to the Camera app, sitting right alongside the native 0.5x, 1x, 2x, and 3x buttons in the zoom platter. Tap it to jump straight to 5x zoom.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "How It Works"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "Zoom5x hooks into CameraUI.framework's zoom control configuration and injects a `CAMZoomPoint` into the zoom points array at the correct sorted position. The button, label, haptics, dial snapping, and tap handling are all handled by Apple's native code \u2014 the tweak just adds one more point to the list.\n\nThe tweak dynamically reads the device's actual-to-display zoom factor ratio from the existing zoom points and computes the correct AVFoundation videoZoomFactor for the 5x button. This means it works on any device regardless of the internal zoom factor scale.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Important Notes"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- **iPhone 15 Pro Max** (5x optical): The tweak is a no-op \u2014 5x already exists natively.\n- **iPhone 14 Pro / 15 Pro** (3x optical): The 5x button uses **digital zoom** beyond the 3x telephoto lens. Image quality will be reduced compared to an optical 5x.\n- **iPhone 14 and earlier** (no telephoto or 2x telephoto): Same as above \u2014 5x is digital zoom.\n- The 15x max-zoom button (digital) is preserved and unaffected.",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Compatibility"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "iOS 14.0 \u2013 17.0 \u00a0|\u00a0 arm64 / arm64e \u00a0|\u00a0 Rootless (NathanLR)",
+          "useSpacing": true
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "class": "DepictionHeaderView",
+          "title": "Credits"
+        },
+        {
+          "class": "DepictionTableTextView",
+          "title": "Developer",
+          "text": "zeroxjf"
+        },
+        {
+          "class": "DepictionTableButtonView",
+          "title": "Follow zeroxjf on Twitter",
+          "action": "https://x.com/zeroxjf",
+          "openExternal": true,
+          "tintColor": "#5B9FFF"
+        }
+      ],
+      "class": "DepictionStackView"
+    },
+    {
+      "tabname": "Changelog",
+      "views": [
+        {
+          "class": "DepictionHeaderView",
+          "title": "1.0.0"
+        },
+        {
+          "class": "DepictionMarkdownView",
+          "markdown": "- Initial release\n- Adds 5x zoom button to Camera app zoom platter\n- Dynamically computes correct AVFoundation zoom factor per device\n- Maintains sorted zoom point order for proper dial/piecewise mapping\n- Supports both continuous zoom and selection-only zoom modes",
+          "useSpacing": true
+        }
+      ],
+      "class": "DepictionStackView"
+    }
+  ],
+  "class": "DepictionTabView"
+}

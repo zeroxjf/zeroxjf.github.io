@@ -293,11 +293,69 @@
       font-size: 0.85rem;
     }
 
+    /* Detail view */
+    .detail-view { display: none; }
+    .detail-view.active { display: block; }
+    .list-view.hidden { display: none; }
+
+    .detail-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #6eb5ff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .detail-back:hover { text-decoration: underline; }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .detail-version {
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      background: #1e1e1e;
+      color: #999;
+    }
+
+    .detail-desc {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: -1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .detail-depiction {
+      background: #141414;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
     @media (max-width: 500px) {
       .header { padding: 2rem 1rem 1.25rem; }
       .content { padding: 1rem; }
       .tweak-desc { display: none; }
       .header-links { gap: 1rem; }
+      .detail-title { font-size: 1.2rem; }
     }
   </style>
 </head>
@@ -322,8 +380,11 @@
   </div>
 
   <div class="content">
-    <div class="section-label">Packages</div>
-    <div class="tweak-list" id="tweak-list"></div>
+    <div class="list-view" id="list-view">
+      <div class="section-label">Packages</div>
+      <div class="tweak-list" id="tweak-list"></div>
+    </div>
+    <div class="detail-view" id="detail-view"></div>
   </div>
 
   <script>
@@ -331,6 +392,7 @@
       {
         name: 'TypeMillennium',
         id: 'com.zeroxjf.bartype',
+        slug: 'typemillennium',
         version: '1.1.1',
         desc: 'System-wide iMessage typing indicator banner',
         tint: '#5B9FFF',
@@ -339,6 +401,7 @@
       {
         name: 'Zoom5x',
         id: 'com.zeroxjf.zoom5x',
+        slug: 'zoom5x',
         version: '1.0.0',
         desc: 'Adds a 5x zoom button to the Camera app',
         tint: '#5B9FFF',
@@ -347,6 +410,7 @@
       {
         name: 'SpringCuts',
         id: 'com.anthopak.springcuts-rootless',
+        slug: 'springcuts',
         version: '1.5.2',
         desc: 'Run Shortcuts from SSH & CLI (rootless port)',
         tint: '#FFB25B',
@@ -354,56 +418,44 @@
       }
     ];
 
-    // Simple markdown-ish renderer (handles the subset used in depictions)
+    const tweakBySlug = {};
+    TWEAKS.forEach(t => { tweakBySlug[t.slug] = t; });
+
+    // --- Markdown renderer ---
     function renderMarkdown(md) {
-      // Code blocks first
       let html = md.replace(/```([^`]*?)```/gs, (_, code) =>
         '<pre><code>' + escapeHtml(code.trim()) + '</code></pre>'
       );
-      // Inline code
       html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-      // Bold
       html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      // Italic
       html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
-      // Links
       html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-      // Split into blocks by double newline
       const blocks = html.split(/\n\n+/);
       const out = [];
-
       for (const block of blocks) {
         const lines = block.split('\n');
-        // Check if it's a list
         if (lines.every(l => l.match(/^- /) || l.trim() === '')) {
           const items = lines.filter(l => l.startsWith('- ')).map(l => '<li>' + l.slice(2) + '</li>');
           out.push('<ul>' + items.join('') + '</ul>');
         } else if (block.startsWith('<pre>')) {
           out.push(block);
-        } else {
-          // Treat single newlines as line items if they start with -
-          let processed = block;
-          if (processed.includes('\n- ')) {
-            const parts = processed.split('\n');
-            const result = [];
-            let listItems = [];
-            for (const p of parts) {
-              if (p.startsWith('- ')) {
-                listItems.push('<li>' + p.slice(2) + '</li>');
-              } else {
-                if (listItems.length) {
-                  result.push('<ul>' + listItems.join('') + '</ul>');
-                  listItems = [];
-                }
-                result.push('<p>' + p + '</p>');
-              }
+        } else if (block.includes('\n- ')) {
+          const parts = block.split('\n');
+          const result = [];
+          let listItems = [];
+          for (const p of parts) {
+            if (p.startsWith('- ')) {
+              listItems.push('<li>' + p.slice(2) + '</li>');
+            } else {
+              if (listItems.length) { result.push('<ul>' + listItems.join('') + '</ul>'); listItems = []; }
+              result.push('<p>' + p + '</p>');
             }
-            if (listItems.length) result.push('<ul>' + listItems.join('') + '</ul>');
-            out.push(result.join(''));
-          } else {
-            out.push('<p>' + processed.replace(/\n/g, '<br>') + '</p>');
           }
+          if (listItems.length) result.push('<ul>' + listItems.join('') + '</ul>');
+          out.push(result.join(''));
+        } else {
+          out.push('<p>' + block.replace(/\n/g, '<br>') + '</p>');
         }
       }
       return out.join('');
@@ -413,28 +465,24 @@
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    // --- Depiction renderer ---
     function renderDepictionView(view, tint) {
       switch (view.class) {
         case 'DepictionHeaderView':
           return `<div class="dep-header">${escapeHtml(view.title)}</div>`;
-
         case 'DepictionMarkdownView':
           return `<div class="dep-markdown">${renderMarkdown(view.markdown)}</div>`;
-
         case 'DepictionSeparatorView':
           return '<hr class="dep-separator">';
-
         case 'DepictionTableTextView':
           return `<div class="dep-table-row">
             <span class="dep-table-title">${escapeHtml(view.title)}</span>
             <span class="dep-table-value">${escapeHtml(view.text)}</span>
           </div>`;
-
         case 'DepictionTableButtonView':
           const color = view.tintColor || tint || '#6eb5ff';
           return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank"
             style="background:${color}22; color:${color}">${escapeHtml(view.title)}</a>`;
-
         default:
           return '';
       }
@@ -443,44 +491,17 @@
     function renderDepiction(data) {
       const tint = data.tintColor || '#6eb5ff';
       const tabs = data.tabs || [];
-
       let tabsHtml = '<div class="dep-tabs">';
       let contentsHtml = '';
-
       tabs.forEach((tab, i) => {
         const active = i === 0 ? ' active' : '';
         tabsHtml += `<button class="dep-tab${active}" data-tab="${i}"
           style="${i === 0 ? 'border-bottom-color:' + tint : ''}">${escapeHtml(tab.tabname)}</button>`;
-
         const views = (tab.views || []).map(v => renderDepictionView(v, tint)).join('');
         contentsHtml += `<div class="dep-tab-content${active}" data-tab="${i}">${views}</div>`;
       });
-
       tabsHtml += '</div>';
       return tabsHtml + contentsHtml;
-    }
-
-    // Cache fetched depictions
-    const depictionCache = {};
-
-    async function loadDepiction(tweakId, depUrl, container, tint) {
-      if (depictionCache[tweakId]) {
-        container.innerHTML = renderDepiction(depictionCache[tweakId]);
-        bindTabs(container, tint);
-        return;
-      }
-
-      container.innerHTML = '<div class="dep-loading">Loading...</div>';
-
-      try {
-        const resp = await fetch(depUrl);
-        const data = await resp.json();
-        depictionCache[tweakId] = data;
-        container.innerHTML = renderDepiction(data);
-        bindTabs(container, tint);
-      } catch {
-        container.innerHTML = '<div class="dep-loading">Failed to load depiction</div>';
-      }
     }
 
     function bindTabs(container, tint) {
@@ -500,9 +521,63 @@
       });
     }
 
-    // Build the tweak list
+    // --- Depiction cache & loader ---
+    const depictionCache = {};
+
+    async function fetchDepiction(tweak) {
+      if (depictionCache[tweak.id]) return depictionCache[tweak.id];
+      const resp = await fetch(tweak.depiction);
+      const data = await resp.json();
+      depictionCache[tweak.id] = data;
+      return data;
+    }
+
+    // --- Views ---
+    const listView = document.getElementById('list-view');
+    const detailView = document.getElementById('detail-view');
     const list = document.getElementById('tweak-list');
 
+    function showList() {
+      listView.classList.remove('hidden');
+      detailView.classList.remove('active');
+      detailView.innerHTML = '';
+      document.title = "zeroxjf's Repo";
+    }
+
+    async function showDetail(tweak) {
+      listView.classList.add('hidden');
+      detailView.classList.add('active');
+      document.title = tweak.name + " — zeroxjf's Repo";
+
+      detailView.innerHTML = `
+        <button class="detail-back" id="detail-back">\u2039 All Packages</button>
+        <div class="detail-header">
+          <span class="detail-title">${escapeHtml(tweak.name)}</span>
+          <span class="detail-version">${tweak.version}</span>
+        </div>
+        <div class="detail-desc">${escapeHtml(tweak.desc)}</div>
+        <div class="detail-depiction" id="detail-dep">
+          <div class="dep-loading">Loading...</div>
+        </div>
+      `;
+
+      document.getElementById('detail-back').addEventListener('click', () => {
+        history.pushState(null, '', window.location.pathname);
+        showList();
+      });
+
+      try {
+        const data = await fetchDepiction(tweak);
+        const depEl = document.getElementById('detail-dep');
+        depEl.innerHTML = renderDepiction(data);
+        bindTabs(depEl, tweak.tint);
+      } catch {
+        document.getElementById('detail-dep').innerHTML =
+          '<div class="dep-loading">Failed to load depiction</div>';
+      }
+    }
+
+    // --- Build tweak list cards ---
     TWEAKS.forEach(tweak => {
       const card = document.createElement('div');
       card.className = 'tweak-card';
@@ -515,30 +590,30 @@
           <div class="tweak-meta">
             <span class="tweak-version">${tweak.version}</span>
             <span class="tweak-dot" style="background:${tweak.tint}"></span>
-            <span class="tweak-arrow">&#x203A;</span>
+            <span class="tweak-arrow">\u203A</span>
           </div>
         </div>
-        <div class="depiction-panel">
-          <div class="depiction-inner"></div>
-        </div>
       `;
-
-      card.addEventListener('click', e => {
-        if (e.target.closest('.dep-tab, .dep-button, a')) return;
-        const isOpen = card.classList.contains('open');
-        // Close all others
-        document.querySelectorAll('.tweak-card.open').forEach(c => c.classList.remove('open'));
-        if (!isOpen) {
-          card.classList.add('open');
-          const inner = card.querySelector('.depiction-inner');
-          if (!inner.children.length) {
-            loadDepiction(tweak.id, tweak.depiction, inner, tweak.tint);
-          }
-        }
+      card.addEventListener('click', () => {
+        history.pushState(null, '', '#' + tweak.slug);
+        showDetail(tweak);
       });
-
       list.appendChild(card);
     });
+
+    // --- Hash routing ---
+    function route() {
+      const hash = window.location.hash.slice(1);
+      const tweak = tweakBySlug[hash];
+      if (tweak) {
+        showDetail(tweak);
+      } else {
+        showList();
+      }
+    }
+
+    window.addEventListener('popstate', route);
+    route();
   </script>
 </body>
 </html>

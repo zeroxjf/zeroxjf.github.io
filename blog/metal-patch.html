@@ -223,11 +223,12 @@
       <blockquote>The vphone VM needs the Metal compiler plugin built and installed. Source is at <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/main.mm</code>, build script at <code>build.sh</code>. Do the following:
         <ol>
           <li>Run <code>./build.sh</code> to compile the dylib.</li>
+          <li>Get the VM's IP address: <code>tart ip vphone</code>. Use this IP for all SSH/SCP commands below.</li>
           <li>Boot DFU: <code>./.build/debug/tart run vphone --dfu &amp;</code></li>
-          <li>Boot SSH ramdisk: <code>cd CFW &amp;&amp; ./boot_rd.sh</code> then <code>iproxy 2222 22 &amp;</code></li>
-          <li>SSH in (root@127.0.0.1 -p2222, pw alpine), mount rootfs: <code>/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</code></li>
-          <li>SCP dylib to <code>/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></li>
-          <li>Halt: <code>sync &amp;&amp; /sbin/halt</code></li>
+          <li>Boot SSH ramdisk: <code>cd CFW &amp;&amp; ./boot_rd.sh</code></li>
+          <li>SSH in (<code>ssh root@&lt;VM_IP&gt;</code>, pw alpine), mount rootfs: <code>/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</code></li>
+          <li>SCP dylib: <code>scp libAppleParavirtCompilerPluginIOGPUFamily.dylib root@&lt;VM_IP&gt;:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></li>
+          <li>Halt: <code>ssh root@&lt;VM_IP&gt; "sync &amp;&amp; /sbin/halt"</code></li>
           <li>Kill tart, normal boot: <code>./.build/debug/tart run vphone --vnc-experimental</code></li>
         </ol>
         The rest of the bundle is already on rootfs from fix_boot.py.
@@ -237,15 +238,17 @@
 <pre><code>cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
 chmod +x build.sh &amp;&amp; ./build.sh
 
+# Get the VM's IP
+VM_IP=$(tart ip vphone)
+
 ./.build/debug/tart run vphone --dfu &amp;
 cd CFW &amp;&amp; ./boot_rd.sh
-iproxy 2222 22 &amp;
 
-ssh root@127.0.0.1 -p2222 "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
-scp -P 2222 libAppleParavirtCompilerPluginIOGPUFamily.dylib \
-    root@127.0.0.1:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/
+ssh root@$VM_IP "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
+scp libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    root@$VM_IP:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/
 
-ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
+ssh root@$VM_IP "sync &amp;&amp; /sbin/halt"
 ./.build/debug/tart run vphone --vnc-experimental</code></pre>
       <p>SSH password: <code>alpine</code></p>
 

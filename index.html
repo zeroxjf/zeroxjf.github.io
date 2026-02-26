@@ -41,6 +41,13 @@
       opacity: 0.85;
     }
 
+    .header-subtitle {
+      font-size: 0.78rem;
+      color: #606068;
+      margin-top: 0.35rem;
+      letter-spacing: 0.04em;
+    }
+
     .header-links {
       margin-top: 0.6rem;
       display: flex;
@@ -189,6 +196,100 @@
       color: #45454c;
       transition: color 0.15s;
     }
+
+    /* ---- Research cards ---- */
+    .research-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .research-card {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      text-decoration: none;
+      padding: 0.9rem 1rem;
+      background: #1c1c1f;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .research-card:hover {
+      background: #222225;
+      border-color: #333337;
+    }
+
+    .research-card:hover .research-name { color: #7ca0c4; }
+
+    .research-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #c8c8cc;
+      transition: color 0.15s;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      letter-spacing: -0.01em;
+    }
+
+    .research-desc {
+      font-size: 0.82rem;
+      color: #75757c;
+      margin-top: 0.2rem;
+      line-height: 1.45;
+    }
+
+    .research-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.45rem;
+    }
+
+    .research-tag {
+      font-size: 0.68rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: #222225;
+      color: #606068;
+      font-weight: 500;
+    }
+
+    .research-tag.severity-high {
+      background: #2a1a1a;
+      color: #c47c7c;
+    }
+
+    .research-tag.severity-critical {
+      background: #2a1515;
+      color: #d47070;
+    }
+
+    .research-stars {
+      font-size: 0.7rem;
+      color: #55555c;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .research-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+      margin-top: 0.15rem;
+    }
+
+    .research-arrow {
+      font-size: 0.9rem;
+      color: #45454c;
+      transition: color 0.15s;
+    }
+
+    .research-card:hover .research-arrow { color: #7ca0c4; }
 
     /* ---- Tweak cards ---- */
     .tweak-list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -477,6 +578,7 @@
 <body>
   <div class="header">
     <img class="header-logo" src="logo.png" alt="0xjf">
+    <div class="header-subtitle">iOS Researcher</div>
     <div class="header-links">
       <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
       <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank">Donate</a>
@@ -513,6 +615,92 @@
             <span class="blog-arrow">&rsaquo;</span>
           </div>
         </a>
+      </div>
+    </div>
+
+    <!-- Research -->
+    <div class="section" id="research-section">
+      <div class="section-header">
+        <span class="section-label">Vulnerability Research</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="research-list">
+
+        <a class="research-card" href="https://github.com/zeroxjf/AppleSEPKeyStore-UAF-Panic" target="_blank">
+          <div>
+            <div class="research-name">AppleSEPKeyStore-UAF-Panic</div>
+            <div class="research-desc">AppleSEPKeyStore Use-After-Free Panic (iOS/macOS 26.1-26.2)</div>
+            <div class="research-tags">
+              <span class="research-tag severity-critical">kernel</span>
+              <span class="research-tag">uaf</span>
+              <span class="research-stars">&#9734; 22</span>
+            </div>
+          </div>
+          <div class="research-meta">
+            <span class="research-arrow">&rsaquo;</span>
+          </div>
+        </a>
+
+        <a class="research-card" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+          <div>
+            <div class="research-name">SEP-Exhaustion-Kernel-Panic</div>
+            <div class="research-desc">SEP firmware panic via AppleKeyStore &mdash; iOS/macOS 26.x kernel vulnerability</div>
+            <div class="research-tags">
+              <span class="research-tag severity-critical">kernel/SEP</span>
+              <span class="research-tag">DoS</span>
+              <span class="research-stars">&#9734; 21</span>
+            </div>
+          </div>
+          <div class="research-meta">
+            <span class="research-arrow">&rsaquo;</span>
+          </div>
+        </a>
+
+        <a class="research-card" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+          <div>
+            <div class="research-name">AppleKeyStore-close-UAF</div>
+            <div class="research-desc">AppleKeyStoreUserClient close() Use-After-Free &mdash; iOS kernel vulnerability (patched in 26.3 RC)</div>
+            <div class="research-tags">
+              <span class="research-tag severity-critical">kernel</span>
+              <span class="research-tag">uaf</span>
+              <span class="research-stars">&#9734; 17</span>
+            </div>
+          </div>
+          <div class="research-meta">
+            <span class="research-arrow">&rsaquo;</span>
+          </div>
+        </a>
+
+        <a class="research-card" href="https://github.com/zeroxjf/AppleJPEGDriver-startDecoder-timeout-UAF-deferred-panic" target="_blank">
+          <div>
+            <div class="research-name">AppleJPEGDriver-startDecoder-timeout-UAF</div>
+            <div class="research-desc">PoC app for an AppleJPEGDriver timeout/error queue UAF leading to a deferred kernel panic (A19 Pro, iOS 26.3 RC)</div>
+            <div class="research-tags">
+              <span class="research-tag severity-critical">kernel</span>
+              <span class="research-tag">uaf</span>
+              <span class="research-stars">&#9734; 10</span>
+            </div>
+          </div>
+          <div class="research-meta">
+            <span class="research-arrow">&rsaquo;</span>
+          </div>
+        </a>
+
+        <a class="research-card" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+          <div>
+            <div class="research-name">IOHIDFamily-FastPathUserClient-Race-Conditions</div>
+            <div class="research-desc">UAF and AOP coprocessor panic in IOHIDEventServiceFastPathUserClient. No entitlements, reachable from app sandbox.</div>
+            <div class="research-tags">
+              <span class="research-tag severity-high">kernel</span>
+              <span class="research-tag">race condition</span>
+              <span class="research-stars">&#9734; 4</span>
+            </div>
+          </div>
+          <div class="research-meta">
+            <span class="research-arrow">&rsaquo;</span>
+          </div>
+        </a>
+
       </div>
     </div>
 
@@ -680,11 +868,13 @@
     const listView = document.getElementById('list-view');
     const detailView = document.getElementById('detail-view');
     const blogSection = document.getElementById('blog-section');
+    const researchSection = document.getElementById('research-section');
     const list = document.getElementById('tweak-list');
 
     function showList() {
       listView.classList.remove('hidden');
       blogSection.style.display = '';
+      researchSection.style.display = '';
       detailView.classList.remove('active');
       detailView.innerHTML = '';
       document.title = "zeroxjf";
@@ -693,6 +883,7 @@
     async function showDetail(tweak) {
       listView.classList.add('hidden');
       blogSection.style.display = 'none';
+      researchSection.style.display = 'none';
       detailView.classList.add('active');
       document.title = tweak.name + " \u2014 zeroxjf";
 

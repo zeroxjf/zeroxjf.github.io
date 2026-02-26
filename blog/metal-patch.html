@@ -138,45 +138,51 @@
       font-size: 1.1rem;
       font-weight: 600;
       color: #d0d0d4;
-      margin: 1.75rem 0 0.5rem;
+      margin: 2rem 0 0.65rem;
     }
 
     .post-body h2:first-child { margin-top: 0; }
 
-    .post-body p { margin-bottom: 0.6rem; }
+    .post-body p { margin-bottom: 0.75rem; }
     .post-body strong { color: #c8c8cc; font-weight: 600; }
 
     .post-body ul, .post-body ol {
       margin: 0.25rem 0 0.6rem 1.25rem;
     }
 
-    .post-body li { margin-bottom: 0.25rem; }
+    .post-body li { margin-bottom: 0.35rem; }
 
     .post-body code {
       font-family: 'SF Mono', 'Menlo', monospace;
       font-size: 0.82rem;
-      background: #1c1c1f;
-      padding: 0.12rem 0.32rem;
-      border-radius: 3px;
-      color: #b0b4ba;
+      background: #1e1e22;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      color: #c0c4ca;
     }
 
     .post-body pre {
       background: #18181b;
       border: 1px solid #27272a;
       border-radius: 8px;
-      padding: 0.75rem 1rem;
+      padding: 1rem 1.15rem;
       overflow-x: auto;
-      margin: 0.5rem 0 0.75rem;
+      margin: 0.65rem 0 1rem;
     }
 
     .post-body pre code {
       background: none;
       padding: 0;
-      font-size: 0.78rem;
-      color: #85858c;
-      line-height: 1.5;
+      font-size: 0.8rem;
+      color: #9ca0a8;
+      line-height: 1.55;
     }
+
+    /* syntax hints */
+    .sh-comment { color: #555a63; font-style: italic; }
+    .sh-var { color: #c4a46c; }
+    .sh-string { color: #7aac8a; }
+    .sh-flag { color: #8a8a92; }
 
     .post-body a {
       color: #7ca0c4;
@@ -228,56 +234,81 @@
 
     <div class="post-body">
       <h2>AI-assisted install</h2>
-      <p>Save <a href="assets/metal-patch/main.mm">main.mm</a> and <a href="assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then give this prompt to Claude Code, Codex, or similar:</p>
-      <blockquote>The vphone VM needs the Metal compiler plugin built and installed. Source is at <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/main.mm</code>, build script at <code>build.sh</code>. Do the following:
-        <ol>
-          <li>Run <code>./build.sh</code> to compile the dylib.</li>
-          <li>Get the VM's IP address: <code>tart ip vphone</code>. Use this IP for all SSH/SCP commands below.</li>
-          <li>Boot DFU: <code>./.build/debug/tart run vphone --dfu &amp;</code></li>
-          <li>Boot SSH ramdisk: <code>cd CFW &amp;&amp; ./boot_rd.sh</code></li>
-          <li>SSH in (<code>ssh root@&lt;VM_IP&gt;</code>, pw alpine), mount rootfs: <code>/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</code></li>
-          <li>SCP dylib: <code>scp libAppleParavirtCompilerPluginIOGPUFamily.dylib root@&lt;VM_IP&gt;:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></li>
-          <li>Halt: <code>ssh root@&lt;VM_IP&gt; "sync &amp;&amp; /sbin/halt"</code></li>
-          <li>Kill tart, normal boot: <code>./.build/debug/tart run vphone --vnc-experimental</code></li>
-        </ol>
-        The rest of the bundle is already on rootfs from fix_boot.py.
-      </blockquote>
+      <p>Save <a href="assets/metal-patch/main.mm">main.mm</a> and <a href="assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then feed the following to Claude Code, Codex, or similar:</p>
+<pre><code><span class="sh-comment"># Prompt for AI agent:</span>
+<span class="sh-comment">#</span>
+<span class="sh-comment"># The vphone VM needs the Metal compiler plugin built and installed.</span>
+<span class="sh-comment"># Source: CFW/libAppleParavirtCompilerPluginIOGPUFamily/main.mm</span>
+<span class="sh-comment"># Build:  ./build.sh</span>
+<span class="sh-comment">#</span>
+<span class="sh-comment"># Steps:</span>
+<span class="sh-comment">#   1. Run ./build.sh to compile the dylib</span>
+<span class="sh-comment">#   2. Get VM IP: tart ip vphone — use for all SSH/SCP below</span>
+<span class="sh-comment">#   3. Boot DFU:  ./.build/debug/tart run vphone --dfu &amp;</span>
+<span class="sh-comment">#   4. Boot SSH ramdisk:  cd CFW &amp;&amp; ./boot_rd.sh</span>
+<span class="sh-comment">#   5. SSH in (pw: alpine), mount rootfs:</span>
+<span class="sh-comment">#        /sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</span>
+<span class="sh-comment">#   6. SCP the dylib into the bundle dir on rootfs</span>
+<span class="sh-comment">#   7. Halt:  sync &amp;&amp; /sbin/halt</span>
+<span class="sh-comment">#   8. Kill tart, normal boot:  tart run vphone --vnc-experimental</span>
+<span class="sh-comment">#</span>
+<span class="sh-comment"># The rest of the bundle is already on rootfs from fix_boot.py.</span></code></pre>
 
       <h2>Manual install</h2>
-<pre><code>cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
+<pre><code><span class="sh-comment"># build</span>
+cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
 chmod +x build.sh &amp;&amp; ./build.sh
 
-# Get the VM's IP
-VM_IP=$(tart ip vphone)
+<span class="sh-comment"># get VM IP</span>
+<span class="sh-var">VM_IP</span>=$(<span class="sh-string">tart ip vphone</span>)
 
-./.build/debug/tart run vphone --dfu &amp;
+<span class="sh-comment"># boot into DFU, then SSH ramdisk</span>
+./.build/debug/tart run vphone <span class="sh-flag">--dfu</span> &amp;
 cd CFW &amp;&amp; ./boot_rd.sh
 
-ssh root@$VM_IP "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
-scp libAppleParavirtCompilerPluginIOGPUFamily.dylib \
-    root@$VM_IP:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/
+<span class="sh-comment"># mount rootfs read-write</span>
+ssh root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"</span>
 
-ssh root@$VM_IP "sync &amp;&amp; /sbin/halt"
-./.build/debug/tart run vphone --vnc-experimental</code></pre>
+<span class="sh-comment"># copy dylib into the Metal bundle</span>
+scp libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    root@<span class="sh-var">$VM_IP</span>:<span class="sh-string">/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</span>
+
+<span class="sh-comment"># halt, then normal boot</span>
+ssh root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"sync &amp;&amp; /sbin/halt"</span>
+./.build/debug/tart run vphone <span class="sh-flag">--vnc-experimental</span></code></pre>
       <p>SSH password: <code>alpine</code></p>
 
       <h2>Verify</h2>
       <ul>
-        <li><code>backboardd</code> running (no crash)</li>
-        <li>SpringBoard renders with a background, not black</li>
-        <li>MetalTest: <code>Metal Device Create Success: Apple Paravirtual device</code></li>
+        <li><code>backboardd</code> is running (no crash loop)</li>
+        <li>SpringBoard renders with a wallpaper &mdash; not a black screen</li>
+        <li>MetalTest reports: <code>Metal Device Create Success: Apple Paravirtual device</code></li>
       </ul>
 
       <hr class="post-divider">
 
       <h2>Why this is necessary</h2>
-      <p>The VM's paravirt GPU kernel driver works, but Metal needs a userspace plugin at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>. The main binary, plist, and codesig copy from the PCC disk image. The compiler plugin only exists in the PCC dyld shared cache &mdash; extracted Mach-Os have cache-relative vmaddrs, no <code>LC_DYLD_CHAINED_FIXUPS</code>, no rebase/bind opcodes. dyld can't load them. <code>backboardd</code> crashes, black screen.</p>
+      <p>The VM's paravirtualized GPU kernel driver works fine on its own. Metal, however, requires a userspace compiler plugin at:</p>
+<pre><code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code></pre>
+      <p>The main binary, Info.plist, and code signature all copy cleanly from the PCC disk image. The compiler plugin is the problem &mdash; it only exists inside the PCC <code>dyld_shared_cache</code>.</p>
+      <p>Extracting it doesn't help. The extracted Mach-O has cache-relative vmaddrs, no <code>LC_DYLD_CHAINED_FIXUPS</code>, and no rebase/bind opcodes. dyld refuses to load it. Without the plugin, <code>backboardd</code> crashes on launch and you get a black screen.</p>
 
       <h2>What the plugin does</h2>
-      <p>Four exports: <code>MTLCompilerCreate</code> (version==8 check, stores target triple), <code>MTLCompilerBuildRequestWithOptions</code> (AIR module in, metallib out), <code>MTLCompilerDelete</code>, <code>MTLCompilerReleaseReply</code>. Calls <code>libGPUCompiler</code> and <code>libLLVM</code> from the device DSC. Key flags: <code>-undefined dynamic_lookup</code> (runtime symbol resolution) and <code>-not_for_dyld_shared_cache</code>.</p>
+      <p>Four exported functions:</p>
+      <ul>
+        <li><code>MTLCompilerCreate</code> &mdash; version check (==8), stores the target triple</li>
+        <li><code>MTLCompilerBuildRequestWithOptions</code> &mdash; takes an AIR module, produces a metallib</li>
+        <li><code>MTLCompilerDelete</code> &mdash; teardown</li>
+        <li><code>MTLCompilerReleaseReply</code> &mdash; frees the reply buffer</li>
+      </ul>
+      <p>Internally these call into <code>libGPUCompiler</code> and <code>libLLVM</code> from the device DSC. Two linker flags matter:</p>
+<pre><code><span class="sh-flag">-undefined dynamic_lookup</span>   <span class="sh-comment"># resolve symbols at runtime from the DSC</span>
+<span class="sh-flag">-not_for_dyld_shared_cache</span>  <span class="sh-comment"># don't try to slide into the shared cache</span></code></pre>
 
       <h2>RE notes</h2>
-      <p>From the PCC DSC. 47 functions, mostly C++ thunks. <code>AppleParavirtCompiler</code> class with vtable + 3 members. arm64e <code>auth_stubs</code> confirmed the import set. Entry point search walks <code>air.vertex</code>/<code>air.fragment</code>/<code>air.kernel</code> metadata nodes. Original used C++ LLVM API; reimplementation uses the stable C API (exported since LLVM 3.x).</p>
+      <p>Reversed from the PCC dyld shared cache. The original has 47 functions, mostly C++ thunks wrapping LLVM calls.</p>
+      <p>The <code>AppleParavirtCompiler</code> class has a vtable and 3 instance members. arm64e <code>auth_stubs</code> made it straightforward to confirm the full import set &mdash; every cross-image call goes through a PAC stub with the target symbol name in the GOT.</p>
+      <p>The shader entry point search walks <code>air.vertex</code>, <code>air.fragment</code>, and <code>air.kernel</code> metadata nodes in the AIR module. The original implementation uses the C++ LLVM API directly; the reimplementation uses the stable C API instead (exported since LLVM 3.x), which avoids ABI fragility across toolchain versions.</p>
     </div>
   </div>
 </body>

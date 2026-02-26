@@ -90,19 +90,36 @@
     }
 
     .blog-post {
-      padding: 1.25rem 0;
+      padding: 0.9rem 0;
       border-bottom: 1px solid #1a1a1a;
     }
 
     .blog-post:last-child { border-bottom: none; }
 
+    .blog-post-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      cursor: pointer;
+    }
+
+    .blog-post-header:hover .blog-title { color: #6eb5ff; }
+
+    .blog-detail {
+      display: none;
+      padding-top: 0.5rem;
+    }
+
+    .blog-post.expanded .blog-detail { display: block; }
+
     .blog-meta {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #555;
-      margin-bottom: 0.4rem;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .blog-meta a {
@@ -115,24 +132,18 @@
     .blog-meta-sep { color: #333; }
 
     .blog-title {
-      font-size: 1.2rem;
-      font-weight: 700;
+      font-size: 1rem;
+      font-weight: 600;
       color: #fff;
       line-height: 1.35;
       letter-spacing: -0.01em;
+      transition: color 0.15s;
     }
-
-    .blog-title a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .blog-title a:hover { color: #6eb5ff; }
 
     .blog-excerpt {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: #888;
-      margin-top: 0.35rem;
+      margin-top: 0.25rem;
       line-height: 1.55;
     }
 
@@ -572,24 +583,27 @@
       <div class="section-label">Blog</div>
       <div class="blog-list">
 
-        <article class="blog-post" id="blog-metal-patch">
-          <div class="blog-meta">
-            <span>Feb 2026</span>
-            <span class="blog-meta-sep">/</span>
-            <span>for <a href="https://github.com/wh1te4ever/super-tart-vphone" target="_blank">wh1te4ever/super-tart-vphone</a></span>
+        <article class="blog-post" id="metal-patch">
+          <div class="blog-post-header" onclick="navigateBlog('metal-patch')">
+            <div class="blog-title">Patching Metal Graphics into vphone</div>
+            <div class="blog-meta">
+              <span>Feb 2026</span>
+              <span class="blog-meta-sep">/</span>
+              <span><a href="https://github.com/wh1te4ever/super-tart-vphone" target="_blank" onclick="event.stopPropagation()">wh1te4ever/super-tart-vphone</a></span>
+            </div>
           </div>
-          <div class="blog-title">Patching Metal Graphics into vphone</div>
-          <div class="blog-excerpt">vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</div>
-          <div class="blog-files">
-            <a class="blog-file-link" href="blog/assets/metal-patch/main.mm">main.mm</a>
-            <a class="blog-file-link" href="blog/assets/metal-patch/build.sh">build.sh</a>
-          </div>
-          <div class="blog-actions">
-            <button class="blog-action-link" onclick="toggleBlogSection('blog-metal-patch', 'steps', this)">Install steps</button>
-            <button class="blog-action-link" onclick="toggleBlogSection('blog-metal-patch', 'bg', this)">Background</button>
-          </div>
+          <div class="blog-detail">
+            <div class="blog-excerpt">vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</div>
+            <div class="blog-files">
+              <a class="blog-file-link" href="blog/assets/metal-patch/main.mm">main.mm</a>
+              <a class="blog-file-link" href="blog/assets/metal-patch/build.sh">build.sh</a>
+            </div>
+            <div class="blog-actions">
+              <button class="blog-action-link" onclick="toggleBlogSection('metal-patch', 'steps', this)">Install steps</button>
+              <button class="blog-action-link" onclick="toggleBlogSection('metal-patch', 'bg', this)">Background</button>
+            </div>
 
-          <div class="blog-expand" id="blog-metal-patch-steps">
+          <div class="blog-expand" id="metal-patch-steps">
             <div class="blog-expand-inner">
               <h2>AI-assisted install</h2>
               <p>Save <a href="blog/assets/metal-patch/main.mm">main.mm</a> and <a href="blog/assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then give this prompt to Claude Code, Codex, or similar:</p>
@@ -631,7 +645,7 @@ ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
             </div>
           </div>
 
-          <div class="blog-expand" id="blog-metal-patch-bg">
+          <div class="blog-expand" id="metal-patch-bg">
             <div class="blog-expand-inner">
               <h2>Why this is necessary</h2>
               <p>The VM's paravirt GPU kernel driver works, but Metal needs a userspace plugin at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>. The main binary, plist, and codesig copy from the PCC disk image. The compiler plugin only exists in the PCC dyld shared cache &mdash; extracted Mach-Os have cache-relative vmaddrs, no <code>LC_DYLD_CHAINED_FIXUPS</code>, no rebase/bind opcodes. dyld can't load them. <code>backboardd</code> crashes, black screen.</p>
@@ -642,6 +656,7 @@ ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
               <h2>RE notes</h2>
               <p>From the PCC DSC. 47 functions, mostly C++ thunks. <code>AppleParavirtCompiler</code> class with vtable + 3 members. arm64e <code>auth_stubs</code> confirmed the import set. Entry point search walks <code>air.vertex</code>/<code>air.fragment</code>/<code>air.kernel</code> metadata nodes. Original used C++ LLVM API; reimplementation uses the stable C API (exported since LLVM 3.x).</p>
             </div>
+          </div>
           </div>
         </article>
 
@@ -657,13 +672,37 @@ ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
   </div>
 
   <script>
-    // --- Blog toggle ---
+    // --- Blog ---
+    const blogPosts = ['metal-patch'];
+
+    function navigateBlog(slug) {
+      const post = document.getElementById(slug);
+      if (!post) return;
+      const isExpanded = post.classList.contains('expanded');
+      if (isExpanded) {
+        post.classList.remove('expanded');
+        post.querySelectorAll('.blog-expand').forEach(el => { el.style.maxHeight = '0px'; });
+        history.pushState(null, '', window.location.pathname);
+        return;
+      }
+      post.classList.add('expanded');
+      history.pushState(null, '', '#' + slug);
+      post.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function expandBlogFromHash(slug) {
+      const post = document.getElementById(slug);
+      if (!post) return false;
+      post.classList.add('expanded');
+      requestAnimationFrame(() => post.scrollIntoView({ block: 'start' }));
+      return true;
+    }
+
     function toggleBlogSection(postId, sectionKey, btn) {
       const post = document.getElementById(postId);
       const target = document.getElementById(postId + '-' + sectionKey);
       const isOpen = target.style.maxHeight && target.style.maxHeight !== '0px';
 
-      // Close all expand sections in this post
       post.querySelectorAll('.blog-expand').forEach(el => {
         el.style.maxHeight = '0px';
       });
@@ -898,11 +937,25 @@ ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
     // --- Hash routing ---
     function route() {
       const hash = window.location.hash.slice(1);
-      const tweak = tweakBySlug[hash];
-      if (tweak) {
-        showDetail(tweak);
-      } else {
+      // Collapse all blog posts first
+      blogPosts.forEach(slug => {
+        const el = document.getElementById(slug);
+        if (el) {
+          el.classList.remove('expanded');
+          el.querySelectorAll('.blog-expand').forEach(e => { e.style.maxHeight = '0px'; });
+        }
+      });
+
+      if (blogPosts.includes(hash)) {
         showList();
+        expandBlogFromHash(hash);
+      } else {
+        const tweak = tweakBySlug[hash];
+        if (tweak) {
+          showDetail(tweak);
+        } else {
+          showList();
+        }
       }
     }
 

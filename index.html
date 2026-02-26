@@ -90,7 +90,7 @@
     }
 
     .blog-post {
-      padding: 0.9rem 0;
+      padding: 1.1rem 0;
       border-bottom: 1px solid #1a1a1a;
     }
 
@@ -98,8 +98,9 @@
 
     .blog-post-header {
       display: flex;
-      align-items: baseline;
-      gap: 0.6rem;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
       cursor: pointer;
     }
 
@@ -107,7 +108,7 @@
 
     .blog-detail {
       display: none;
-      padding-top: 0.5rem;
+      padding-top: 0.6rem;
     }
 
     .blog-post.expanded .blog-detail { display: block; }
@@ -585,7 +586,10 @@
 
         <article class="blog-post" id="metal-patch">
           <div class="blog-post-header" onclick="navigateBlog('metal-patch')">
-            <div class="blog-title">Patching Metal Graphics into vphone</div>
+            <div>
+              <div class="blog-title">Patching Metal Graphics into vphone</div>
+              <div class="blog-excerpt">vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</div>
+            </div>
             <div class="blog-meta">
               <span>Feb 2026</span>
               <span class="blog-meta-sep">/</span>
@@ -593,7 +597,6 @@
             </div>
           </div>
           <div class="blog-detail">
-            <div class="blog-excerpt">vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</div>
             <div class="blog-files">
               <a class="blog-file-link" href="blog/assets/metal-patch/main.mm">main.mm</a>
               <a class="blog-file-link" href="blog/assets/metal-patch/build.sh">build.sh</a>

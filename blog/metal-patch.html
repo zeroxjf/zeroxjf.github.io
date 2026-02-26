@@ -162,27 +162,29 @@
     }
 
     .post-body pre {
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 8px;
-      padding: 1rem 1.15rem;
+      background: #0f0f12;
+      border: 1px solid #252530;
+      border-left: 3px solid #3a3a50;
+      border-radius: 6px;
+      padding: 1.1rem 1.25rem;
       overflow-x: auto;
-      margin: 0.65rem 0 1rem;
+      margin: 0.65rem 0 1.1rem;
     }
 
     .post-body pre code {
       background: none;
       padding: 0;
       font-size: 0.8rem;
-      color: #9ca0a8;
-      line-height: 1.55;
+      color: #b8bcc4;
+      line-height: 1.6;
     }
 
-    /* syntax hints */
-    .sh-comment { color: #555a63; font-style: italic; }
-    .sh-var { color: #c4a46c; }
-    .sh-string { color: #7aac8a; }
-    .sh-flag { color: #8a8a92; }
+    /* syntax highlighting */
+    .sh-comment { color: #5c6370; font-style: italic; }
+    .sh-var { color: #e5c07b; }
+    .sh-string { color: #98c379; }
+    .sh-flag { color: #c678dd; }
+    .sh-cmd { color: #61afef; }
 
     .post-body a {
       color: #7ca0c4;
@@ -256,25 +258,25 @@
 
       <h2>Manual install</h2>
 <pre><code><span class="sh-comment"># build</span>
-cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
-chmod +x build.sh &amp;&amp; ./build.sh
+<span class="sh-cmd">cd</span> CFW/libAppleParavirtCompilerPluginIOGPUFamily
+<span class="sh-cmd">chmod</span> +x build.sh &amp;&amp; ./build.sh
 
 <span class="sh-comment"># get VM IP</span>
-<span class="sh-var">VM_IP</span>=$(<span class="sh-string">tart ip vphone</span>)
+<span class="sh-var">VM_IP</span>=$(<span class="sh-cmd">tart ip</span> vphone)
 
 <span class="sh-comment"># boot into DFU, then SSH ramdisk</span>
 ./.build/debug/tart run vphone <span class="sh-flag">--dfu</span> &amp;
-cd CFW &amp;&amp; ./boot_rd.sh
+<span class="sh-cmd">cd</span> CFW &amp;&amp; ./boot_rd.sh
 
 <span class="sh-comment"># mount rootfs read-write</span>
-ssh root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"</span>
+<span class="sh-cmd">ssh</span> root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"</span>
 
 <span class="sh-comment"># copy dylib into the Metal bundle</span>
-scp libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+<span class="sh-cmd">scp</span> libAppleParavirtCompilerPluginIOGPUFamily.dylib \
     root@<span class="sh-var">$VM_IP</span>:<span class="sh-string">/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</span>
 
 <span class="sh-comment"># halt, then normal boot</span>
-ssh root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"sync &amp;&amp; /sbin/halt"</span>
+<span class="sh-cmd">ssh</span> root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"sync &amp;&amp; /sbin/halt"</span>
 ./.build/debug/tart run vphone <span class="sh-flag">--vnc-experimental</span></code></pre>
       <p>SSH password: <code>alpine</code></p>
 
@@ -289,7 +291,7 @@ ssh root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"sync &amp;&
 
       <h2>Why this is necessary</h2>
       <p>The VM's paravirtualized GPU kernel driver works fine on its own. Metal, however, requires a userspace compiler plugin at:</p>
-<pre><code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code></pre>
+<pre><code><span class="sh-string">/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</span></code></pre>
       <p>The main binary, Info.plist, and code signature all copy cleanly from the PCC disk image. The compiler plugin is the problem &mdash; it only exists inside the PCC <code>dyld_shared_cache</code>.</p>
       <p>Extracting it doesn't help. The extracted Mach-O has cache-relative vmaddrs, no <code>LC_DYLD_CHAINED_FIXUPS</code>, and no rebase/bind opcodes. dyld refuses to load it. Without the plugin, <code>backboardd</code> crashes on launch and you get a black screen.</p>
 

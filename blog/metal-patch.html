@@ -257,8 +257,10 @@
 <span class="sh-comment">#   5. SSH in (pw: alpine), mount rootfs:</span>
 <span class="sh-comment">#        /sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</span>
 <span class="sh-comment">#   6. SCP the dylib into the bundle dir on rootfs</span>
-<span class="sh-comment">#   7. Halt:  sync &amp;&amp; /sbin/halt</span>
-<span class="sh-comment">#   8. Kill tart, normal boot:  tart run vphone --vnc-experimental</span>
+<span class="sh-comment">#   7. Re-sign the bundle on device:</span>
+<span class="sh-comment">#        ldid -S /mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib</span>
+<span class="sh-comment">#   8. Halt:  sync &amp;&amp; /sbin/halt</span>
+<span class="sh-comment">#   9. Kill tart, normal boot:  tart run vphone --vnc-experimental</span>
 <span class="sh-comment">#</span>
 <span class="sh-comment"># The rest of the bundle is already on rootfs from fix_boot.py.</span></code></pre>
 
@@ -280,6 +282,9 @@
 <span class="sh-comment"># copy dylib into the Metal bundle</span>
 <span class="sh-cmd">scp</span> libAppleParavirtCompilerPluginIOGPUFamily.dylib \
     root@<span class="sh-var">$VM_IP</span>:<span class="sh-string">/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</span>
+
+<span class="sh-comment"># re-sign the dylib on device</span>
+<span class="sh-cmd">ssh</span> root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"ldid -S /mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib"</span>
 
 <span class="sh-comment"># halt, then normal boot</span>
 <span class="sh-cmd">ssh</span> root@<span class="sh-var">$VM_IP</span> <span class="sh-string">"sync &amp;&amp; /sbin/halt"</span>

@@ -78,6 +78,155 @@
       margin-bottom: 0.75rem;
     }
 
+    /* Blog section */
+    .blog-section {
+      margin-bottom: 2rem;
+    }
+
+    .blog-card {
+      background: #141414;
+      border: 1px solid #1e1e1e;
+      border-left: 3px solid #6eb5ff;
+      border-radius: 12px;
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .blog-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .blog-date {
+      font-size: 0.75rem;
+      color: #555;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+
+    .blog-excerpt {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 0.4rem;
+      line-height: 1.5;
+    }
+
+    .blog-toggle {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.82rem;
+      color: #6eb5ff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .blog-toggle:hover { text-decoration: underline; }
+
+    .blog-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .blog-card.open .blog-body {
+      max-height: 30000px;
+    }
+
+    .blog-body-inner {
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid #1e1e1e;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #ccc;
+    }
+
+    .blog-body-inner h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .blog-body-inner h2:first-child { margin-top: 0; }
+
+    .blog-body-inner h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ddd;
+      margin: 1.25rem 0 0.4rem;
+    }
+
+    .blog-body-inner p {
+      margin-bottom: 0.6rem;
+    }
+
+    .blog-body-inner strong { color: #fff; font-weight: 600; }
+
+    .blog-body-inner ul, .blog-body-inner ol {
+      margin: 0.3rem 0 0.6rem 1.25rem;
+    }
+
+    .blog-body-inner li { margin-bottom: 0.3rem; }
+
+    .blog-body-inner code {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.82rem;
+      background: #1a1a1a;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      color: #ddd;
+    }
+
+    .blog-body-inner pre {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+
+    .blog-body-inner pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.78rem;
+      color: #bbb;
+      line-height: 1.5;
+    }
+
+    .blog-body-inner a {
+      color: #6eb5ff;
+      text-decoration: none;
+    }
+
+    .blog-body-inner a:hover { text-decoration: underline; }
+
+    .blog-body-inner hr {
+      border: none;
+      border-top: 1px solid #1e1e1e;
+      margin: 1.25rem 0;
+    }
+
+    .blog-body-inner blockquote {
+      border-left: 2px solid #333;
+      padding-left: 0.75rem;
+      margin: 0.5rem 0;
+      color: #999;
+    }
+
     /* Tweak cards */
     .tweak-list { display: flex; flex-direction: column; gap: 0.5rem; }
 
@@ -356,6 +505,7 @@
       .tweak-desc { display: none; }
       .header-links { gap: 1rem; }
       .detail-title { font-size: 1.2rem; }
+      .blog-title { font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -380,6 +530,372 @@
   </div>
 
   <div class="content">
+    <!-- Blog -->
+    <div class="blog-section" id="blog-section">
+      <div class="section-label">Blog</div>
+
+      <div class="blog-card" id="blog-metal-patch">
+        <div class="blog-card-header">
+          <div>
+            <div class="blog-title">Reimplementing Apple's Paravirt GPU Compiler Plugin</div>
+            <div class="blog-excerpt">The virtual iPhone uses a paravirtualized GPU, but Metal doesn't work because the userspace compiler plugin is trapped inside the dyld shared cache. You can't extract it. So I reverse-engineered and rewrote it from scratch.</div>
+          </div>
+          <span class="blog-date">Feb 2026</span>
+        </div>
+        <button class="blog-toggle" onclick="toggleBlog('blog-metal-patch', this)">Read more</button>
+
+        <div class="blog-body">
+          <div class="blog-body-inner">
+
+            <h2>The Problem</h2>
+            <p>The virtual iPhone uses a paravirtualized GPU (<code>AppleParavirtGPU</code>). The kernel sees it, but Metal doesn't work because the userspace GPU plugin bundle is missing.</p>
+            <p>On PCC, this bundle is at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>:</p>
+            <ul>
+              <li><code>AppleParavirtGPUMetalIOGPUFamily</code> &mdash; main bundle binary</li>
+              <li><code>Info.plist</code></li>
+              <li><code>_CodeSignature/CodeResources</code></li>
+              <li><code>libAppleParavirtCompilerPluginIOGPUFamily.dylib</code> &mdash; shader compiler plugin</li>
+            </ul>
+            <p>The main binary, Info.plist, and CodeResources copy straight from the PCC disk image. They work as-is. The compiler plugin dylib is the problem.</p>
+
+            <h2>Why You Can't Extract the Compiler Plugin from the DSC</h2>
+            <p><code>libAppleParavirtCompilerPluginIOGPUFamily.dylib</code> does not exist as a standalone file on the PCC disk. It lives only inside the PCC's dyld shared cache (DSC). If you extract it (<code>ipsw dyld extract</code> or similar), the resulting Mach-O has:</p>
+            <ul>
+              <li>A vmaddr relative to its position in the shared cache (e.g. <code>0x19db71000</code>)</li>
+              <li>No <code>LC_DYLD_INFO_ONLY</code> or <code>LC_DYLD_CHAINED_FIXUPS</code> load commands</li>
+              <li>No rebase opcodes, no bind opcodes</li>
+            </ul>
+            <p>dyld can't relocate it or resolve its symbols. <code>backboardd</code> tries to <code>dlopen</code> it, fails, and CoreAnimation crashes in <code>CA::OGL::MetalContext::get_tile_pipeline</code> during shader warmup. backboardd dies, black screen.</p>
+            <p>Doesn't matter how you extract it &mdash; <code>ipsw dyld extract</code>, memory dump, whatever. DSC images only work as part of the shared cache.</p>
+
+            <h2>What the Compiler Plugin Does</h2>
+            <p>Metal shader compiler plugin for the paravirtual GPU. Loaded via <code>dlopen</code> by CoreAnimation. Four exported C functions:</p>
+            <ul>
+              <li><strong><code>MTLCompilerCreate(targetInfo, version)</code></strong> &mdash; Creates a compiler instance. Checks <code>version == 8</code>, stores the target triple, creates a GPU compiler handle via <code>MTLGPUCompilerCreate</code>.</li>
+              <li><strong><code>MTLCompilerBuildRequestWithOptions(...)</code></strong> &mdash; Main compilation function. Takes an LLVM IR module (AIR format), compiles it into a metallib binary, returns the compiled bytes.</li>
+              <li><strong><code>MTLCompilerDelete(compiler)</code></strong> &mdash; Destroys the compiler instance.</li>
+              <li><strong><code>MTLCompilerReleaseReply(compiler)</code></strong> &mdash; Frees the memory buffer from the last compilation.</li>
+            </ul>
+            <p>Internally, <code>MTLCompilerBuildRequestWithOptions</code>:</p>
+            <ul>
+              <li>Calls <code>MTLDowngradeAIRModule</code> to downgrade the AIR module for the target</li>
+              <li>Searches LLVM named metadata nodes (<code>air.vertex</code>, <code>air.fragment</code>, <code>air.kernel</code>) for the shader entry point name</li>
+              <li>Creates a shared LLVM module via <code>LLVMExtraMakeSharedModule</code></li>
+              <li>Builds a metallib using <code>MTLMetalLibCreateExecutableWithTriple</code></li>
+              <li>Creates a Metal function with <code>MTLMetalFunctionCreate</code> and inserts it</li>
+              <li>Serializes to a memory buffer with <code>MTLWriteMetalLibToMemoryBuffer</code></li>
+            </ul>
+
+            <h2>External Dependencies</h2>
+            <p>Calls into two libraries already in the iPhone's DSC:</p>
+            <h3>From libGPUCompiler.dylib</h3>
+            <ul>
+              <li><code>MTLGPUCompilerCreate</code> / <code>MTLGPUCompilerDestroy</code></li>
+              <li><code>MTLDowngradeAIRModule</code></li>
+              <li><code>MTLMetalLibCreateExecutableWithTriple</code></li>
+              <li><code>MTLMetalFunctionCreate</code> / <code>MTLMetalLibInsertFunction</code></li>
+              <li><code>MTLWriteMetalLibToMemoryBuffer</code></li>
+            </ul>
+            <h3>From libLLVM.dylib</h3>
+            <ul>
+              <li><code>LLVMDisposeMemoryBuffer</code> / <code>LLVMGetBufferStart</code> / <code>LLVMGetBufferSize</code></li>
+              <li><code>LLVMGetTarget</code> / <code>LLVMExtraMakeSharedModule</code> / <code>LLVMExtraDisposeSharedModule</code></li>
+              <li><code>LLVMGetNamedMetadataNumOperands</code> / <code>LLVMGetNamedMetadataOperands</code></li>
+              <li><code>LLVMGetMDNodeNumOperands</code> / <code>LLVMGetMDNodeOperands</code> / <code>LLVMGetValueName2</code></li>
+            </ul>
+            <p>All available at runtime &mdash; Metal.framework already loads libLLVM and libGPUCompiler.</p>
+
+            <h2>The Reimplementation</h2>
+
+            <h3>build.sh</h3>
+<pre><code>#!/bin/zsh
+set -e
+cd "$(dirname "$0")"
+
+xcrun -sdk iphoneos clang++ \
+    -arch arm64e \
+    -dynamiclib \
+    -std=c++17 \
+    -w -Wl,-w \
+    -Wl,-undefined,dynamic_lookup \
+    -Wl,-not_for_dyld_shared_cache \
+    main.mm \
+    -o libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    -install_name /System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    -O2
+
+codesign -f -s - libAppleParavirtCompilerPluginIOGPUFamily.dylib
+
+echo "Built and signed $(wc -c &lt; libAppleParavirtCompilerPluginIOGPUFamily.dylib) bytes"</code></pre>
+
+            <h3>main.mm</h3>
+<pre><code>// Reimplementation of libAppleParavirtCompilerPluginIOGPUFamily.dylib
+// Metal shader compiler plugin for the paravirtualized GPU.
+// Bridges between Metal's compiler interface and the GPUCompiler/LLVM pipeline.
+
+#include &lt;cstdlib&gt;
+#include &lt;cstring&gt;
+#include &lt;cstdint&gt;
+
+// --- LLVM C API (from libLLVM.dylib) ---
+extern "C" {
+    typedef struct LLVMOpaqueModule *LLVMModuleRef;
+    typedef struct LLVMOpaqueMemoryBuffer *LLVMMemoryBufferRef;
+    typedef struct LLVMOpaqueValue *LLVMValueRef;
+
+    void LLVMDisposeMemoryBuffer(LLVMMemoryBufferRef MemBuf);
+    const char *LLVMGetBufferStart(LLVMMemoryBufferRef MemBuf);
+    size_t LLVMGetBufferSize(LLVMMemoryBufferRef MemBuf);
+    const char *LLVMGetTarget(LLVMModuleRef M);
+    LLVMModuleRef LLVMExtraMakeSharedModule(LLVMModuleRef M);
+    void LLVMExtraDisposeSharedModule(LLVMModuleRef M);
+
+    unsigned LLVMGetNamedMetadataNumOperands(LLVMModuleRef M, const char *Name);
+    void LLVMGetNamedMetadataOperands(LLVMModuleRef M, const char *Name, LLVMValueRef *Dest);
+    unsigned LLVMGetMDNodeNumOperands(LLVMValueRef V);
+    void LLVMGetMDNodeOperands(LLVMValueRef V, LLVMValueRef *Dest);
+    const char *LLVMGetValueName2(LLVMValueRef Val, size_t *Length);
+}
+
+// --- GPUCompiler API (from libGPUCompiler.dylib) ---
+extern "C" {
+    typedef void *MTLGPUCompilerRef;
+    typedef void *MTLMetalLibRef;
+    typedef void *MTLMetalFunctionRef;
+
+    MTLGPUCompilerRef MTLGPUCompilerCreate(int version);
+    void MTLGPUCompilerDestroy(MTLGPUCompilerRef compiler);
+    int MTLDowngradeAIRModule(LLVMModuleRef module, const char *targetTriple, int flags);
+    MTLMetalLibRef MTLMetalLibCreateExecutableWithTriple(LLVMModuleRef sharedModule, const char *entryPointData);
+    MTLMetalFunctionRef MTLMetalFunctionCreate(LLVMModuleRef sharedModule, const char *entryName);
+    void MTLMetalLibInsertFunction(MTLMetalLibRef lib, MTLMetalFunctionRef func);
+    LLVMMemoryBufferRef MTLWriteMetalLibToMemoryBuffer(MTLMetalLibRef lib);
+}
+
+struct AppleParavirtCompilerTargetInfo {
+    const char *targetTriple;
+};
+
+class AppleParavirtCompiler {
+public:
+    virtual ~AppleParavirtCompiler();
+    bool init(const AppleParavirtCompilerTargetInfo *info);
+    bool buildRequestWithOptions(
+        const void *inputData, size_t inputSize, unsigned int flags,
+        LLVMModuleRef module,
+        const void **outCode, size_t *outCodeSize,
+        const void **outReflection, size_t *outReflectionSize,
+        const void **outDebug, size_t *outDebugSize,
+        const char **outError);
+    void deleteCompilerReply();
+
+private:
+    LLVMMemoryBufferRef _bufferRef = nullptr;
+    MTLGPUCompilerRef _gpuCompiler = nullptr;
+    const char *_targetTriple = nullptr;
+};
+
+static const char *entryPointsMetadata[] = {
+    "air.vertex", "air.fragment", "air.kernel",
+};
+static const int numEntryPointsMetadata = 3;
+
+AppleParavirtCompiler::~AppleParavirtCompiler() {
+    if (_gpuCompiler) {
+        MTLGPUCompilerDestroy(_gpuCompiler);
+        _gpuCompiler = nullptr;
+    }
+}
+
+bool AppleParavirtCompiler::init(const AppleParavirtCompilerTargetInfo *info) {
+    _targetTriple = info-&gt;targetTriple;
+    _gpuCompiler = MTLGPUCompilerCreate(1);
+    return (_gpuCompiler != nullptr);
+}
+
+void AppleParavirtCompiler::deleteCompilerReply() {
+    if (_bufferRef) {
+        LLVMDisposeMemoryBuffer(_bufferRef);
+        _bufferRef = nullptr;
+    }
+}
+
+bool AppleParavirtCompiler::buildRequestWithOptions(
+    const void *inputData, size_t inputSize, unsigned int flags,
+    LLVMModuleRef module,
+    const void **outCode, size_t *outCodeSize,
+    const void **outReflection, size_t *outReflectionSize,
+    const void **outDebug, size_t *outDebugSize,
+    const char **outError)
+{
+    _bufferRef = nullptr;
+    if (!module) { *outError = "null module"; return true; }
+
+    int result = MTLDowngradeAIRModule(module, _targetTriple, 0);
+    if (!result) { *outError = nullptr; return false; }
+    if (!_gpuCompiler) { *outError = "no gpu compiler"; return true; }
+
+    const char *entryName = nullptr;
+    size_t entryNameLen = 0;
+
+    for (int i = 0; i &lt; numEntryPointsMetadata; i++) {
+        unsigned numNamedOps = LLVMGetNamedMetadataNumOperands(module, entryPointsMetadata[i]);
+        if (numNamedOps &gt; 0) {
+            LLVMValueRef *namedOps = (LLVMValueRef *)alloca(numNamedOps * sizeof(LLVMValueRef));
+            LLVMGetNamedMetadataOperands(module, entryPointsMetadata[i], namedOps);
+            LLVMValueRef mdNode = namedOps[0];
+            if (mdNode) {
+                unsigned numOps = LLVMGetMDNodeNumOperands(mdNode);
+                if (numOps &gt; 0) {
+                    LLVMValueRef *ops = (LLVMValueRef *)alloca(numOps * sizeof(LLVMValueRef));
+                    LLVMGetMDNodeOperands(mdNode, ops);
+                    if (ops[0]) {
+                        entryName = LLVMGetValueName2(ops[0], &amp;entryNameLen);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    const char *triple = LLVMGetTarget(module);
+    LLVMModuleRef sharedModule = LLVMExtraMakeSharedModule(module);
+
+    char *entryNameStr = nullptr;
+    if (entryName &amp;&amp; entryNameLen &gt; 0) {
+        entryNameStr = (char *)malloc(entryNameLen + 1);
+        memcpy(entryNameStr, entryName, entryNameLen);
+        entryNameStr[entryNameLen] = '\0';
+    }
+
+    MTLMetalLibRef metalLib = MTLMetalLibCreateExecutableWithTriple(sharedModule,
+                                                                     entryNameStr ? entryNameStr : "");
+    if (entryNameStr) free(entryNameStr);
+    if (!metalLib) {
+        LLVMExtraDisposeSharedModule(sharedModule);
+        *outError = "failed to create metallib";
+        return true;
+    }
+
+    MTLMetalFunctionRef func = MTLMetalFunctionCreate(sharedModule, entryName);
+    MTLMetalLibInsertFunction(metalLib, func);
+
+    _bufferRef = MTLWriteMetalLibToMemoryBuffer(metalLib);
+    if (!_bufferRef) {
+        LLVMExtraDisposeSharedModule(sharedModule);
+        *outError = "failed to write metallib";
+        return true;
+    }
+
+    LLVMExtraDisposeSharedModule(sharedModule);
+    *outCode = LLVMGetBufferStart(_bufferRef);
+    *outCodeSize = LLVMGetBufferSize(_bufferRef);
+    *outReflection = nullptr; *outReflectionSize = 0;
+    *outDebug = nullptr; *outDebugSize = 0;
+    *outError = nullptr;
+    return false;
+}
+
+// --- Exported C interface ---
+extern "C" {
+
+__attribute__((visibility("default")))
+void *MTLCompilerCreate(void *targetInfo, uint64_t version) {
+    if (version != 8) return nullptr;
+    AppleParavirtCompiler *compiler = new AppleParavirtCompiler();
+    if (!compiler-&gt;init((const AppleParavirtCompilerTargetInfo *)targetInfo)) {
+        delete compiler;
+        return nullptr;
+    }
+    return compiler;
+}
+
+__attribute__((visibility("default")))
+bool MTLCompilerBuildRequestWithOptions(
+    void *compilerObj,
+    const void *inputData, size_t inputSize, unsigned int flags,
+    LLVMModuleRef module,
+    const void **outCode, size_t *outCodeSize,
+    const void **outReflection, size_t *outReflectionSize,
+    const void **outDebug, size_t *outDebugSize,
+    const char **outError)
+{
+    AppleParavirtCompiler *compiler = (AppleParavirtCompiler *)compilerObj;
+    return compiler-&gt;buildRequestWithOptions(inputData, inputSize, flags, module,
+                                             outCode, outCodeSize,
+                                             outReflection, outReflectionSize,
+                                             outDebug, outDebugSize, outError);
+}
+
+__attribute__((visibility("default")))
+void MTLCompilerDelete(void *compilerObj) {
+    if (compilerObj) delete (AppleParavirtCompiler *)compilerObj;
+}
+
+__attribute__((visibility("default")))
+void MTLCompilerReleaseReply(void *compilerObj) {
+    if (compilerObj) ((AppleParavirtCompiler *)compilerObj)-&gt;deleteCompilerReply();
+}
+
+} // extern "C"</code></pre>
+
+            <h2>Key Linker Flags</h2>
+            <ul>
+              <li><strong><code>-undefined dynamic_lookup</code></strong> &mdash; LLVM and GPUCompiler symbols aren't in the SDK. This defers resolution to runtime, where dyld finds them in the DSC.</li>
+              <li><strong><code>-not_for_dyld_shared_cache</code></strong> &mdash; Required because the linker rejects <code>-undefined dynamic_lookup</code> for shared-cache-eligible dylibs.</li>
+              <li><strong><code>-install_name ...</code></strong> &mdash; Must match the exact on-device load path.</li>
+            </ul>
+            <p>Ad-hoc codesigned. Sufficient on a jailbroken device.</p>
+
+            <h2>Build &amp; Install</h2>
+            <ol>
+              <li>Build the dylib: <code>chmod +x build.sh &amp;&amp; ./build.sh</code></li>
+              <li>Boot the VM in DFU mode, start the SSH ramdisk:
+<pre><code>./.build/debug/tart run vphone --dfu &amp;
+cd CFW &amp;&amp; ./boot_rd.sh
+iproxy 2222 22 &amp;</code></pre>
+              </li>
+              <li>Mount the rootfs writable and copy the dylib:
+<pre><code>ssh root@127.0.0.1 -p2222 "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
+
+scp -P 2222 libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    root@127.0.0.1:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></pre>
+              </li>
+              <li>Halt and normal boot:
+<pre><code>ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
+# wait for VM to stop, kill tart
+./.build/debug/tart run vphone --vnc-experimental</code></pre>
+              </li>
+            </ol>
+            <p>SSH password is <code>alpine</code>. The rest of the bundle (main binary, Info.plist, CodeResources) should already be on the rootfs from <code>fix_boot.py</code>.</p>
+
+            <h2>Verify</h2>
+            <ul>
+              <li><code>backboardd</code> running (no crash)</li>
+              <li>SpringBoard renders with a background, not a black screen</li>
+              <li>MetalTest prints <code>Metal Device Create Success: Apple Paravirtual device</code></li>
+            </ul>
+
+            <hr>
+
+            <h2>Reverse Engineering Notes</h2>
+            <p>RE'd from the PCC dyld shared cache. Any disassembler that handles DSC loading works (IDA, Ghidra, Hopper). Open the PCC DSC, navigate to the <code>libAppleParavirtCompilerPluginIOGPUFamily</code> image.</p>
+            <ul>
+              <li>47 total functions, most are C++ thunks/destructors</li>
+              <li>The class is <code>AppleParavirtCompiler</code> with a vtable, three member variables (buffer ref, GPU compiler handle, target triple)</li>
+              <li>Import stubs (<code>auth_stubs</code> in arm64e) confirmed the exact set of LLVM/GPUCompiler functions used</li>
+              <li>The entry point metadata search iterates over <code>air.vertex</code>, <code>air.fragment</code>, <code>air.kernel</code> named metadata nodes, pulls the first operand of the first metadata tuple, and reads the function name</li>
+              <li>The LLVM metadata access in the DSC used C++ LLVM API directly (since both the plugin and libLLVM share the cache address space). The reimplementation uses the older LLVM C API which has been exported since LLVM 3.x</li>
+              <li><code>MTLDowngradeAIRModule</code> returning 0 means "nothing to compile" (success, no output). Nonzero means compilation should proceed.</li>
+              <li><code>MTLCompilerCreate</code> checks <code>version == 8</code>. Other versions return null.</li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packages -->
     <div class="list-view" id="list-view">
       <div class="section-label">Packages</div>
       <div class="tweak-list" id="tweak-list"></div>
@@ -388,6 +904,13 @@
   </div>
 
   <script>
+    // --- Blog toggle ---
+    function toggleBlog(id, btn) {
+      const card = document.getElementById(id);
+      card.classList.toggle('open');
+      btn.textContent = card.classList.contains('open') ? 'Collapse' : 'Read more';
+    }
+
     const TWEAKS = [
       {
         name: 'TypeMillennium',
@@ -535,10 +1058,12 @@
     // --- Views ---
     const listView = document.getElementById('list-view');
     const detailView = document.getElementById('detail-view');
+    const blogSection = document.getElementById('blog-section');
     const list = document.getElementById('tweak-list');
 
     function showList() {
       listView.classList.remove('hidden');
+      blogSection.style.display = '';
       detailView.classList.remove('active');
       detailView.innerHTML = '';
       document.title = "zeroxjf's Repo";
@@ -546,8 +1071,9 @@
 
     async function showDetail(tweak) {
       listView.classList.add('hidden');
+      blogSection.style.display = 'none';
       detailView.classList.add('active');
-      document.title = tweak.name + " — zeroxjf's Repo";
+      document.title = tweak.name + " \u2014 zeroxjf's Repo";
 
       detailView.innerHTML = `
         <button class="detail-back" id="detail-back">\u2039 All Packages</button>

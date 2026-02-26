@@ -315,8 +315,10 @@
         <li><code>MTLCompilerReleaseReply</code> &mdash; frees the reply buffer</li>
       </ul>
       <p>Internally these call into <code>libGPUCompiler</code> and <code>libLLVM</code> from the device DSC. Two linker flags matter:</p>
-<pre><code><span class="sh-flag">-undefined dynamic_lookup</span>   <span class="sh-comment"># resolve symbols at runtime from the DSC</span>
+<pre><code><span class="sh-flag">-miphoneos-version-min=26.1</span> <span class="sh-comment"># must match or be ≤ the device's iOS version</span>
+<span class="sh-flag">-undefined dynamic_lookup</span>   <span class="sh-comment"># resolve symbols at runtime from the DSC</span>
 <span class="sh-flag">-not_for_dyld_shared_cache</span>  <span class="sh-comment"># don't try to slide into the shared cache</span></code></pre>
+      <p><strong>Important:</strong> Without <code>-miphoneos-version-min</code>, the deployment target defaults to your Xcode SDK version. If that's newer than the device's iOS (e.g. SDK 26.2 vs device on 26.1), dyld will refuse to load the dylib. Match the flag to your vphone's iOS version.</p>
 
       <h2>RE notes</h2>
       <p>Reversed from the PCC dyld shared cache. The original has 47 functions, mostly C++ thunks wrapping LLVM calls.</p>

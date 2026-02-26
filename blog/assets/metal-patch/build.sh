@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 
 xcrun -sdk iphoneos clang++ \
     -arch arm64e \
+    -miphoneos-version-min=26.1 \
     -dynamiclib \
     -std=c++17 \
     -w -Wl,-w \

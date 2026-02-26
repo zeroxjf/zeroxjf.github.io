@@ -574,79 +574,17 @@
         <div class="blog-card-header">
           <div>
             <div class="blog-title">Reimplementing Apple's Paravirt GPU Compiler Plugin</div>
-            <div class="blog-excerpt">The virtual iPhone uses a paravirtualized GPU, but Metal doesn't work because the userspace compiler plugin is trapped inside the dyld shared cache. You can't extract it. So I reverse-engineered and rewrote it from scratch.</div>
+            <div class="blog-excerpt">The VM's paravirtualized GPU needs a Metal compiler plugin that only exists inside the PCC dyld shared cache. You can't extract it &mdash; DSC images have no relocations. Reverse-engineered and rewrote it.</div>
           </div>
           <span class="blog-date">Feb 2026</span>
         </div>
 
         <div class="blog-preview">
-          <h2>The Problem</h2>
-          <p>The virtual iPhone uses a paravirtualized GPU (<code>AppleParavirtGPU</code>). The kernel sees it, but Metal doesn't work because the userspace GPU plugin bundle is missing.</p>
-          <p>On PCC, this bundle is at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>:</p>
-          <ul>
-            <li><code>AppleParavirtGPUMetalIOGPUFamily</code> &mdash; main bundle binary</li>
-            <li><code>Info.plist</code></li>
-            <li><code>_CodeSignature/CodeResources</code></li>
-            <li><code>libAppleParavirtCompilerPluginIOGPUFamily.dylib</code> &mdash; shader compiler plugin</li>
-          </ul>
-          <p>The main binary, Info.plist, and CodeResources copy straight from the PCC disk image. They work as-is. The compiler plugin dylib is the problem.</p>
 
-          <h2>Why You Can't Extract the Compiler Plugin from the DSC</h2>
-          <p><code>libAppleParavirtCompilerPluginIOGPUFamily.dylib</code> does not exist as a standalone file on the PCC disk. It lives only inside the PCC's dyld shared cache (DSC). If you extract it (<code>ipsw dyld extract</code> or similar), the resulting Mach-O has:</p>
-          <ul>
-            <li>A vmaddr relative to its position in the shared cache (e.g. <code>0x19db71000</code>)</li>
-            <li>No <code>LC_DYLD_INFO_ONLY</code> or <code>LC_DYLD_CHAINED_FIXUPS</code> load commands</li>
-            <li>No rebase opcodes, no bind opcodes</li>
-          </ul>
-          <p>dyld can't relocate it or resolve its symbols. <code>backboardd</code> tries to <code>dlopen</code> it, fails, and CoreAnimation crashes in <code>CA::OGL::MetalContext::get_tile_pipeline</code> during shader warmup. backboardd dies, black screen.</p>
-          <p>Doesn't matter how you extract it &mdash; <code>ipsw dyld extract</code>, memory dump, whatever. DSC images only work as part of the shared cache.</p>
-        </div>
+          <h2>1. Save the source files</h2>
+          <p>Save both to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>.</p>
 
-        <button class="blog-toggle" onclick="toggleBlog('blog-metal-patch', this)">Read more</button>
-
-        <div class="blog-body">
-          <div class="blog-body-inner">
-
-            <h2>What the Compiler Plugin Does</h2>
-            <p>Metal shader compiler plugin for the paravirtual GPU. Loaded via <code>dlopen</code> by CoreAnimation. Four exported C functions:</p>
-            <ul>
-              <li><strong><code>MTLCompilerCreate(targetInfo, version)</code></strong> &mdash; Creates a compiler instance. Checks <code>version == 8</code>, stores the target triple, creates a GPU compiler handle via <code>MTLGPUCompilerCreate</code>.</li>
-              <li><strong><code>MTLCompilerBuildRequestWithOptions(...)</code></strong> &mdash; Main compilation function. Takes an LLVM IR module (AIR format), compiles it into a metallib binary, returns the compiled bytes.</li>
-              <li><strong><code>MTLCompilerDelete(compiler)</code></strong> &mdash; Destroys the compiler instance.</li>
-              <li><strong><code>MTLCompilerReleaseReply(compiler)</code></strong> &mdash; Frees the memory buffer from the last compilation.</li>
-            </ul>
-            <p>Internally, <code>MTLCompilerBuildRequestWithOptions</code>:</p>
-            <ul>
-              <li>Calls <code>MTLDowngradeAIRModule</code> to downgrade the AIR module for the target</li>
-              <li>Searches LLVM named metadata nodes (<code>air.vertex</code>, <code>air.fragment</code>, <code>air.kernel</code>) for the shader entry point name</li>
-              <li>Creates a shared LLVM module via <code>LLVMExtraMakeSharedModule</code></li>
-              <li>Builds a metallib using <code>MTLMetalLibCreateExecutableWithTriple</code></li>
-              <li>Creates a Metal function with <code>MTLMetalFunctionCreate</code> and inserts it</li>
-              <li>Serializes to a memory buffer with <code>MTLWriteMetalLibToMemoryBuffer</code></li>
-            </ul>
-
-            <h2>External Dependencies</h2>
-            <p>Calls into two libraries already in the iPhone's DSC:</p>
-            <h3>From libGPUCompiler.dylib</h3>
-            <ul>
-              <li><code>MTLGPUCompilerCreate</code> / <code>MTLGPUCompilerDestroy</code></li>
-              <li><code>MTLDowngradeAIRModule</code></li>
-              <li><code>MTLMetalLibCreateExecutableWithTriple</code></li>
-              <li><code>MTLMetalFunctionCreate</code> / <code>MTLMetalLibInsertFunction</code></li>
-              <li><code>MTLWriteMetalLibToMemoryBuffer</code></li>
-            </ul>
-            <h3>From libLLVM.dylib</h3>
-            <ul>
-              <li><code>LLVMDisposeMemoryBuffer</code> / <code>LLVMGetBufferStart</code> / <code>LLVMGetBufferSize</code></li>
-              <li><code>LLVMGetTarget</code> / <code>LLVMExtraMakeSharedModule</code> / <code>LLVMExtraDisposeSharedModule</code></li>
-              <li><code>LLVMGetNamedMetadataNumOperands</code> / <code>LLVMGetNamedMetadataOperands</code></li>
-              <li><code>LLVMGetMDNodeNumOperands</code> / <code>LLVMGetMDNodeOperands</code> / <code>LLVMGetValueName2</code></li>
-            </ul>
-            <p>All available at runtime &mdash; Metal.framework already loads libLLVM and libGPUCompiler.</p>
-
-            <h2>The Reimplementation</h2>
-
-            <h3>build.sh</h3>
+          <h3>build.sh</h3>
 <pre><code>#!/bin/zsh
 set -e
 cd "$(dirname "$0")"
@@ -664,13 +602,12 @@ xcrun -sdk iphoneos clang++ \
     -O2
 
 codesign -f -s - libAppleParavirtCompilerPluginIOGPUFamily.dylib
-
 echo "Built and signed $(wc -c &lt; libAppleParavirtCompilerPluginIOGPUFamily.dylib) bytes"</code></pre>
 
-            <h3>main.mm</h3>
+          <h3>main.mm</h3>
 <pre><code>// Reimplementation of libAppleParavirtCompilerPluginIOGPUFamily.dylib
 // Metal shader compiler plugin for the paravirtualized GPU.
-// Bridges between Metal's compiler interface and the GPUCompiler/LLVM pipeline.
+// Bridges Metal's compiler interface to GPUCompiler/LLVM.
 
 #include &lt;cstdlib&gt;
 #include &lt;cstring&gt;
@@ -878,56 +815,72 @@ void MTLCompilerReleaseReply(void *compilerObj) {
 
 } // extern "C"</code></pre>
 
-            <h2>Key Linker Flags</h2>
-            <ul>
-              <li><strong><code>-undefined dynamic_lookup</code></strong> &mdash; LLVM and GPUCompiler symbols aren't in the SDK. This defers resolution to runtime, where dyld finds them in the DSC.</li>
-              <li><strong><code>-not_for_dyld_shared_cache</code></strong> &mdash; Required because the linker rejects <code>-undefined dynamic_lookup</code> for shared-cache-eligible dylibs.</li>
-              <li><strong><code>-install_name ...</code></strong> &mdash; Must match the exact on-device load path.</li>
-            </ul>
-            <p>Ad-hoc codesigned. Sufficient on a jailbroken device.</p>
-
-            <h2>Build &amp; Install</h2>
+          <h2>2. AI-assisted build &amp; install</h2>
+          <p>Give this prompt to Claude Code, Codex, or similar:</p>
+          <blockquote>The vphone VM needs the Metal compiler plugin built and installed. The source is at <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/main.mm</code> and the build script is <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/build.sh</code>. Do the following:
             <ol>
-              <li>Build the dylib: <code>chmod +x build.sh &amp;&amp; ./build.sh</code></li>
-              <li>Boot the VM in DFU mode, start the SSH ramdisk:
-<pre><code>./.build/debug/tart run vphone --dfu &amp;
-cd CFW &amp;&amp; ./boot_rd.sh
-iproxy 2222 22 &amp;</code></pre>
-              </li>
-              <li>Mount the rootfs writable and copy the dylib:
-<pre><code>ssh root@127.0.0.1 -p2222 "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
+              <li>Run <code>./build.sh</code> in <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code> to compile the dylib.</li>
+              <li>Boot the VM in DFU mode: <code>./.build/debug/tart run vphone --dfu &amp;</code></li>
+              <li>Boot the SSH ramdisk: <code>cd CFW &amp;&amp; ./boot_rd.sh</code> then <code>iproxy 2222 22 &amp;</code></li>
+              <li>SSH into the ramdisk (root@127.0.0.1 -p2222, password alpine), mount the rootfs writable: <code>/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</code></li>
+              <li>SCP the built dylib to <code>/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code> on the device.</li>
+              <li>Halt the device: <code>sync &amp;&amp; /sbin/halt</code></li>
+              <li>Kill tart, then normal boot: <code>./.build/debug/tart run vphone --vnc-experimental</code></li>
+            </ol>
+            The rest of the bundle (main binary, Info.plist, CodeResources) is already on the rootfs from fix_boot.py. You're only replacing the compiler plugin dylib.
+          </blockquote>
 
+          <h2>3. Manual build &amp; install</h2>
+<pre><code># Build
+cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
+chmod +x build.sh &amp;&amp; ./build.sh
+
+# Boot DFU + ramdisk
+./.build/debug/tart run vphone --dfu &amp;
+cd CFW &amp;&amp; ./boot_rd.sh
+iproxy 2222 22 &amp;
+
+# Mount rootfs, copy dylib
+ssh root@127.0.0.1 -p2222 "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
 scp -P 2222 libAppleParavirtCompilerPluginIOGPUFamily.dylib \
-    root@127.0.0.1:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></pre>
-              </li>
-              <li>Halt and normal boot:
-<pre><code>ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
+    root@127.0.0.1:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/
+
+# Halt + normal boot
+ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
 # wait for VM to stop, kill tart
 ./.build/debug/tart run vphone --vnc-experimental</code></pre>
-              </li>
-            </ol>
-            <p>SSH password is <code>alpine</code>. The rest of the bundle (main binary, Info.plist, CodeResources) should already be on the rootfs from <code>fix_boot.py</code>.</p>
+          <p>SSH password is <code>alpine</code>.</p>
 
-            <h2>Verify</h2>
+          <h2>4. Verify</h2>
+          <ul>
+            <li><code>backboardd</code> running (no crash)</li>
+            <li>SpringBoard renders with a background, not a black screen</li>
+            <li>MetalTest prints <code>Metal Device Create Success: Apple Paravirtual device</code></li>
+          </ul>
+
+        </div>
+
+        <button class="blog-toggle" onclick="toggleBlog('blog-metal-patch', this)">Background</button>
+
+        <div class="blog-body">
+          <div class="blog-body-inner">
+
+            <h2>Why this is necessary</h2>
+            <p>The VM uses a paravirtualized GPU (<code>AppleParavirtGPU</code>). The kernel sees it, but Metal needs a userspace plugin bundle at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>. The main binary, Info.plist, and CodeResources copy from the PCC disk image. The compiler plugin dylib is the problem &mdash; it only exists inside the PCC dyld shared cache.</p>
+            <p>Extracting it doesn't work. The resulting Mach-O has a cache-relative vmaddr, no <code>LC_DYLD_INFO_ONLY</code>/<code>LC_DYLD_CHAINED_FIXUPS</code>, no rebase/bind opcodes. dyld can't relocate it. <code>backboardd</code> tries to <code>dlopen</code> it, fails, CoreAnimation crashes in <code>CA::OGL::MetalContext::get_tile_pipeline</code>. Black screen.</p>
+
+            <h2>What the plugin does</h2>
+            <p>Metal shader compiler for the paravirt GPU. Four exports: <code>MTLCompilerCreate</code> (checks version==8, stores target triple), <code>MTLCompilerBuildRequestWithOptions</code> (takes LLVM IR / AIR module, compiles to metallib), <code>MTLCompilerDelete</code>, <code>MTLCompilerReleaseReply</code>. Calls into <code>libGPUCompiler.dylib</code> and <code>libLLVM.dylib</code> in the device DSC &mdash; both already loaded by Metal.framework at runtime.</p>
+
+            <h2>Key linker flags</h2>
             <ul>
-              <li><code>backboardd</code> running (no crash)</li>
-              <li>SpringBoard renders with a background, not a black screen</li>
-              <li>MetalTest prints <code>Metal Device Create Success: Apple Paravirtual device</code></li>
+              <li><strong><code>-undefined dynamic_lookup</code></strong> &mdash; defers LLVM/GPUCompiler symbol resolution to runtime</li>
+              <li><strong><code>-not_for_dyld_shared_cache</code></strong> &mdash; required with dynamic_lookup</li>
+              <li><strong><code>-install_name ...</code></strong> &mdash; must match the on-device load path</li>
             </ul>
 
-            <hr>
-
-            <h2>Reverse Engineering Notes</h2>
-            <p>RE'd from the PCC dyld shared cache. Any disassembler that handles DSC loading works (IDA, Ghidra, Hopper). Open the PCC DSC, navigate to the <code>libAppleParavirtCompilerPluginIOGPUFamily</code> image.</p>
-            <ul>
-              <li>47 total functions, most are C++ thunks/destructors</li>
-              <li>The class is <code>AppleParavirtCompiler</code> with a vtable, three member variables (buffer ref, GPU compiler handle, target triple)</li>
-              <li>Import stubs (<code>auth_stubs</code> in arm64e) confirmed the exact set of LLVM/GPUCompiler functions used</li>
-              <li>The entry point metadata search iterates over <code>air.vertex</code>, <code>air.fragment</code>, <code>air.kernel</code> named metadata nodes, pulls the first operand of the first metadata tuple, and reads the function name</li>
-              <li>The LLVM metadata access in the DSC used C++ LLVM API directly (since both the plugin and libLLVM share the cache address space). The reimplementation uses the older LLVM C API which has been exported since LLVM 3.x</li>
-              <li><code>MTLDowngradeAIRModule</code> returning 0 means "nothing to compile" (success, no output). Nonzero means compilation should proceed.</li>
-              <li><code>MTLCompilerCreate</code> checks <code>version == 8</code>. Other versions return null.</li>
-            </ul>
+            <h2>RE notes</h2>
+            <p>Reverse-engineered from the PCC DSC (<code>System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e</code>). 47 functions, mostly C++ thunks. Class <code>AppleParavirtCompiler</code> with vtable, three members. arm64e <code>auth_stubs</code> confirmed the exact import set. Entry point search iterates <code>air.vertex</code>/<code>air.fragment</code>/<code>air.kernel</code> metadata nodes. Original used C++ LLVM API; reimplementation uses the stable C API (exported since LLVM 3.x).</p>
 
           </div>
         </div>

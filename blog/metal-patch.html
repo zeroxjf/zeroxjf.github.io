@@ -235,6 +235,9 @@
     <hr class="post-divider">
 
     <div class="post-body">
+      <h2>Overview</h2>
+      <p>vphone gets a working paravirtualized GPU from the kernel driver, but Metal won't initialize without a userspace shader compiler plugin. Apple ships one in the PCC dyld shared cache, but it can't be extracted &mdash; the Mach-O comes out with broken relocations and dyld won't load it. This is a clean-room reimplementation of that plugin (~230 lines of C++) built from reverse engineering the original. It compiles against the device's <code>libLLVM</code> and <code>libGPUCompiler</code> at runtime, and gets installed into the Metal bundle on rootfs via SSH ramdisk.</p>
+
       <h2>AI-assisted install</h2>
       <p>Save <a href="assets/metal-patch/main.mm">main.mm</a> and <a href="assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then feed the following to Claude Code, Codex, or similar:</p>
 <pre><code><span class="sh-comment"># Prompt for AI agent:</span>

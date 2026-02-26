@@ -39,6 +39,12 @@
       margin: 0 auto;
     }
 
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -49,6 +55,14 @@
     }
 
     .back-link:hover { text-decoration: underline; }
+
+    .header-logo {
+      height: 28px;
+      width: auto;
+      opacity: 0.5;
+    }
+
+    .header-logo:hover { opacity: 0.7; }
 
     .content {
       max-width: 720px;
@@ -198,6 +212,7 @@
   <div class="header">
     <div class="header-inner">
       <a class="back-link" href="/">&lsaquo; Back</a>
+      <a href="/"><img class="header-logo" src="../logo.png" alt="0xjf"></a>
     </div>
   </div>
 

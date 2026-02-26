@@ -4,6 +4,19 @@
   <meta charset="UTF-8">
   <title>Patching Metal Graphics into vphone — zeroxjf</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache. Clean-room reimplementation from RE, ~230 lines of C++.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Patching Metal Graphics into vphone">
+  <meta property="og:description" content="The shader compiler plugin is trapped in the PCC dyld shared cache — extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://zeroxjf.github.io/blog/metal-patch.html">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@zeroxjf">
+  <meta name="twitter:title" content="Patching Metal Graphics into vphone">
+  <meta name="twitter:description" content="The shader compiler plugin is trapped in the PCC dyld shared cache — extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 

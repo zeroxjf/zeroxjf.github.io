@@ -236,7 +236,8 @@
 
     <div class="post-body">
       <h2>Overview</h2>
-      <p>vphone gets a working paravirtualized GPU from the kernel driver, but Metal won't initialize without a userspace shader compiler plugin. Apple ships one in the PCC dyld shared cache, but it can't be extracted &mdash; the Mach-O comes out with broken relocations and dyld won't load it. This is a clean-room reimplementation of that plugin (~230 lines of C++) built from reverse engineering the original. It compiles against the device's <code>libLLVM</code> and <code>libGPUCompiler</code> at runtime, and gets installed into the Metal bundle on rootfs via SSH ramdisk.</p>
+      <p><a href="https://github.com/wh1te4ever/super-tart-vphone" target="_blank">vphone</a> by <a href="https://github.com/wh1te4ever" target="_blank">wh1te4ever</a> gets a working paravirtualized GPU from the kernel driver, but Metal won't initialize without a userspace shader compiler plugin. Apple ships one in the PCC dyld shared cache, but it can't be extracted &mdash; the Mach-O comes out with broken relocations and dyld won't load it. This is a clean-room reimplementation of that plugin (~230 lines of C++) built from reverse engineering the original. It compiles against the device's <code>libLLVM</code> and <code>libGPUCompiler</code> at runtime, and gets installed into the Metal bundle on rootfs via SSH ramdisk.</p>
+      <p>All of the VM infrastructure &mdash; the paravirtualized GPU driver, the boot chain, the SSH ramdisk, <code>fix_boot.py</code>, and everything else that makes this possible &mdash; is <a href="https://github.com/wh1te4ever" target="_blank">wh1te4ever</a>'s work. This post only covers the compiler plugin shim.</p>
 
       <h2>AI-assisted install</h2>
       <p>Save <a href="assets/metal-patch/main.mm">main.mm</a> and <a href="assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then feed the following to Claude Code, Codex, or similar:</p>
@@ -314,6 +315,11 @@
       <p>Reversed from the PCC dyld shared cache. The original has 47 functions, mostly C++ thunks wrapping LLVM calls.</p>
       <p>The <code>AppleParavirtCompiler</code> class has a vtable and 3 instance members. arm64e <code>auth_stubs</code> made it straightforward to confirm the full import set &mdash; every cross-image call goes through a PAC stub with the target symbol name in the GOT.</p>
       <p>The shader entry point search walks <code>air.vertex</code>, <code>air.fragment</code>, and <code>air.kernel</code> metadata nodes in the AIR module. The original implementation uses the C++ LLVM API directly; the reimplementation uses the stable C API instead (exported since LLVM 3.x), which avoids ABI fragility across toolchain versions.</p>
+
+      <hr class="post-divider">
+
+      <h2>Disclaimer</h2>
+      <p>No Apple software is redistributed here. The source files above are an original, clean-room reimplementation. They contain only function prototypes (not copyrightable) and new code that conforms to the same interface. No binaries, libraries, or code from Apple's dyld shared cache, disk images, or SDKs are included. The dylib links against nothing at build time &mdash; all symbols are resolved at runtime via <code>-undefined dynamic_lookup</code> against libraries already present on the device.</p>
     </div>
   </div>
 </body>

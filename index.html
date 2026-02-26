@@ -24,8 +24,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-      background: #0a0a0a;
-      color: #e0e0e0;
+      background: #141416;
+      color: #b0b4ba;
       min-height: 100vh;
     }
 
@@ -38,7 +38,7 @@
     .header h1 {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #fff;
+      color: #d0d0d4;
       letter-spacing: -0.025em;
     }
 
@@ -51,7 +51,7 @@
     }
 
     .header-links a {
-      color: #6eb5ff;
+      color: #7ca0c4;
       text-decoration: none;
     }
 
@@ -70,18 +70,18 @@
       align-items: center;
       gap: 0.4rem;
       padding: 0.4rem 0.75rem;
-      background: #141414;
-      border: 1px solid #1e1e1e;
+      background: #1c1c1f;
+      border: 1px solid #27272a;
       border-radius: 8px;
-      color: #999;
+      color: #75757c;
       text-decoration: none;
       font-size: 0.8rem;
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
 
-    .manager-btn:hover { background: #1a1a1a; border-color: #2a2a2a; color: #ccc; }
-    .manager-btn img { height: 16px; width: 16px; opacity: 0.7; }
-    .manager-btn:hover img { opacity: 1; }
+    .manager-btn:hover { background: #222225; border-color: #333337; color: #a0a0a6; }
+    .manager-btn img { height: 16px; width: 16px; opacity: 0.6; }
+    .manager-btn:hover img { opacity: 0.85; }
 
     /* ---- Layout ---- */
     .content { max-width: 700px; margin: 0 auto; padding: 0 1.5rem 3rem; }
@@ -93,7 +93,7 @@
 
     .section + .section {
       margin-top: 0.5rem;
-      border-top: 1px solid #161616;
+      border-top: 1px solid #222225;
     }
 
     .section-header {
@@ -108,18 +108,18 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #555;
+      color: #606068;
     }
 
     .section-line {
       flex: 1;
       height: 1px;
-      background: #1a1a1a;
+      background: #27272a;
     }
 
     .section-count {
       font-size: 0.7rem;
-      color: #333;
+      color: #45454c;
       font-variant-numeric: tabular-nums;
     }
 
@@ -137,24 +137,24 @@
       gap: 1rem;
       text-decoration: none;
       padding: 1.25rem 1.15rem;
-      background: #111;
-      border: 1px solid #181818;
+      background: #1c1c1f;
+      border: 1px solid #27272a;
       border-radius: 10px;
       transition: background 0.15s, border-color 0.15s;
     }
 
     .blog-card:hover {
-      background: #151515;
-      border-color: #252525;
+      background: #222225;
+      border-color: #333337;
     }
 
-    .blog-card:hover .blog-title { color: #6eb5ff; }
-    .blog-card:hover .blog-arrow { color: #6eb5ff; }
+    .blog-card:hover .blog-title { color: #7ca0c4; }
+    .blog-card:hover .blog-arrow { color: #7ca0c4; }
 
     .blog-title {
       font-size: 0.95rem;
       font-weight: 600;
-      color: #e8e8e8;
+      color: #c8c8cc;
       line-height: 1.35;
       letter-spacing: -0.01em;
       transition: color 0.15s;
@@ -162,7 +162,7 @@
 
     .blog-excerpt {
       font-size: 0.84rem;
-      color: #666;
+      color: #75757c;
       margin-top: 0.4rem;
       line-height: 1.6;
       display: -webkit-box;
@@ -182,12 +182,12 @@
 
     .blog-date {
       font-size: 0.72rem;
-      color: #444;
+      color: #55555c;
     }
 
     .blog-arrow {
       font-size: 0.9rem;
-      color: #333;
+      color: #45454c;
       transition: color 0.15s;
     }
 
@@ -195,8 +195,8 @@
     .tweak-list { display: flex; flex-direction: column; gap: 0.5rem; }
 
     .tweak-card {
-      background: #111;
-      border: 1px solid #181818;
+      background: #1c1c1f;
+      border: 1px solid #27272a;
       border-radius: 10px;
       padding: 0.9rem 1rem;
       cursor: pointer;
@@ -204,7 +204,7 @@
       position: relative;
     }
 
-    .tweak-card:hover { background: #151515; border-color: #252525; }
+    .tweak-card:hover { background: #222225; border-color: #333337; }
 
     .tweak-card-top {
       display: flex;
@@ -217,12 +217,12 @@
     .tweak-name {
       font-size: 0.95rem;
       font-weight: 600;
-      color: #e8e8e8;
+      color: #c8c8cc;
     }
 
     .tweak-desc {
       font-size: 0.82rem;
-      color: #666;
+      color: #75757c;
       margin-top: 0.15rem;
       white-space: nowrap;
       overflow: hidden;
@@ -242,18 +242,18 @@
       font-weight: 500;
       padding: 0.15rem 0.45rem;
       border-radius: 4px;
-      background: #1a1a1a;
-      color: #555;
+      background: #222225;
+      color: #606068;
       font-variant-numeric: tabular-nums;
     }
 
     .tweak-arrow {
       font-size: 0.85rem;
-      color: #333;
+      color: #45454c;
       transition: transform 0.2s, color 0.15s;
     }
 
-    .tweak-card:hover .tweak-arrow { color: #6eb5ff; }
+    .tweak-card:hover .tweak-arrow { color: #7ca0c4; }
     .tweak-card.open .tweak-arrow { transform: rotate(90deg); }
 
     .tweak-dot {
@@ -275,7 +275,7 @@
     .depiction-inner {
       padding-top: 1rem;
       margin-top: 1rem;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid #27272a;
     }
 
     /* ---- Tabs ---- */
@@ -283,14 +283,14 @@
       display: flex;
       gap: 0;
       margin-bottom: 1rem;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid #27272a;
     }
 
     .dep-tab {
       padding: 0.5rem 1rem;
       font-size: 0.82rem;
       font-weight: 500;
-      color: #555;
+      color: #606068;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       transition: color 0.15s, border-color 0.15s;
@@ -300,8 +300,8 @@
       border-right: none;
     }
 
-    .dep-tab:hover { color: #aaa; }
-    .dep-tab.active { color: #fff; }
+    .dep-tab:hover { color: #a0a0a6; }
+    .dep-tab.active { color: #d0d0d4; }
 
     .dep-tab-content { display: none; }
     .dep-tab-content.active { display: block; }
@@ -312,7 +312,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: #777;
+      color: #75757c;
       margin: 1.25rem 0 0.5rem;
     }
 
@@ -321,12 +321,12 @@
     .dep-markdown {
       font-size: 0.88rem;
       line-height: 1.6;
-      color: #bbb;
+      color: #a0a0a6;
     }
 
     .dep-markdown p { margin-bottom: 0.5rem; }
     .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { color: #ddd; font-weight: 600; }
+    .dep-markdown strong { color: #c8c8cc; font-weight: 600; }
     .dep-markdown em { font-style: italic; }
 
     .dep-markdown ul, .dep-markdown ol {
@@ -338,15 +338,15 @@
     .dep-markdown code {
       font-family: 'SF Mono', 'Menlo', monospace;
       font-size: 0.8rem;
-      background: #161616;
+      background: #1a1a1d;
       padding: 0.12rem 0.32rem;
       border-radius: 4px;
-      color: #ccc;
+      color: #b0b4ba;
     }
 
     .dep-markdown pre {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
+      background: #16161a;
+      border: 1px solid #27272a;
       border-radius: 8px;
       padding: 0.75rem 1rem;
       overflow-x: auto;
@@ -357,11 +357,11 @@
       background: none;
       padding: 0;
       font-size: 0.78rem;
-      color: #999;
+      color: #85858c;
     }
 
     .dep-markdown a {
-      color: #6eb5ff;
+      color: #7ca0c4;
       text-decoration: none;
     }
 
@@ -369,7 +369,7 @@
 
     .dep-separator {
       border: none;
-      border-top: 1px solid #181818;
+      border-top: 1px solid #27272a;
       margin: 0.75rem 0;
     }
 
@@ -381,8 +381,8 @@
       font-size: 0.85rem;
     }
 
-    .dep-table-title { color: #666; }
-    .dep-table-value { color: #bbb; font-weight: 500; }
+    .dep-table-title { color: #75757c; }
+    .dep-table-value { color: #a0a0a6; font-weight: 500; }
 
     .dep-button {
       display: inline-block;
@@ -392,7 +392,7 @@
       font-size: 0.85rem;
       font-weight: 500;
       text-decoration: none;
-      color: #fff;
+      color: #d0d0d4;
       transition: opacity 0.15s;
     }
 
@@ -401,7 +401,7 @@
     .dep-loading {
       text-align: center;
       padding: 2rem;
-      color: #444;
+      color: #55555c;
       font-size: 0.82rem;
     }
 
@@ -414,7 +414,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      color: #6eb5ff;
+      color: #7ca0c4;
       text-decoration: none;
       font-size: 0.82rem;
       margin-bottom: 1.25rem;
@@ -436,7 +436,7 @@
     .detail-title {
       font-size: 1.3rem;
       font-weight: 700;
-      color: #fff;
+      color: #d0d0d4;
     }
 
     .detail-version {
@@ -444,20 +444,20 @@
       font-weight: 500;
       padding: 0.2rem 0.55rem;
       border-radius: 5px;
-      background: #1a1a1a;
-      color: #666;
+      background: #222225;
+      color: #606068;
     }
 
     .detail-desc {
       font-size: 0.88rem;
-      color: #666;
+      color: #75757c;
       margin-top: -1rem;
       margin-bottom: 1.25rem;
     }
 
     .detail-depiction {
-      background: #111;
-      border: 1px solid #181818;
+      background: #1c1c1f;
+      border: 1px solid #27272a;
       border-radius: 12px;
       padding: 1.25rem;
     }
@@ -625,7 +625,7 @@
             <span class="dep-table-value">${escapeHtml(view.text)}</span>
           </div>`;
         case 'DepictionTableButtonView':
-          const color = view.tintColor || tint || '#6eb5ff';
+          const color = view.tintColor || tint || '#7ca0c4';
           return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank"
             style="background:${color}22; color:${color}">${escapeHtml(view.title)}</a>`;
         default:
@@ -634,7 +634,7 @@
     }
 
     function renderDepiction(data) {
-      const tint = data.tintColor || '#6eb5ff';
+      const tint = data.tintColor || '#7ca0c4';
       const tabs = data.tabs || [];
       let tabsHtml = '<div class="dep-tabs">';
       let contentsHtml = '';

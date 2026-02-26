@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patching Metal Graphics into vphone — zeroxjf</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #6eb5ff;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .post-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: #555;
+      margin-top: 0.6rem;
+    }
+
+    .post-meta a {
+      color: #555;
+      text-decoration: none;
+    }
+
+    .post-meta a:hover { color: #888; text-decoration: underline; }
+
+    .post-meta-sep { color: #333; }
+
+    .post-excerpt {
+      font-size: 0.95rem;
+      color: #888;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    .post-files {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .post-file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.65rem;
+      background: #161616;
+      border: 1px solid #222;
+      border-radius: 6px;
+      color: #999;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .post-file-link:hover { border-color: #6eb5ff; color: #6eb5ff; }
+
+    .post-divider {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      margin: 1.75rem 0;
+    }
+
+    .post-body {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: #ccc;
+    }
+
+    .post-body h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 1.75rem 0 0.5rem;
+    }
+
+    .post-body h2:first-child { margin-top: 0; }
+
+    .post-body p { margin-bottom: 0.6rem; }
+    .post-body strong { color: #fff; font-weight: 600; }
+
+    .post-body ul, .post-body ol {
+      margin: 0.25rem 0 0.6rem 1.25rem;
+    }
+
+    .post-body li { margin-bottom: 0.25rem; }
+
+    .post-body code {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.82rem;
+      background: #161616;
+      padding: 0.12rem 0.32rem;
+      border-radius: 3px;
+      color: #ddd;
+    }
+
+    .post-body pre {
+      background: #0f0f0f;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0 0.75rem;
+    }
+
+    .post-body pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.78rem;
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    .post-body a {
+      color: #6eb5ff;
+      text-decoration: none;
+    }
+
+    .post-body a:hover { text-decoration: underline; }
+
+    .post-body blockquote {
+      border-left: 2px solid #2a2a2a;
+      padding-left: 0.75rem;
+      margin: 0.5rem 0;
+      color: #999;
+      font-size: 0.87rem;
+    }
+
+    .post-body blockquote ol {
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 500px) {
+      .content { padding: 1.5rem 1rem 2rem; }
+      .post-title { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <a class="back-link" href="/">&lsaquo; Back</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <h1 class="post-title">Patching Metal Graphics into vphone</h1>
+    <div class="post-meta">
+      <span>Feb 2026</span>
+      <span class="post-meta-sep">/</span>
+      <span><a href="https://github.com/wh1te4ever/super-tart-vphone" target="_blank">wh1te4ever/super-tart-vphone</a></span>
+    </div>
+    <p class="post-excerpt">vphone's paravirtualized GPU has no Metal because the shader compiler plugin is trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</p>
+
+    <div class="post-files">
+      <a class="post-file-link" href="assets/metal-patch/main.mm">main.mm</a>
+      <a class="post-file-link" href="assets/metal-patch/build.sh">build.sh</a>
+    </div>
+
+    <hr class="post-divider">
+
+    <div class="post-body">
+      <h2>AI-assisted install</h2>
+      <p>Save <a href="assets/metal-patch/main.mm">main.mm</a> and <a href="assets/metal-patch/build.sh">build.sh</a> to <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/</code>, then give this prompt to Claude Code, Codex, or similar:</p>
+      <blockquote>The vphone VM needs the Metal compiler plugin built and installed. Source is at <code>CFW/libAppleParavirtCompilerPluginIOGPUFamily/main.mm</code>, build script at <code>build.sh</code>. Do the following:
+        <ol>
+          <li>Run <code>./build.sh</code> to compile the dylib.</li>
+          <li>Boot DFU: <code>./.build/debug/tart run vphone --dfu &amp;</code></li>
+          <li>Boot SSH ramdisk: <code>cd CFW &amp;&amp; ./boot_rd.sh</code> then <code>iproxy 2222 22 &amp;</code></li>
+          <li>SSH in (root@127.0.0.1 -p2222, pw alpine), mount rootfs: <code>/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1</code></li>
+          <li>SCP dylib to <code>/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/</code></li>
+          <li>Halt: <code>sync &amp;&amp; /sbin/halt</code></li>
+          <li>Kill tart, normal boot: <code>./.build/debug/tart run vphone --vnc-experimental</code></li>
+        </ol>
+        The rest of the bundle is already on rootfs from fix_boot.py.
+      </blockquote>
+
+      <h2>Manual install</h2>
+<pre><code>cd CFW/libAppleParavirtCompilerPluginIOGPUFamily
+chmod +x build.sh &amp;&amp; ./build.sh
+
+./.build/debug/tart run vphone --dfu &amp;
+cd CFW &amp;&amp; ./boot_rd.sh
+iproxy 2222 22 &amp;
+
+ssh root@127.0.0.1 -p2222 "/sbin/mount_apfs -o rw /dev/disk1s1 /mnt1"
+scp -P 2222 libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+    root@127.0.0.1:/mnt1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/
+
+ssh root@127.0.0.1 -p2222 "sync &amp;&amp; /sbin/halt"
+./.build/debug/tart run vphone --vnc-experimental</code></pre>
+      <p>SSH password: <code>alpine</code></p>
+
+      <h2>Verify</h2>
+      <ul>
+        <li><code>backboardd</code> running (no crash)</li>
+        <li>SpringBoard renders with a background, not black</li>
+        <li>MetalTest: <code>Metal Device Create Success: Apple Paravirtual device</code></li>
+      </ul>
+
+      <hr class="post-divider">
+
+      <h2>Why this is necessary</h2>
+      <p>The VM's paravirt GPU kernel driver works, but Metal needs a userspace plugin at <code>/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle</code>. The main binary, plist, and codesig copy from the PCC disk image. The compiler plugin only exists in the PCC dyld shared cache &mdash; extracted Mach-Os have cache-relative vmaddrs, no <code>LC_DYLD_CHAINED_FIXUPS</code>, no rebase/bind opcodes. dyld can't load them. <code>backboardd</code> crashes, black screen.</p>
+
+      <h2>What the plugin does</h2>
+      <p>Four exports: <code>MTLCompilerCreate</code> (version==8 check, stores target triple), <code>MTLCompilerBuildRequestWithOptions</code> (AIR module in, metallib out), <code>MTLCompilerDelete</code>, <code>MTLCompilerReleaseReply</code>. Calls <code>libGPUCompiler</code> and <code>libLLVM</code> from the device DSC. Key flags: <code>-undefined dynamic_lookup</code> (runtime symbol resolution) and <code>-not_for_dyld_shared_cache</code>.</p>
+
+      <h2>RE notes</h2>
+      <p>From the PCC DSC. 47 functions, mostly C++ thunks. <code>AppleParavirtCompiler</code> class with vtable + 3 members. arm64e <code>auth_stubs</code> confirmed the import set. Entry point search walks <code>air.vertex</code>/<code>air.fragment</code>/<code>air.kernel</code> metadata nodes. Original used C++ LLVM API; reimplementation uses the stable C API (exported since LLVM 3.x).</p>
+    </div>
+  </div>
+</body>
+</html>

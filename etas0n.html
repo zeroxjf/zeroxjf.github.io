@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>etas0n - checkm8 2.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            overflow: hidden;
+        }
+
+        .title {
+            font-size: 72px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            color: #ff0000;
+            text-shadow: 0 0 40px rgba(255, 0, 0, 0.4), 0 0 80px rgba(255, 0, 0, 0.2);
+            margin-bottom: 12px;
+            animation: flicker 3s infinite;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #333;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 60px;
+        }
+
+        .btn-container {
+            position: relative;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-glow {
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.15) 0%, transparent 70%);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .btn {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: radial-gradient(circle at 35% 35%, #ff2020, #cc0000 50%, #880000);
+            box-shadow:
+                0 8px 0 #550000,
+                0 12px 30px rgba(0, 0, 0, 0.6),
+                inset 0 -4px 12px rgba(0, 0, 0, 0.4),
+                inset 0 4px 12px rgba(255, 100, 100, 0.3),
+                0 0 60px rgba(255, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: transform 0.1s, box-shadow 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow:
+                0 2px 0 #550000,
+                0 4px 15px rgba(0, 0, 0, 0.6),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.4),
+                inset 0 4px 12px rgba(255, 100, 100, 0.3),
+                0 0 80px rgba(255, 0, 0, 0.5);
+        }
+
+        .btn-text {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .btn-sub {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 6px;
+            pointer-events: none;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            font-size: 11px;
+            color: #222;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            96% { opacity: 0.9; }
+            97% { opacity: 1; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">etas0n</div>
+    <div class="subtitle">permanent. unpatchable. forever.</div>
+
+    <div class="btn-container" onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">
+        <div class="btn-glow"></div>
+        <div class="btn">
+            <div class="btn-text">checkm8 2.0</div>
+            <div class="btn-sub">tap to jailbreak</div>
+        </div>
+    </div>
+
+    <div class="footer">etas0n v0.0.1 &mdash; trust me bro</div>
+</body>
+</html>

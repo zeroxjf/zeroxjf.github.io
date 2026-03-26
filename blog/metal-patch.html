@@ -21,28 +21,31 @@
   <meta name="twitter:image" content="https://zeroxjf.github.io/blog/assets/metal-patch/og-image.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-      background: #141416;
-      color: #b0b4ba;
+      background: #f5f5f7;
+      color: #1d1d1f;
       min-height: 100vh;
     }
 
     .header {
-      padding: 2.5rem 1.5rem 1.75rem;
+      padding: 2.5rem 1.5rem 2rem;
       text-align: center;
+      background: #ffffff;
+      border-bottom: 1px solid #d2d2d7;
     }
 
     .header-logo {
       height: 48px;
       width: auto;
-      opacity: 0.85;
+      filter: brightness(0);
     }
 
     .header-subtitle {
       font-size: 0.78rem;
-      color: #606068;
+      color: #6e6e73;
       margin-top: 0.35rem;
       letter-spacing: 0.04em;
     }
@@ -51,7 +54,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      color: #7ca0c4;
+      color: #0071e3;
       text-decoration: none;
       font-size: 0.85rem;
       margin-top: 0.75rem;
@@ -68,7 +71,7 @@
     .post-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #d0d0d4;
+      color: #1d1d1f;
       letter-spacing: -0.02em;
       line-height: 1.3;
     }
@@ -78,22 +81,17 @@
       align-items: center;
       gap: 0.5rem;
       font-size: 0.8rem;
-      color: #606068;
+      color: #6e6e73;
       margin-top: 0.5rem;
     }
 
-    .post-meta a {
-      color: #606068;
-      text-decoration: none;
-    }
-
-    .post-meta a:hover { color: #85858c; text-decoration: underline; }
-
-    .post-meta-sep { color: #3a3a40; }
+    .post-meta a { color: #6e6e73; text-decoration: none; }
+    .post-meta a:hover { color: #1d1d1f; text-decoration: underline; }
+    .post-meta-sep { color: #d2d2d7; }
 
     .post-excerpt {
       font-size: 0.95rem;
-      color: #8a8a92;
+      color: #6e6e73;
       margin-top: 0.85rem;
       line-height: 1.55;
     }
@@ -110,61 +108,59 @@
       align-items: center;
       gap: 0.3rem;
       padding: 0.3rem 0.65rem;
-      background: #1c1c1f;
-      border: 1px solid #27272a;
+      background: #ffffff;
+      border: 1px solid #d2d2d7;
       border-radius: 6px;
-      color: #85858c;
+      color: #1d1d1f;
       text-decoration: none;
       font-size: 0.78rem;
       font-family: 'SF Mono', 'Menlo', monospace;
       transition: border-color 0.15s, color 0.15s;
     }
 
-    .post-file-link:hover { border-color: #7ca0c4; color: #7ca0c4; }
+    .post-file-link:hover { border-color: #0071e3; color: #0071e3; }
 
     .post-divider {
       border: none;
-      border-top: 1px solid #222225;
+      border-top: 1px solid #d2d2d7;
       margin: 1.75rem 0;
     }
 
     .post-body {
       font-size: 0.92rem;
       line-height: 1.65;
-      color: #a8a8ae;
+      color: #1d1d1f;
     }
 
     .post-body h2 {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #d0d0d4;
+      color: #1d1d1f;
       margin: 2rem 0 0.65rem;
     }
 
     .post-body h2:first-child { margin-top: 0; }
 
     .post-body p { margin-bottom: 0.75rem; }
-    .post-body strong { color: #c8c8cc; font-weight: 600; }
+    .post-body strong { color: #1d1d1f; font-weight: 600; }
 
-    .post-body ul, .post-body ol {
-      margin: 0.25rem 0 0.6rem 1.25rem;
-    }
-
+    .post-body ul, .post-body ol { margin: 0.25rem 0 0.6rem 1.25rem; }
     .post-body li { margin-bottom: 0.35rem; }
 
     .post-body code {
       font-family: 'SF Mono', 'Menlo', monospace;
       font-size: 0.82rem;
-      background: #1e1e22;
+      background: #f5f5f7;
       padding: 0.15rem 0.35rem;
       border-radius: 4px;
-      color: #c0c4ca;
+      color: #1d1d1f;
+      border: 1px solid #e8e8ed;
     }
 
     .post-body pre {
-      background: #0f0f12;
-      border: 1px solid #252530;
-      border-left: 3px solid #3a3a50;
+      background: #f5f5f7;
+      border: 1px solid #d2d2d7;
+      border-left: 3px solid #0071e3;
       border-radius: 6px;
       padding: 1.1rem 1.25rem;
       overflow-x: auto;
@@ -175,35 +171,30 @@
       background: none;
       padding: 0;
       font-size: 0.8rem;
-      color: #b8bcc4;
+      color: #1d1d1f;
       line-height: 1.6;
+      border: none;
     }
 
-    /* syntax highlighting */
-    .sh-comment { color: #5c6370; font-style: italic; }
-    .sh-var { color: #e5c07b; }
-    .sh-string { color: #98c379; }
-    .sh-flag { color: #c678dd; }
-    .sh-cmd { color: #61afef; }
+    /* syntax highlighting — light/Xcode-style */
+    .sh-comment { color: #6e6e73; font-style: italic; }
+    .sh-var     { color: #b95000; }
+    .sh-string  { color: #268800; }
+    .sh-flag    { color: #7f4098; }
+    .sh-cmd     { color: #0055d4; }
 
-    .post-body a {
-      color: #7ca0c4;
-      text-decoration: none;
-    }
-
+    .post-body a { color: #0071e3; text-decoration: none; }
     .post-body a:hover { text-decoration: underline; }
 
     .post-body blockquote {
-      border-left: 2px solid #333337;
+      border-left: 2px solid #d2d2d7;
       padding-left: 0.75rem;
       margin: 0.5rem 0;
-      color: #85858c;
+      color: #6e6e73;
       font-size: 0.87rem;
     }
 
-    .post-body blockquote ol {
-      margin-top: 0.3rem;
-    }
+    .post-body blockquote ol { margin-top: 0.3rem; }
 
     @media (max-width: 500px) {
       .content { padding: 1.5rem 1rem 2rem; }
@@ -235,7 +226,7 @@
     <hr class="post-divider">
 
     <div class="post-body">
-      <p><em><span style="color: #e05555;">&#x26A0;</span> <strong style="color: #c8c8cc;">Disclaimer:</strong> No Apple software is redistributed here. The source files are an original, clean-room reimplementation containing only function prototypes and new code. No binaries, libraries, or code from Apple's dyld shared cache, disk images, or SDKs are included. The dylib links against nothing at build time &mdash; all symbols are resolved at runtime via <code>-undefined dynamic_lookup</code> against libraries already present on the device.</em></p>
+      <p><em><span style="color: #d70015;">&#x26A0;</span> <strong>Disclaimer:</strong> No Apple software is redistributed here. The source files are an original, clean-room reimplementation containing only function prototypes and new code. No binaries, libraries, or code from Apple's dyld shared cache, disk images, or SDKs are included. The dylib links against nothing at build time &mdash; all symbols are resolved at runtime via <code>-undefined dynamic_lookup</code> against libraries already present on the device.</em></p>
 
       <h2>Overview</h2>
       <p><a href="https://github.com/wh1te4ever/super-tart-vphone" target="_blank">vphone</a> by <a href="https://github.com/wh1te4ever" target="_blank">wh1te4ever</a> gets a working paravirtualized GPU from the kernel driver, but Metal won't initialize without a userspace shader compiler plugin. Apple ships one in the PCC dyld shared cache, but it can't be extracted &mdash; the Mach-O comes out with broken relocations and dyld won't load it. This is a clean-room reimplementation of that plugin (~230 lines of C++) built from reverse engineering the original. It compiles against the device's <code>libLLVM</code> and <code>libGPUCompiler</code> at runtime, and gets installed into the Metal bundle on rootfs via SSH ramdisk.</p>

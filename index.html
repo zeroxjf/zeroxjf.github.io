@@ -90,7 +90,14 @@
     .manager-btn:hover img { opacity: 0.85; }
 
     /* ---- Layout ---- */
-    .content { max-width: 700px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
 
     /* ---- Sections ---- */
     .section {
@@ -100,6 +107,11 @@
     .section + .section {
       margin-top: 0.5rem;
       border-top: 1px solid #222225;
+    }
+
+    .panels .section + .section {
+      margin-top: 0;
+      border-top: none;
     }
 
     .section-header {
@@ -563,6 +575,14 @@
     }
 
     /* ---- Responsive ---- */
+    @media (max-width: 850px) {
+      .panels { grid-template-columns: 1fr; }
+      .panels .section + .section {
+        margin-top: 0.5rem;
+        border-top: 1px solid #222225;
+      }
+    }
+
     @media (max-width: 500px) {
       .header { padding: 2rem 1rem 1.5rem; }
       .content { padding: 0 1rem 2rem; }
@@ -607,6 +627,7 @@
   </div>
 
   <div class="content">
+  <div class="panels" id="panels">
 
     <!-- Research -->
     <div class="section" id="research-section">
@@ -724,6 +745,7 @@
       </div>
       <div class="tweak-list" id="tweak-list"></div>
     </div>
+  </div><!-- /.panels -->
     <div class="detail-view" id="detail-view"></div>
 
   </div>
@@ -878,23 +900,18 @@
     // --- Views ---
     const listView = document.getElementById('list-view');
     const detailView = document.getElementById('detail-view');
-    const blogSection = document.getElementById('blog-section');
-    const researchSection = document.getElementById('research-section');
+    const panels = document.getElementById('panels');
     const list = document.getElementById('tweak-list');
 
     function showList() {
-      listView.classList.remove('hidden');
-      blogSection.style.display = '';
-      researchSection.style.display = '';
+      panels.style.display = '';
       detailView.classList.remove('active');
       detailView.innerHTML = '';
       document.title = "zeroxjf";
     }
 
     async function showDetail(tweak) {
-      listView.classList.add('hidden');
-      blogSection.style.display = 'none';
-      researchSection.style.display = 'none';
+      panels.style.display = 'none';
       detailView.classList.add('active');
       document.title = tweak.name + " \u2014 zeroxjf";
 

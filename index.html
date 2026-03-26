@@ -90,14 +90,18 @@
     .manager-btn:hover img { opacity: 0.85; }
 
     /* ---- Layout ---- */
-    .content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    .content { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 3rem; }
 
     .panels {
       display: grid;
-      grid-template-columns: 1fr 1.3fr 0.75fr;
-      gap: 1.5rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
       align-items: start;
-      margin: 0 auto;
+    }
+
+    .panel-right {
+      display: flex;
+      flex-direction: column;
     }
 
     /* ---- Sections ---- */
@@ -108,11 +112,6 @@
     .section + .section {
       margin-top: 0.5rem;
       border-top: 1px solid #222225;
-    }
-
-    .panels .section + .section {
-      margin-top: 0;
-      border-top: none;
     }
 
     .section-header {
@@ -576,12 +575,8 @@
     }
 
     /* ---- Responsive ---- */
-    @media (max-width: 850px) {
+    @media (max-width: 700px) {
       .panels { grid-template-columns: 1fr; }
-      .panels .section + .section {
-        margin-top: 0.5rem;
-        border-top: 1px solid #222225;
-      }
     }
 
     @media (max-width: 500px) {
@@ -717,6 +712,8 @@
       </div>
     </div>
 
+    <div class="panel-right">
+
     <!-- Blog -->
     <div class="section" id="blog-section">
       <div class="section-header">
@@ -746,6 +743,7 @@
       </div>
       <div class="tweak-list" id="tweak-list"></div>
     </div>
+    </div><!-- /.panel-right -->
   </div><!-- /.panels -->
     <div class="detail-view" id="detail-view"></div>
 

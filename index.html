@@ -25,16 +25,16 @@
 
     body {
       font-family: 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
-      background: #0d1117;
-      color: #c9d1d9;
+      background: #0c0e14;
+      color: #b0b8c8;
       min-height: 100vh;
       line-height: 1.6;
     }
 
-    a { color: #58a6ff; text-decoration: none; transition: color 0.15s; }
-    a:hover { color: #79c0ff; }
+    a { color: #6b8aed; text-decoration: none; transition: color 0.15s; }
+    a:hover { color: #93aaf5; }
 
-    ::selection { background: #58a6ff33; }
+    ::selection { background: #4c6ef533; }
 
     /* ---- Layout ---- */
     .content {
@@ -45,40 +45,68 @@
 
     /* ---- Header ---- */
     .header {
-      padding: 3rem 0 1.5rem;
-      border-bottom: 1px solid #21262d;
+      padding: 3.5rem 0 1.5rem;
+      border-bottom: 1px solid #1a1f2b;
       margin-bottom: 2rem;
     }
 
     .header-title {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: #f0f6fc;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.3rem;
+      color: #e2e8f0;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.15rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+    }
+
+    .header-prefix {
+      color: #4c6ef5;
+      font-weight: 400;
+      opacity: 0.7;
+    }
+
+    .header-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.3em;
+      background: #4c6ef5;
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
     }
 
     .header-sub {
-      font-size: 0.85rem;
-      color: #484f58;
-      margin-bottom: 1.2rem;
+      font-size: 0.8rem;
+      color: #525866;
+      margin-bottom: 1.4rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      letter-spacing: 0.03em;
     }
 
     .nav {
       display: flex;
-      gap: 1.2rem;
+      gap: 0.3rem;
       flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
 
     .nav a {
-      font-size: 0.82rem;
-      color: #8b949e;
+      font-size: 0.75rem;
+      color: #525866;
       font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
     }
 
-    .nav a:hover { color: #f0f6fc; }
-    .nav a.active { color: #f0f6fc; font-weight: 700; }
+    .nav a:hover { color: #e2e8f0; background: #1a1f2b; }
+    .nav a.active { color: #e2e8f0; background: #1a1f2b; }
 
     .social-row {
       display: flex;
@@ -87,17 +115,17 @@
     }
 
     .social-row a {
-      color: #484f58;
+      color: #3d4350;
       display: inline-flex;
       transition: color 0.15s;
     }
 
-    .social-row a:hover { color: #c9d1d9; }
+    .social-row a:hover { color: #e2e8f0; }
 
     /* ---- Intro ---- */
     .intro {
-      font-size: 0.88rem;
-      color: #8b949e;
+      font-size: 0.85rem;
+      color: #525866;
       margin-bottom: 2.5rem;
       line-height: 1.7;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -107,11 +135,14 @@
     .section { margin-bottom: 2.5rem; }
 
     .section-title {
-      font-size: 0.95rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      color: #f0f6fc;
+      color: #525866;
       margin-bottom: 1rem;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-left: 0.75rem;
+      border-left: 2px solid #4c6ef5;
     }
 
     /* ---- Post lines (research & blog) ---- */
@@ -119,17 +150,17 @@
       display: flex;
       align-items: baseline;
       gap: 1rem;
-      padding: 0.35rem 0;
-      border-bottom: 1px solid #21262d;
-      transition: border-color 0.15s;
+      padding: 0.45rem 0.5rem;
+      margin: 0 -0.5rem;
+      border-radius: 4px;
+      transition: background 0.15s;
     }
 
-    .post-line:last-child { border-bottom: none; }
-    .post-line:hover { border-color: #30363d; }
+    .post-line:hover { background: #12151e; }
 
     .line-date {
-      font-size: 0.72rem;
-      color: #484f58;
+      font-size: 0.7rem;
+      color: #3d4350;
       flex-shrink: 0;
       width: 5.5rem;
       font-variant-numeric: tabular-nums;
@@ -137,12 +168,12 @@
 
     .line-title {
       font-size: 0.85rem;
-      color: #c9d1d9;
+      color: #b0b8c8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       transition: color 0.15s;
     }
 
-    .post-line:hover .line-title { color: #f0f6fc; }
+    .post-line:hover .line-title { color: #e2e8f0; }
 
     .line-tags {
       display: inline-flex;
@@ -168,7 +199,7 @@
 
     .line-stars {
       font-size: 0.68rem;
-      color: #484f58;
+      color: #3d4350;
       margin-left: auto;
       flex-shrink: 0;
       font-variant-numeric: tabular-nums;
@@ -187,16 +218,16 @@
       align-items: center;
       gap: 0.4rem;
       padding: 0.35rem 0.7rem;
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 6px;
-      color: #8b949e;
+      background: #111420;
+      border: 1px solid #1a1f2b;
+      border-radius: 4px;
+      color: #525866;
       text-decoration: none;
       font-size: 0.75rem;
       transition: border-color 0.15s, color 0.15s;
     }
 
-    .manager-btn:hover { border-color: #30363d; color: #c9d1d9; }
+    .manager-btn:hover { border-color: #2a3040; color: #b0b8c8; }
     .manager-btn img { height: 14px; width: 14px; opacity: 0.7; }
 
     /* ---- Tweak list ---- */
@@ -204,14 +235,14 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #21262d;
+      padding: 0.5rem 0.5rem;
+      margin: 0 -0.5rem;
+      border-radius: 4px;
       cursor: pointer;
-      transition: border-color 0.15s;
+      transition: background 0.15s;
     }
 
-    .tweak-line:last-child { border-bottom: none; }
-    .tweak-line:hover { border-color: #30363d; }
+    .tweak-line:hover { background: #12151e; }
 
     .tweak-dot {
       width: 6px;
@@ -224,34 +255,34 @@
 
     .tweak-name {
       font-size: 0.85rem;
-      color: #c9d1d9;
+      color: #b0b8c8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-weight: 600;
       transition: color 0.15s;
     }
 
-    .tweak-line:hover .tweak-name { color: #f0f6fc; }
+    .tweak-line:hover .tweak-name { color: #e2e8f0; }
 
     .tweak-desc {
       font-size: 0.75rem;
-      color: #484f58;
+      color: #3d4350;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     .tweak-ver {
       font-size: 0.68rem;
-      color: #484f58;
+      color: #3d4350;
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
 
     .tweak-arrow {
       font-size: 0.85rem;
-      color: #30363d;
+      color: #2a3040;
       transition: color 0.15s;
     }
 
-    .tweak-line:hover .tweak-arrow { color: #58a6ff; }
+    .tweak-line:hover .tweak-arrow { color: #6b8aed; }
 
     /* ---- Detail view ---- */
     .detail-view { display: none; }
@@ -261,7 +292,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      color: #58a6ff;
+      color: #6b8aed;
       font-size: 0.8rem;
       cursor: pointer;
       background: none;
@@ -271,7 +302,7 @@
       font-family: inherit;
     }
 
-    .detail-back:hover { color: #79c0ff; }
+    .detail-back:hover { color: #93aaf5; }
 
     .detail-header {
       display: flex;
@@ -280,23 +311,23 @@
       margin-bottom: 0.5rem;
     }
 
-    .detail-title { font-size: 1.2rem; font-weight: 700; color: #f0f6fc; }
+    .detail-title { font-size: 1.2rem; font-weight: 700; color: #e2e8f0; }
 
     .detail-version {
       font-size: 0.7rem;
       padding: 0.15rem 0.45rem;
       border-radius: 4px;
-      background: #161b22;
-      color: #8b949e;
-      border: 1px solid #21262d;
+      background: #111420;
+      color: #525866;
+      border: 1px solid #1a1f2b;
     }
 
-    .detail-desc { font-size: 0.82rem; color: #484f58; margin-bottom: 1.5rem; }
+    .detail-desc { font-size: 0.82rem; color: #3d4350; margin-bottom: 1.5rem; }
 
     .detail-depiction {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 8px;
+      background: #111420;
+      border: 1px solid #1a1f2b;
+      border-radius: 6px;
       padding: 1.25rem;
     }
 
@@ -304,14 +335,14 @@
     .dep-tabs {
       display: flex;
       margin-bottom: 1rem;
-      border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid #1a1f2b;
     }
 
     .dep-tab {
       padding: 0.5rem 1rem;
       font-size: 0.78rem;
       font-weight: 500;
-      color: #484f58;
+      color: #3d4350;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       transition: color 0.15s, border-color 0.15s;
@@ -322,8 +353,8 @@
       font-family: inherit;
     }
 
-    .dep-tab:hover { color: #c9d1d9; }
-    .dep-tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+    .dep-tab:hover { color: #b0b8c8; }
+    .dep-tab.active { color: #6b8aed; border-bottom-color: #4c6ef5; }
 
     .dep-tab-content { display: none; }
     .dep-tab-content.active { display: block; }
@@ -333,7 +364,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: #8b949e;
+      color: #525866;
       margin: 1.25rem 0 0.5rem;
     }
 
@@ -342,12 +373,12 @@
     .dep-markdown {
       font-size: 0.84rem;
       line-height: 1.7;
-      color: #c9d1d9;
+      color: #b0b8c8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
     .dep-markdown p { margin-bottom: 0.5rem; }
     .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { color: #f0f6fc; font-weight: 600; }
+    .dep-markdown strong { color: #e2e8f0; font-weight: 600; }
     .dep-markdown em { font-style: italic; }
     .dep-markdown ul, .dep-markdown ol { margin: 0.3rem 0 0.5rem 1.25rem; }
     .dep-markdown li { margin-bottom: 0.25rem; }
@@ -355,27 +386,27 @@
     .dep-markdown code {
       font-family: 'SF Mono', 'Menlo', monospace;
       font-size: 0.78rem;
-      background: #0d1117;
+      background: #0c0e14;
       padding: 0.12rem 0.32rem;
       border-radius: 4px;
-      color: #c9d1d9;
-      border: 1px solid #21262d;
+      color: #b0b8c8;
+      border: 1px solid #1a1f2b;
     }
 
     .dep-markdown pre {
-      background: #0d1117;
-      border: 1px solid #21262d;
+      background: #0c0e14;
+      border: 1px solid #1a1f2b;
       border-radius: 6px;
       padding: 0.75rem 1rem;
       overflow-x: auto;
       margin: 0.5rem 0;
     }
 
-    .dep-markdown pre code { background: none; padding: 0; font-size: 0.76rem; color: #8b949e; border: none; }
-    .dep-markdown a { color: #58a6ff; }
+    .dep-markdown pre code { background: none; padding: 0; font-size: 0.76rem; color: #525866; border: none; }
+    .dep-markdown a { color: #6b8aed; }
     .dep-markdown a:hover { text-decoration: underline; }
 
-    .dep-separator { border: none; border-top: 1px solid #21262d; margin: 0.75rem 0; }
+    .dep-separator { border: none; border-top: 1px solid #1a1f2b; margin: 0.75rem 0; }
 
     .dep-table-row {
       display: flex;
@@ -383,35 +414,35 @@
       align-items: center;
       padding: 0.5rem 0;
       font-size: 0.82rem;
-      border-bottom: 1px solid #161b22;
+      border-bottom: 1px solid #111420;
     }
 
-    .dep-table-title { color: #484f58; }
-    .dep-table-value { color: #c9d1d9; font-weight: 500; }
+    .dep-table-title { color: #3d4350; }
+    .dep-table-value { color: #b0b8c8; font-weight: 500; }
 
     .dep-button {
       display: inline-block;
       padding: 0.45rem 1rem;
       margin: 0.5rem 0;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: 0.8rem;
       font-weight: 500;
       text-decoration: none;
-      background: #21262d;
-      color: #58a6ff;
-      border: 1px solid #30363d;
+      background: #1a1f2b;
+      color: #6b8aed;
+      border: 1px solid #2a3040;
       transition: background 0.15s;
     }
 
-    .dep-button:hover { background: #30363d; }
+    .dep-button:hover { background: #2a3040; }
 
-    .dep-loading { text-align: center; padding: 2rem; color: #484f58; font-size: 0.78rem; }
+    .dep-loading { text-align: center; padding: 2rem; color: #3d4350; font-size: 0.78rem; }
 
     /* ---- Responsive ---- */
     @media (max-width: 500px) {
       .content { padding: 0 1rem 3rem; }
       .header { padding: 2rem 0 1.2rem; }
-      .header-title { font-size: 1.4rem; }
+      .header-title { font-size: 1.3rem; }
       .line-date { width: 4.5rem; font-size: 0.65rem; }
       .tweak-desc { display: none; }
       .line-tags { display: none; }
@@ -423,14 +454,14 @@
   <div class="content">
 
     <div class="header">
-      <div class="header-title" id="scramble-title">zeroxjf</div>
+      <div class="header-title"><span class="header-prefix">0x</span>jf<span class="header-cursor"></span></div>
       <div class="header-sub">iOS Security Researcher</div>
 
       <nav class="nav">
-        <a href="/" class="active">/home</a>
-        <a href="#research">/research</a>
-        <a href="#blog">/blog</a>
-        <a href="#tweaks">/tweaks</a>
+        <a href="/" class="active">home</a>
+        <a href="#research">research</a>
+        <a href="#blog">blog</a>
+        <a href="#tweaks">tweaks</a>
       </nav>
 
       <div class="social-row">
@@ -556,62 +587,6 @@
 
   </div>
 
-  <!-- Text scramble animation -->
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var el = document.getElementById('scramble-title');
-    if (!el) return;
-
-    var originalText = el.textContent.trim();
-    var chars = originalText.split('');
-    var finalLen = chars.length;
-    var pool = '0123456789abcdef@#$%&';
-
-    var display = [];
-    for (var i = 0; i < finalLen; i++) {
-      display.push(pool[Math.floor(Math.random() * pool.length)]);
-    }
-    el.textContent = display.join('');
-
-    var currentPos = 0;
-    var cycleCount = 0;
-    var lastFrame = 0;
-
-    var cyclesForChar = [];
-    for (var i = 0; i < finalLen; i++) {
-      cyclesForChar.push(3 + Math.floor(Math.random() * 10));
-    }
-
-    function frame(ts) {
-      var speed = Math.max(20, 40 - (currentPos * 1.5));
-      if (ts - lastFrame < speed) { requestAnimationFrame(frame); return; }
-      lastFrame = ts;
-
-      if (currentPos >= finalLen) { el.textContent = originalText; return; }
-
-      if (cycleCount >= cyclesForChar[currentPos]) {
-        display[currentPos] = chars[currentPos];
-        currentPos++;
-        cycleCount = 0;
-      } else {
-        display[currentPos] = pool[Math.floor(Math.random() * pool.length)];
-        cycleCount++;
-      }
-
-      for (var i = currentPos + 1; i < finalLen; i++) {
-        if (Math.random() < 0.06) {
-          display[i] = pool[Math.floor(Math.random() * pool.length)];
-        }
-      }
-
-      el.textContent = display.join('');
-      requestAnimationFrame(frame);
-    }
-
-    setTimeout(function () { requestAnimationFrame(frame); }, 200);
-  });
-  </script>
-
   <!-- Tweaks & depiction logic -->
   <script>
     const TWEAKS = [
@@ -621,7 +596,7 @@
         slug: 'typemillennium',
         version: '1.1.1',
         desc: 'System-wide iMessage typing indicator banner',
-        tint: '#58a6ff',
+        tint: '#6b8aed',
         depiction: 'depictions/com.zeroxjf.bartype.json'
       },
       {
@@ -630,7 +605,7 @@
         slug: 'zoom5x',
         version: '1.0.0',
         desc: 'Adds a 5x zoom button to the Camera app',
-        tint: '#58a6ff',
+        tint: '#6b8aed',
         depiction: 'depictions/com.zeroxjf.zoom5x.json'
       },
       {
@@ -639,7 +614,7 @@
         slug: 'springcuts',
         version: '1.5.2',
         desc: 'Run Shortcuts from SSH & CLI (rootless port)',
-        tint: '#e3b341',
+        tint: '#d4a032',
         depiction: 'depictions/com.anthopak.springcuts-rootless.json'
       }
     ];
@@ -713,7 +688,7 @@
     }
 
     function renderDepiction(data) {
-      const tint = data.tintColor || '#58a6ff';
+      const tint = data.tintColor || '#6b8aed';
       const tabs = data.tabs || [];
       let tabsHtml = '<div class="dep-tabs">';
       let contentsHtml = '';

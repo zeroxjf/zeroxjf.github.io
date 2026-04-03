@@ -24,376 +24,294 @@
     button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-      background: #f2f2f7;
-      color: #1d1d1f;
+      font-family: 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+      background: #0d1117;
+      color: #c9d1d9;
       min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a { color: #58a6ff; text-decoration: none; transition: color 0.15s; }
+    a:hover { color: #79c0ff; }
+
+    ::selection { background: #58a6ff33; }
+
+    /* ---- Layout ---- */
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
     }
 
     /* ---- Header ---- */
     .header {
-      padding: 2.5rem 1.5rem 2rem;
-      text-align: center;
-      background: #ffffff;
-      border-bottom: 1px solid #d2d2d7;
+      padding: 3rem 0 1.5rem;
+      border-bottom: 1px solid #21262d;
+      margin-bottom: 2rem;
     }
 
-    .header-logo {
-      height: 48px;
-      width: auto;
-      filter: brightness(0);
+    .header-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #f0f6fc;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.3rem;
     }
 
-    .header-name {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin-top: 0.5rem;
-      letter-spacing: -0.01em;
-    }
-
-    .header-subtitle {
-      font-size: 0.78rem;
-      color: #48484a;
-      margin-top: 0.15rem;
-      letter-spacing: 0.04em;
-    }
-
-    .header-links {
-      margin-top: 0.6rem;
-      display: flex;
-      justify-content: center;
-      gap: 1.25rem;
+    .header-sub {
       font-size: 0.85rem;
+      color: #484f58;
+      margin-bottom: 1.2rem;
     }
 
-    .header-links a {
-      color: #0071e3;
-      text-decoration: none;
-    }
-
-    .header-links a:hover { text-decoration: underline; }
-
-    .manager-buttons {
+    .nav {
       display: flex;
-      justify-content: center;
-      gap: 0.4rem;
-      margin-top: 1rem;
+      gap: 1.2rem;
       flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .nav a {
+      font-size: 0.82rem;
+      color: #8b949e;
+      font-weight: 500;
+    }
+
+    .nav a:hover { color: #f0f6fc; }
+    .nav a.active { color: #f0f6fc; font-weight: 700; }
+
+    .social-row {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .social-row a {
+      color: #484f58;
+      display: inline-flex;
+      transition: color 0.15s;
+    }
+
+    .social-row a:hover { color: #c9d1d9; }
+
+    /* ---- Intro ---- */
+    .intro {
+      font-size: 0.88rem;
+      color: #8b949e;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ---- Sections ---- */
+    .section { margin-bottom: 2.5rem; }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ---- Post lines (research & blog) ---- */
+    .post-line {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #21262d;
+      transition: border-color 0.15s;
+    }
+
+    .post-line:last-child { border-bottom: none; }
+    .post-line:hover { border-color: #30363d; }
+
+    .line-date {
+      font-size: 0.72rem;
+      color: #484f58;
+      flex-shrink: 0;
+      width: 5.5rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .line-title {
+      font-size: 0.85rem;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: color 0.15s;
+    }
+
+    .post-line:hover .line-title { color: #f0f6fc; }
+
+    .line-tags {
+      display: inline-flex;
+      gap: 0.4rem;
+      margin-left: 0.5rem;
+    }
+
+    .line-tag {
+      font-size: 0.62rem;
+      padding: 0.05rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .line-tag.kernel { background: #da363433; color: #f85149; border: 1px solid #da364322; }
+    .line-tag.sep { background: #da363433; color: #f85149; border: 1px solid #da364322; }
+    .line-tag.uaf { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
+    .line-tag.dos { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
+    .line-tag.race { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
+    .line-tag.cve { background: #23882433; color: #3fb950; border: 1px solid #23882422; }
+
+    .line-stars {
+      font-size: 0.68rem;
+      color: #484f58;
+      margin-left: auto;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Package manager buttons ---- */
+    .manager-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
     .manager-btn {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.4rem 0.75rem;
-      background: #f5f5f7;
-      border: 1px solid #d2d2d7;
-      border-radius: 8px;
-      color: #1d1d1f;
+      padding: 0.35rem 0.7rem;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      color: #8b949e;
       text-decoration: none;
-      font-size: 0.8rem;
-      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.75rem;
+      transition: border-color 0.15s, color 0.15s;
     }
 
-    .manager-btn:hover { background: #e8e8ed; border-color: #b9b9be; }
-    .manager-btn img { height: 16px; width: 16px; }
+    .manager-btn:hover { border-color: #30363d; color: #c9d1d9; }
+    .manager-btn img { height: 14px; width: 14px; opacity: 0.7; }
 
-    /* ---- Layout ---- */
-    .content { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 3rem; }
-
-    .panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    .panel-right {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ---- Sections ---- */
-    .section { padding-top: 2rem; }
-
-    .section + .section { margin-top: 1rem; }
-
-    .section-header {
+    /* ---- Tweak list ---- */
+    .tweak-line {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .section-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #636366;
-    }
-
-    .section-line { display: none; }
-
-    .section-count {
-      font-size: 0.68rem;
-      color: #636366;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ---- Blog ---- */
-    .blog-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .blog-card {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-      text-decoration: none;
-      padding: 1.1rem 1.15rem;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-      transition: box-shadow 0.2s;
-    }
-
-    .blog-card:hover {
-      box-shadow: 0 8px 24px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.06);
-    }
-
-    .blog-card:hover .blog-title { color: #0071e3; }
-    .blog-card:hover .blog-arrow { color: #0071e3; }
-
-    .blog-title {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: #1d1d1f;
-      line-height: 1.35;
-      letter-spacing: -0.01em;
-      transition: color 0.15s;
-    }
-
-    .blog-excerpt {
-      font-size: 0.82rem;
-      color: #48484a;
-      margin-top: 0.2rem;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 6;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .blog-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-      white-space: nowrap;
-      margin-top: 0.15rem;
-    }
-
-    .blog-date { font-size: 0.72rem; color: #636366; }
-
-    .blog-arrow {
-      font-size: 0.9rem;
-      color: #636366;
-      transition: color 0.15s;
-    }
-
-    /* ---- Research cards ---- */
-    .research-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .research-card {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-      text-decoration: none;
-      padding: 1.1rem 1.15rem;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-      transition: box-shadow 0.2s;
-    }
-
-    .research-card:hover {
-      box-shadow: 0 8px 24px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.06);
-    }
-
-    .research-card:hover .research-name { color: #0071e3; }
-
-    .research-name {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: #1d1d1f;
-      transition: color 0.15s;
-      letter-spacing: -0.01em;
-    }
-
-    .research-desc {
-      font-size: 0.82rem;
-      color: #48484a;
-      margin-top: 0.2rem;
-      line-height: 1.45;
-    }
-
-    .research-tags {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.45rem;
-      flex-wrap: wrap;
-    }
-
-    .research-tag {
-      font-size: 0.68rem;
-      padding: 0.1rem 0.45rem;
-      border-radius: 20px;
-      background: #f5f5f7;
-      color: #48484a;
-      font-weight: 500;
-      border: 1px solid #e8e8ed;
-    }
-
-    .research-tag.severity-high {
-      background: #fff4f4;
-      color: #c8372d;
-      border-color: #ffd0ce;
-    }
-
-    .research-tag.severity-critical {
-      background: #fff0f0;
-      color: #d70015;
-      border-color: #ffc9c9;
-    }
-
-    .research-stars {
-      font-size: 0.7rem;
-      color: #636366;
-      display: flex;
-      align-items: center;
-      gap: 0.2rem;
-    }
-
-    .research-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-      white-space: nowrap;
-      margin-top: 0.15rem;
-    }
-
-    .research-arrow {
-      font-size: 0.9rem;
-      color: #636366;
-      transition: color 0.15s;
-    }
-
-    .research-card:hover .research-arrow { color: #0071e3; }
-
-    /* ---- Tweak cards ---- */
-    .tweak-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .tweak-card {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 1.1rem 1.15rem;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #21262d;
       cursor: pointer;
-      transition: box-shadow 0.2s;
-      position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      transition: border-color 0.15s;
     }
 
-    .tweak-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.06); }
-
-    .tweak-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .tweak-card-info { flex: 1; min-width: 0; }
-
-    .tweak-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #1d1d1f;
-    }
-
-    .tweak-desc {
-      font-size: 0.82rem;
-      color: #48484a;
-      margin-top: 0.15rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tweak-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-      margin-left: 1rem;
-    }
-
-    .tweak-version {
-      font-size: 0.72rem;
-      font-weight: 500;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      background: #f5f5f7;
-      color: #48484a;
-      border: 1px solid #e8e8ed;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .tweak-arrow {
-      font-size: 0.85rem;
-      color: #636366;
-      transition: transform 0.2s, color 0.15s;
-    }
-
-    .tweak-card:hover .tweak-arrow { color: #0071e3; }
-    .tweak-card.open .tweak-arrow { transform: rotate(90deg); }
+    .tweak-line:last-child { border-bottom: none; }
+    .tweak-line:hover { border-color: #30363d; }
 
     .tweak-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
-    /* ---- Depiction panel ---- */
-    .depiction-panel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s ease;
+    .tweak-info { flex: 1; min-width: 0; }
+
+    .tweak-name {
+      font-size: 0.85rem;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 600;
+      transition: color 0.15s;
     }
 
-    .tweak-card.open .depiction-panel { max-height: 3000px; }
+    .tweak-line:hover .tweak-name { color: #f0f6fc; }
 
-    .depiction-inner {
-      padding-top: 1rem;
-      margin-top: 1rem;
-      border-top: 1px solid #d2d2d7;
+    .tweak-desc {
+      font-size: 0.75rem;
+      color: #484f58;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
-    /* ---- Tabs ---- */
+    .tweak-ver {
+      font-size: 0.68rem;
+      color: #484f58;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .tweak-arrow {
+      font-size: 0.85rem;
+      color: #30363d;
+      transition: color 0.15s;
+    }
+
+    .tweak-line:hover .tweak-arrow { color: #58a6ff; }
+
+    /* ---- Detail view ---- */
+    .detail-view { display: none; }
+    .detail-view.active { display: block; }
+
+    .detail-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #58a6ff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 1.25rem;
+      font-family: inherit;
+    }
+
+    .detail-back:hover { color: #79c0ff; }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-title { font-size: 1.2rem; font-weight: 700; color: #f0f6fc; }
+
+    .detail-version {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: #161b22;
+      color: #8b949e;
+      border: 1px solid #21262d;
+    }
+
+    .detail-desc { font-size: 0.82rem; color: #484f58; margin-bottom: 1.5rem; }
+
+    .detail-depiction {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    /* ---- Depiction ---- */
     .dep-tabs {
       display: flex;
       margin-bottom: 1rem;
-      border-bottom: 1px solid #d2d2d7;
+      border-bottom: 1px solid #21262d;
     }
 
     .dep-tab {
       padding: 0.5rem 1rem;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 500;
-      color: #48484a;
+      color: #484f58;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       transition: color 0.15s, border-color 0.15s;
@@ -401,174 +319,140 @@
       border-top: none;
       border-left: none;
       border-right: none;
+      font-family: inherit;
     }
 
-    .dep-tab:hover { color: #1d1d1f; }
-    .dep-tab.active { color: #0071e3; }
+    .dep-tab:hover { color: #c9d1d9; }
+    .dep-tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
 
     .dep-tab-content { display: none; }
     .dep-tab-content.active { display: block; }
 
-    /* ---- Depiction views ---- */
     .dep-header {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: #48484a;
+      color: #8b949e;
       margin: 1.25rem 0 0.5rem;
     }
 
     .dep-header:first-child { margin-top: 0; }
 
-    .dep-markdown { font-size: 0.88rem; line-height: 1.6; color: #1d1d1f; }
+    .dep-markdown {
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
     .dep-markdown p { margin-bottom: 0.5rem; }
     .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { color: #1d1d1f; font-weight: 600; }
+    .dep-markdown strong { color: #f0f6fc; font-weight: 600; }
     .dep-markdown em { font-style: italic; }
     .dep-markdown ul, .dep-markdown ol { margin: 0.3rem 0 0.5rem 1.25rem; }
     .dep-markdown li { margin-bottom: 0.25rem; }
 
     .dep-markdown code {
       font-family: 'SF Mono', 'Menlo', monospace;
-      font-size: 0.8rem;
-      background: #f5f5f7;
+      font-size: 0.78rem;
+      background: #0d1117;
       padding: 0.12rem 0.32rem;
       border-radius: 4px;
-      color: #1d1d1f;
-      border: 1px solid #e8e8ed;
+      color: #c9d1d9;
+      border: 1px solid #21262d;
     }
 
     .dep-markdown pre {
-      background: #f5f5f7;
-      border: 1px solid #d2d2d7;
-      border-radius: 8px;
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
       padding: 0.75rem 1rem;
       overflow-x: auto;
       margin: 0.5rem 0;
     }
 
-    .dep-markdown pre code { background: none; padding: 0; font-size: 0.78rem; color: #3a3a3c; border: none; }
-    .dep-markdown a { color: #0071e3; text-decoration: none; }
+    .dep-markdown pre code { background: none; padding: 0; font-size: 0.76rem; color: #8b949e; border: none; }
+    .dep-markdown a { color: #58a6ff; }
     .dep-markdown a:hover { text-decoration: underline; }
 
-    .dep-separator { border: none; border-top: 1px solid #d2d2d7; margin: 0.75rem 0; }
+    .dep-separator { border: none; border-top: 1px solid #21262d; margin: 0.75rem 0; }
 
     .dep-table-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0.5rem 0;
-      font-size: 0.85rem;
-      border-bottom: 1px solid #f5f5f7;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #161b22;
     }
 
-    .dep-table-title { color: #48484a; }
-    .dep-table-value { color: #1d1d1f; font-weight: 500; }
+    .dep-table-title { color: #484f58; }
+    .dep-table-value { color: #c9d1d9; font-weight: 500; }
 
     .dep-button {
       display: inline-block;
-      padding: 0.5rem 1.1rem;
+      padding: 0.45rem 1rem;
       margin: 0.5rem 0;
-      border-radius: 980px;
-      font-size: 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
       font-weight: 500;
       text-decoration: none;
-      background: #0071e3;
-      color: #ffffff;
+      background: #21262d;
+      color: #58a6ff;
+      border: 1px solid #30363d;
       transition: background 0.15s;
     }
 
-    .dep-button:hover { background: #0077ed; }
+    .dep-button:hover { background: #30363d; }
 
-    .dep-loading { text-align: center; padding: 2rem; color: #636366; font-size: 0.82rem; }
-
-    /* ---- Detail view ---- */
-    .detail-view { display: none; }
-    .detail-view.active { display: block; }
-    .list-view.hidden { display: none; }
-
-    .detail-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      color: #0071e3;
-      text-decoration: none;
-      font-size: 0.82rem;
-      margin-bottom: 1.25rem;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    .detail-back:hover { text-decoration: underline; }
-
-    .detail-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .detail-title { font-size: 1.3rem; font-weight: 700; color: #1d1d1f; }
-
-    .detail-version {
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 0.2rem 0.55rem;
-      border-radius: 5px;
-      background: #f5f5f7;
-      color: #48484a;
-      border: 1px solid #e8e8ed;
-    }
-
-    .detail-desc { font-size: 0.88rem; color: #48484a; margin-top: -1rem; margin-bottom: 1.25rem; }
-
-    .detail-depiction {
-      background: #ffffff;
-      border: 1px solid #d2d2d7;
-      border-radius: 12px;
-      padding: 1.25rem;
-    }
+    .dep-loading { text-align: center; padding: 2rem; color: #484f58; font-size: 0.78rem; }
 
     /* ---- Responsive ---- */
-    @media (max-width: 700px) {
-      .panels { grid-template-columns: 1fr; }
-    }
-
     @media (max-width: 500px) {
-      .header { padding: 2rem 1rem 1.5rem; }
-      .content { padding: 0 1rem 2rem; }
+      .content { padding: 0 1rem 3rem; }
+      .header { padding: 2rem 0 1.2rem; }
+      .header-title { font-size: 1.4rem; }
+      .line-date { width: 4.5rem; font-size: 0.65rem; }
       .tweak-desc { display: none; }
-      .header-links { gap: 1rem; }
-      .detail-title { font-size: 1.15rem; }
-      .blog-title { font-size: 0.9rem; }
-      .blog-excerpt { font-size: 0.78rem; -webkit-line-clamp: 4; }
-      .blog-meta { display: none; }
+      .line-tags { display: none; }
+      .line-stars { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <img class="header-logo" src="logo.png" alt="0xjf">
-    <div class="header-name">zeroxjf</div>
-    <div class="header-subtitle">iOS Researcher</div>
-    <div class="header-links">
-      <a href="https://github.com/zeroxjf" target="_blank" style="display:inline-flex;align-items:center;gap:0.3em;">
-        <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-      <a href="https://twitter.com/zeroxjf" target="_blank" style="display:inline-flex;align-items:center;gap:0.3em;">
-        <svg height="14" width="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        Twitter
-      </a>
-      <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank" style="display:inline-flex;align-items:center;gap:0.3em;">
-        <svg height="14" width="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>
-        Donate
-      </a>
+  <div class="content">
+
+    <div class="header">
+      <div class="header-title" id="scramble-title">zeroxjf</div>
+      <div class="header-sub">iOS Security Researcher</div>
+
+      <nav class="nav">
+        <a href="/" class="active">/home</a>
+        <a href="#research">/research</a>
+        <a href="#blog">/blog</a>
+        <a href="#tweaks">/tweaks</a>
+      </nav>
+
+      <div class="social-row">
+        <a href="https://github.com/zeroxjf" target="_blank" title="GitHub">
+          <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </a>
+        <a href="https://twitter.com/zeroxjf" target="_blank" title="X / Twitter">
+          <svg height="15" width="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
+        </a>
+        <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank" title="Donate">
+          <svg height="15" width="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>
+        </a>
+      </div>
     </div>
-    <div class="manager-buttons">
+
+    <div class="intro">
+      iOS security researcher focused on kernel vulnerability research, exploit development, and jailbreak tweak development.
+      This site serves as a personal archive of my research, writeups, and iOS tweaks.
+    </div>
+
+    <!-- Add Repo -->
+    <div class="manager-row">
       <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io">
         <img src="icons/sileo.png" alt="">Sileo
       </a>
@@ -579,135 +463,156 @@
         <img src="icons/zebra.png" alt="">Zebra
       </a>
     </div>
-  </div>
 
-  <div class="content">
-  <div class="panels" id="panels">
+    <div id="main-view">
 
-    <!-- Research -->
-    <div class="section" id="research-section">
-      <div class="section-header">
-        <span class="section-label">Vulnerability Research</span>
-        <span class="section-line"></span>
-      </div>
-      <div class="research-list">
+    <!-- Vulnerability Research -->
+    <div class="section" id="research">
+      <div class="section-title">Vulnerability Research</div>
 
-        <a class="research-card" href="https://github.com/zeroxjf/CVE-2026-20687-AppleSEPKeyStore-UAF" target="_blank">
-          <div>
-            <div class="research-name">CVE-2026-20687 &mdash; AppleSEPKeyStore-UAF</div>
-            <div class="research-desc">AppleSEPKeyStore Use-After-Free Panic (iOS/macOS 26.1-26.2) &mdash; now official CVE, acknowledged in Apple Security Advisory</div>
-            <div class="research-tags">
-              <span class="research-tag severity-critical">kernel</span>
-              <span class="research-tag">uaf</span>
-              <span class="research-tag">CVE</span>
-              <span class="research-stars">&#9734; 22</span>
-            </div>
-          </div>
-          <div class="research-meta">
-            <span class="research-arrow">&rsaquo;</span>
-          </div>
-        </a>
+      <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20687-AppleSEPKeyStore-UAF" target="_blank">
+        <span class="line-date">2026</span>
+        <span class="line-title">
+          CVE-2026-20687 &mdash; AppleSEPKeyStore Use-After-Free
+          <span class="line-tags">
+            <span class="line-tag kernel">kernel</span>
+            <span class="line-tag uaf">uaf</span>
+            <span class="line-tag cve">CVE</span>
+          </span>
+        </span>
+        <span class="line-stars">&#9734; 22</span>
+      </a>
 
-        <a class="research-card" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-          <div>
-            <div class="research-name">IOHIDFamily-FastPathUserClient-Race-Conditions</div>
-            <div class="research-desc">UAF and AOP coprocessor panic in IOHIDEventServiceFastPathUserClient. No entitlements, reachable from app sandbox.</div>
-            <div class="research-tags">
-              <span class="research-tag severity-high">kernel</span>
-              <span class="research-tag">race condition</span>
-              <span class="research-stars">&#9734; 4</span>
-            </div>
-          </div>
-          <div class="research-meta">
-            <span class="research-arrow">&rsaquo;</span>
-          </div>
-        </a>
+      <a class="post-line" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+        <span class="line-date">2026</span>
+        <span class="line-title">
+          IOHIDFamily FastPathUserClient Race Conditions
+          <span class="line-tags">
+            <span class="line-tag kernel">kernel</span>
+            <span class="line-tag race">race</span>
+          </span>
+        </span>
+        <span class="line-stars">&#9734; 4</span>
+      </a>
 
-        <a class="research-card" href="https://github.com/zeroxjf/AppleJPEGDriver-startDecoder-timeout-UAF-deferred-panic" target="_blank">
-          <div>
-            <div class="research-name">AppleJPEGDriver-startDecoder-timeout-UAF</div>
-            <div class="research-desc">PoC app for an AppleJPEGDriver timeout/error queue UAF leading to a deferred kernel panic (A19 Pro, iOS 26.3 RC)</div>
-            <div class="research-tags">
-              <span class="research-tag severity-critical">kernel</span>
-              <span class="research-tag">uaf</span>
-              <span class="research-stars">&#9734; 10</span>
-            </div>
-          </div>
-          <div class="research-meta">
-            <span class="research-arrow">&rsaquo;</span>
-          </div>
-        </a>
+      <a class="post-line" href="https://github.com/zeroxjf/AppleJPEGDriver-startDecoder-timeout-UAF-deferred-panic" target="_blank">
+        <span class="line-date">2026</span>
+        <span class="line-title">
+          AppleJPEGDriver startDecoder Timeout UAF
+          <span class="line-tags">
+            <span class="line-tag kernel">kernel</span>
+            <span class="line-tag uaf">uaf</span>
+          </span>
+        </span>
+        <span class="line-stars">&#9734; 10</span>
+      </a>
 
-        <a class="research-card" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
-          <div>
-            <div class="research-name">AppleKeyStore-close-UAF</div>
-            <div class="research-desc">AppleKeyStoreUserClient close() Use-After-Free &mdash; iOS kernel vulnerability (patched in 26.3 RC)</div>
-            <div class="research-tags">
-              <span class="research-tag severity-critical">kernel</span>
-              <span class="research-tag">uaf</span>
-              <span class="research-stars">&#9734; 17</span>
-            </div>
-          </div>
-          <div class="research-meta">
-            <span class="research-arrow">&rsaquo;</span>
-          </div>
-        </a>
+      <a class="post-line" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+        <span class="line-date">2026</span>
+        <span class="line-title">
+          AppleKeyStore close() Use-After-Free
+          <span class="line-tags">
+            <span class="line-tag kernel">kernel</span>
+            <span class="line-tag uaf">uaf</span>
+          </span>
+        </span>
+        <span class="line-stars">&#9734; 17</span>
+      </a>
 
-        <a class="research-card" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-          <div>
-            <div class="research-name">SEP-Exhaustion-Kernel-Panic</div>
-            <div class="research-desc">SEP firmware panic via AppleKeyStore &mdash; iOS/macOS 26.x kernel vulnerability</div>
-            <div class="research-tags">
-              <span class="research-tag severity-critical">kernel/SEP</span>
-              <span class="research-tag">DoS</span>
-              <span class="research-stars">&#9734; 21</span>
-            </div>
-          </div>
-          <div class="research-meta">
-            <span class="research-arrow">&rsaquo;</span>
-          </div>
-        </a>
+      <a class="post-line" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+        <span class="line-date">2026</span>
+        <span class="line-title">
+          SEP Exhaustion Kernel Panic via AppleKeyStore
+          <span class="line-tags">
+            <span class="line-tag sep">kernel/SEP</span>
+            <span class="line-tag dos">DoS</span>
+          </span>
+        </span>
+        <span class="line-stars">&#9734; 21</span>
+      </a>
 
-      </div>
     </div>
 
-    <div class="panel-right">
-
     <!-- Blog -->
-    <div class="section" id="blog-section">
-      <div class="section-header">
-        <span class="section-label">Blog</span>
-        <span class="section-line"></span>
-      </div>
-      <div class="blog-list">
-        <a class="blog-card" href="blog/metal-patch.html">
-          <div>
-            <div class="blog-title">Patching Metal Graphics into vphone</div>
-            <div class="blog-excerpt">wh1te4ever's vphone VM gets a working paravirt GPU, but Metal needs a shader compiler plugin trapped in the PCC dyld shared cache &mdash; extracted images have no relocations and can't load. Clean-room reimplementation from RE, ~230 lines of C++.</div>
-          </div>
-          <div class="blog-meta">
-            <span class="blog-date">Feb 2026</span>
-            <span class="blog-arrow">&rsaquo;</span>
-          </div>
-        </a>
-      </div>
+    <div class="section" id="blog">
+      <div class="section-title">Posts</div>
+
+      <a class="post-line" href="blog/metal-patch.html">
+        <span class="line-date">Feb 2026</span>
+        <span class="line-title">Patching Metal Graphics into vphone</span>
+      </a>
+
     </div>
 
     <!-- iOS Tweaks -->
-    <div class="section list-view" id="list-view">
-      <div class="section-header">
-        <span class="section-label">iOS 16/17 Tweaks</span>
-        <span class="section-line"></span>
-        <span class="section-count" id="pkg-count"></span>
-      </div>
-      <div class="tweak-list" id="tweak-list"></div>
+    <div class="section" id="tweaks">
+      <div class="section-title">iOS 16/17 Tweaks</div>
+      <div id="tweak-list"></div>
     </div>
-    </div><!-- /.panel-right -->
-  </div><!-- /.panels -->
+
+    </div><!-- /#main-view -->
+
     <div class="detail-view" id="detail-view"></div>
 
   </div>
 
+  <!-- Text scramble animation -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('scramble-title');
+    if (!el) return;
+
+    var originalText = el.textContent.trim();
+    var chars = originalText.split('');
+    var finalLen = chars.length;
+    var pool = '0123456789abcdef@#$%&';
+
+    var display = [];
+    for (var i = 0; i < finalLen; i++) {
+      display.push(pool[Math.floor(Math.random() * pool.length)]);
+    }
+    el.textContent = display.join('');
+
+    var currentPos = 0;
+    var cycleCount = 0;
+    var lastFrame = 0;
+
+    var cyclesForChar = [];
+    for (var i = 0; i < finalLen; i++) {
+      cyclesForChar.push(3 + Math.floor(Math.random() * 10));
+    }
+
+    function frame(ts) {
+      var speed = Math.max(20, 40 - (currentPos * 1.5));
+      if (ts - lastFrame < speed) { requestAnimationFrame(frame); return; }
+      lastFrame = ts;
+
+      if (currentPos >= finalLen) { el.textContent = originalText; return; }
+
+      if (cycleCount >= cyclesForChar[currentPos]) {
+        display[currentPos] = chars[currentPos];
+        currentPos++;
+        cycleCount = 0;
+      } else {
+        display[currentPos] = pool[Math.floor(Math.random() * pool.length)];
+        cycleCount++;
+      }
+
+      for (var i = currentPos + 1; i < finalLen; i++) {
+        if (Math.random() < 0.06) {
+          display[i] = pool[Math.floor(Math.random() * pool.length)];
+        }
+      }
+
+      el.textContent = display.join('');
+      requestAnimationFrame(frame);
+    }
+
+    setTimeout(function () { requestAnimationFrame(frame); }, 200);
+  });
+  </script>
+
+  <!-- Tweaks & depiction logic -->
   <script>
     const TWEAKS = [
       {
@@ -716,7 +621,7 @@
         slug: 'typemillennium',
         version: '1.1.1',
         desc: 'System-wide iMessage typing indicator banner',
-        tint: '#5B9FFF',
+        tint: '#58a6ff',
         depiction: 'depictions/com.zeroxjf.bartype.json'
       },
       {
@@ -725,7 +630,7 @@
         slug: 'zoom5x',
         version: '1.0.0',
         desc: 'Adds a 5x zoom button to the Camera app',
-        tint: '#5B9FFF',
+        tint: '#58a6ff',
         depiction: 'depictions/com.zeroxjf.zoom5x.json'
       },
       {
@@ -734,15 +639,13 @@
         slug: 'springcuts',
         version: '1.5.2',
         desc: 'Run Shortcuts from SSH & CLI (rootless port)',
-        tint: '#FFB25B',
+        tint: '#e3b341',
         depiction: 'depictions/com.anthopak.springcuts-rootless.json'
       }
     ];
 
     const tweakBySlug = {};
     TWEAKS.forEach(t => { tweakBySlug[t.slug] = t; });
-
-    document.getElementById('pkg-count').textContent = TWEAKS.length;
 
     // --- Markdown renderer ---
     function renderMarkdown(md) {
@@ -803,23 +706,20 @@
             <span class="dep-table-value">${escapeHtml(view.text)}</span>
           </div>`;
         case 'DepictionTableButtonView':
-          const color = view.tintColor || tint || '#7ca0c4';
-          return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank"
-            style="background:${color}22; color:${color}">${escapeHtml(view.title)}</a>`;
+          return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank">${escapeHtml(view.title)}</a>`;
         default:
           return '';
       }
     }
 
     function renderDepiction(data) {
-      const tint = data.tintColor || '#7ca0c4';
+      const tint = data.tintColor || '#58a6ff';
       const tabs = data.tabs || [];
       let tabsHtml = '<div class="dep-tabs">';
       let contentsHtml = '';
       tabs.forEach((tab, i) => {
         const active = i === 0 ? ' active' : '';
-        tabsHtml += `<button class="dep-tab${active}" data-tab="${i}"
-          style="${i === 0 ? 'border-bottom-color:' + tint : ''}">${escapeHtml(tab.tabname)}</button>`;
+        tabsHtml += `<button class="dep-tab${active}" data-tab="${i}">${escapeHtml(tab.tabname)}</button>`;
         const views = (tab.views || []).map(v => renderDepictionView(v, tint)).join('');
         contentsHtml += `<div class="dep-tab-content${active}" data-tab="${i}">${views}</div>`;
       });
@@ -827,18 +727,14 @@
       return tabsHtml + contentsHtml;
     }
 
-    function bindTabs(container, tint) {
+    function bindTabs(container) {
       container.querySelectorAll('.dep-tab').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
           const idx = btn.dataset.tab;
-          container.querySelectorAll('.dep-tab').forEach(t => {
-            t.classList.remove('active');
-            t.style.borderBottomColor = 'transparent';
-          });
+          container.querySelectorAll('.dep-tab').forEach(t => t.classList.remove('active'));
           container.querySelectorAll('.dep-tab-content').forEach(c => c.classList.remove('active'));
           btn.classList.add('active');
-          btn.style.borderBottomColor = tint;
           container.querySelector(`.dep-tab-content[data-tab="${idx}"]`).classList.add('active');
         });
       });
@@ -856,32 +752,31 @@
     }
 
     // --- Views ---
-    const listView = document.getElementById('list-view');
+    const mainView = document.getElementById('main-view');
     const detailView = document.getElementById('detail-view');
-    const panels = document.getElementById('panels');
     const list = document.getElementById('tweak-list');
 
     function showList() {
-      panels.style.display = '';
+      mainView.style.display = '';
       detailView.classList.remove('active');
       detailView.innerHTML = '';
       document.title = "zeroxjf";
     }
 
     async function showDetail(tweak) {
-      panels.style.display = 'none';
+      mainView.style.display = 'none';
       detailView.classList.add('active');
       document.title = tweak.name + " \u2014 zeroxjf";
 
       detailView.innerHTML = `
-        <button class="detail-back" id="detail-back">\u2039 Back</button>
+        <button class="detail-back" id="detail-back">\u2190 back</button>
         <div class="detail-header">
           <span class="detail-title">${escapeHtml(tweak.name)}</span>
           <span class="detail-version">${tweak.version}</span>
         </div>
         <div class="detail-desc">${escapeHtml(tweak.desc)}</div>
         <div class="detail-depiction" id="detail-dep">
-          <div class="dep-loading">Loading...</div>
+          <div class="dep-loading">loading depiction...</div>
         </div>
       `;
 
@@ -894,35 +789,31 @@
         const data = await fetchDepiction(tweak);
         const depEl = document.getElementById('detail-dep');
         depEl.innerHTML = renderDepiction(data);
-        bindTabs(depEl, tweak.tint);
+        bindTabs(depEl);
       } catch {
         document.getElementById('detail-dep').innerHTML =
-          '<div class="dep-loading">Failed to load depiction</div>';
+          '<div class="dep-loading">failed to load depiction</div>';
       }
     }
 
-    // --- Build tweak list cards ---
+    // --- Build tweak list ---
     TWEAKS.forEach(tweak => {
-      const card = document.createElement('div');
-      card.className = 'tweak-card';
-      card.innerHTML = `
-        <div class="tweak-card-top">
-          <div class="tweak-card-info">
-            <div class="tweak-name">${escapeHtml(tweak.name)}</div>
-            <div class="tweak-desc">${escapeHtml(tweak.desc)}</div>
-          </div>
-          <div class="tweak-meta">
-            <span class="tweak-version">${tweak.version}</span>
-            <span class="tweak-dot" style="background:${tweak.tint}"></span>
-            <span class="tweak-arrow">\u203A</span>
-          </div>
+      const line = document.createElement('div');
+      line.className = 'tweak-line';
+      line.innerHTML = `
+        <span class="tweak-dot" style="background:${tweak.tint}"></span>
+        <div class="tweak-info">
+          <div class="tweak-name">${escapeHtml(tweak.name)}</div>
+          <div class="tweak-desc">${escapeHtml(tweak.desc)}</div>
         </div>
+        <span class="tweak-ver">${tweak.version}</span>
+        <span class="tweak-arrow">&rsaquo;</span>
       `;
-      card.addEventListener('click', () => {
+      line.addEventListener('click', () => {
         history.pushState(null, '', '#' + tweak.slug);
         showDetail(tweak);
       });
-      list.appendChild(card);
+      list.appendChild(line);
     });
 
     // --- Hash routing ---

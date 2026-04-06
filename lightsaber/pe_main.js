@@ -8541,7 +8541,7 @@ function injectCorunaTweakloader(existingTask, migFilterBypass, agentPid) {
 
 function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agentPid, path, label) {
 	LOG("[PE] Injecting " + label + " into SpringBoard...");
-	const code = fetchRemoteScript(path);
+	let code = (typeof globalThis.__fiveicondock_code === 'string' && globalThis.__fiveicondock_code.length > 0) ? globalThis.__fiveicondock_code : fetchRemoteScript(path);
 	if (!code) {
 		LOG("[PE] " + label + " fetch failed");
 		return false;

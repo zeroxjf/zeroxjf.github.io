@@ -136,7 +136,7 @@
   let mov_x0_x22 = 0n;
   let add_x22_0x90 = 0n;
   if (integrated) {
-    Object.assign(sbx1_offsets, {
+    sbx1_offsets = {
    "iPhone11,2_4_6_22E240": {
       malloc_restore_2_gadget: 0x1a96445d0n,
       dyld_signPointer_gadget: 0x1a963c1e0n,

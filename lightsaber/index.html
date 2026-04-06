@@ -226,6 +226,7 @@
     function markDone() {
       if (doneSignal) return;
       doneSignal = true;
+      try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       document.getElementById('status').textContent = '';
       var btn = document.getElementById('runBtn');
       btn.textContent = 'Installed';

@@ -17,6 +17,7 @@ let logStart = new Date().getTime();
 let logEntryID = 0;
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
+    try { self.postMessage({ type: 'log', text: out }); } catch(e) {}
     if (!SERVER_LOG) return;
     let obj = {
         id: logEntryID++,

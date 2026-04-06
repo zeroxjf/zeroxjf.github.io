@@ -197,6 +197,13 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 }
                 break;
             }
+            case 'log':
+            {
+                if (data.text) {
+                    try { window.parent.postMessage({ type: 'lightsaber_log', text: data.text }, location.origin); } catch(e) {}
+                }
+                break;
+            }
             default:
             {
                 print("[MSG] Unknown message type: " + data.type);

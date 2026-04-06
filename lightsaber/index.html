@@ -153,12 +153,10 @@
       <div class="section-title">FiveIconDock</div>
       <p class="section-desc">5 icons on your dock, no jailbreak required</p>
       <div class="warning">
-        <strong>It is recommended to use a test device only.</strong> These payloads were originally part of the <a href="https://iverify.io/blog/darksword-ios-exploit-kit-explained">DarkSword</a> in-the-wild malware campaign. All C2 communication has been stripped and the source has been thoroughly reviewed for obfuscated callbacks, but there is still inherent risk in running repurposed exploit code. Expect crashes, resprings, and kernel panics. Success rate is around 60-70% &mdash; you may need to reboot and retry. Use at your own risk.
+        <strong>Test devices recommended.</strong> Derived from the <a href="https://iverify.io/blog/darksword-ios-exploit-kit-explained">DarkSword</a> exploit chain with all C2 stripped and <a href="https://github.com/zeroxjf/zeroxjf.github.io/tree/main/lightsaber">source reviewed</a>. Expect crashes, resprings, and kernel panics. ~60-70% success rate. Use at your own risk.
       </div>
       <div class="info">
-        <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more iOS 18.x versions coming soon)<br>
-        Repurposed from an in-the-wild exploit chain. All original C2 communication removed.<br>
-        <a href="https://github.com/zeroxjf/zeroxjf.github.io/tree/main/lightsaber">Full source code on GitHub.</a>
+        <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more coming soon)
       </div>
       <p id="supportMsg" style="font-size:13px;margin-bottom:6px"></p>
       <div id="status" style="font-size:14px;color:#86868b"></div>
@@ -166,9 +164,8 @@
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
       </div>
       <p class="note">
-        <strong>Takes up to 60 seconds.</strong> Do not switch apps or lock your device while running. If the page refreshes immediately after pressing Install, try again.<br><br>
-        <strong>There is no elegant way to detect completion.</strong> After about a minute, try dragging a 5th icon into your dock. If it doesn't work, reboot and retry.<br><br>
-        If your device resprings, reboot and try again. This chain is fragile &mdash; if it works, avoid running it again. Reproducibility is not very good, so don't press your luck.
+        Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
+        If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
       </p>
     </div>
 

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LightSaber</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/@aspect-ui/fonts@latest/sf-pro/sf-pro-display.css');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      min-height: 100dvh;
+      padding: 28px 24px;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .page {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .page-header {
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #1d1d1f;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #86868b;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #e5e5e7;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 4px;
+    }
+    .section-desc {
+      font-size: 14px;
+      color: #86868b;
+      margin-bottom: 12px;
+    }
+    .supported { color: #34c759; }
+    .unsupported { color: #ff3b30; }
+    .btn {
+      display: inline-block;
+      border: none;
+      padding: 14px 40px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:active { opacity: 0.7; }
+    .btn-run {
+      background: #1d1d1f;
+      color: #fff;
+    }
+    .btn-disabled { background: #e5e5e7; color: #aeaeb2; pointer-events: none; }
+    .btn-done { background: #34c759; color: #fff; pointer-events: none; }
+    .note {
+      font-size: 12px;
+      color: #86868b;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    .warning {
+      background: #fef2f2;
+      border: 1px solid #f87171;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #991b1b;
+      line-height: 1.6;
+    }
+    .warning strong { color: #7f1d1d; font-weight: 700; }
+    .warning a { color: #dc2626; text-decoration: underline; }
+    .info {
+      font-size: 12px;
+      color: #86868b;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .info strong { color: #6e6e73; }
+    .info a { color: #86868b; }
+    .version {
+      font-size: 12px;
+      color: #c7c7cc;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .overlay.active { display: flex; }
+    .dialog {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    .dialog h2 { font-size: 19px; font-weight: 600; color: #b91c1c; margin-bottom: 12px; }
+    .dialog p { font-size: 14px; color: #6e6e73; line-height: 1.6; margin-bottom: 20px; }
+    .dialog-btns { display: flex; gap: 10px; }
+    .dialog-btns button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-cancel { background: #f5f5f7; color: #6e6e73; }
+    .btn-confirm { background: #1d1d1f; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-header">
+      <div class="page-title">LightSaber</div>
+      <div class="page-subtitle">iOS research tools</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">FiveIconDock</div>
+      <p class="section-desc">5 icons on your dock, no jailbreak required</p>
+      <div class="warning">
+        <strong>It is recommended to use a test device only.</strong> These payloads were originally part of the <a href="https://iverify.io/blog/darksword-ios-exploit-kit-explained">DarkSword</a> in-the-wild malware campaign. All C2 communication has been stripped and the source has been thoroughly reviewed for obfuscated callbacks, but there is still inherent risk in running repurposed exploit code. Expect crashes, resprings, and kernel panics. Success rate is around 70% &mdash; you may need to retry. Use at your own risk.
+      </div>
+      <div class="info">
+        <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2<br>
+        Repurposed from an in-the-wild exploit chain. All original C2 communication removed.<br>
+        <a href="https://github.com/zeroxjf/zeroxjf.github.io/tree/main/lightsaber">Full source code on GitHub.</a>
+      </div>
+      <p id="supportMsg" style="font-size:13px;margin-bottom:6px"></p>
+      <div id="status" style="font-size:14px;color:#86868b"></div>
+      <div style="text-align:center;margin-top:12px">
+        <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
+      </div>
+      <p class="note">
+        Takes up to 60 seconds. Safari may freeze or reload near the end &mdash; this is normal. Do not switch apps or lock your device while running.<br><br>
+        There is no elegant way to detect completion. After about a minute, try dragging a 5th icon into your dock. If it doesn't work, reboot and retry.
+      </p>
+    </div>
+
+    <p class="version">v0.0.23</p>
+  </div>
+
+  <div id="confirmOverlay" class="overlay">
+    <div class="dialog">
+      <h2>Are you sure?</h2>
+      <p>This will execute kernel-level exploits on your device. Crashes, resprings, and panics are expected. Exercise extreme caution if using on a personal device.</p>
+      <div class="dialog-btns">
+        <button class="btn-cancel" onclick="dismissConfirm()">Cancel</button>
+        <button class="btn-confirm" onclick="proceedInstall()">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var ua = navigator.userAgent;
+    var iosMatch = /iPhone OS ([0-9_]+)/g.exec(ua);
+    var iosVer = iosMatch ? iosMatch[1].replace(/_/g, '.') : null;
+    var iosParts = iosVer ? iosVer.split('.').map(Number) : [0,0,0];
+    var major = iosParts[0], minor = iosParts[1], patch = iosParts[2] || 0;
+    var isIphone = /iPhone/.test(ua);
+    var doneSignal = false;
+
+    var supportMsg = document.getElementById('supportMsg');
+    var canRun = false;
+
+    if (!isIphone) {
+      supportMsg.className = 'unsupported';
+      supportMsg.textContent = 'iPhone only.';
+    } else if (major < 18 || (major === 18 && minor < 4)) {
+      supportMsg.className = 'unsupported';
+      supportMsg.textContent = 'iOS ' + iosVer + ' is not supported.';
+    } else if (major === 18 && minor >= 4 && (minor < 6 || (minor === 6 && patch <= 2))) {
+      supportMsg.className = 'supported';
+      supportMsg.textContent = 'iOS ' + iosVer;
+      canRun = true;
+    } else {
+      supportMsg.className = 'unsupported';
+      supportMsg.textContent = 'iOS ' + iosVer + ' is not yet supported.';
+    }
+
+    if (!canRun) {
+      document.getElementById('runBtn').className = 'btn btn-disabled';
+      document.getElementById('runBtn').textContent = 'Not available';
+      document.getElementById('runBtn').onclick = null;
+    }
+
+    function markDone() {
+      if (doneSignal) return;
+      doneSignal = true;
+      document.getElementById('status').textContent = '';
+      var btn = document.getElementById('runBtn');
+      btn.textContent = 'Installed';
+      btn.className = 'btn btn-done';
+    }
+
+    window.addEventListener('message', function(event) {
+      var data = event.data || {};
+      if (data.type === 'lightsaber_done') markDone();
+    });
+
+    function confirmInstall() {
+      if (!canRun) return;
+      document.getElementById('confirmOverlay').className = 'overlay active';
+    }
+
+    function dismissConfirm() {
+      document.getElementById('confirmOverlay').className = 'overlay';
+    }
+
+    function proceedInstall() {
+      document.getElementById('confirmOverlay').className = 'overlay';
+      runExploit();
+    }
+
+    function runExploit() {
+      if (!canRun) return;
+      doneSignal = false;
+      document.getElementById('runBtn').className = 'btn btn-disabled';
+      document.getElementById('runBtn').textContent = 'Installing...';
+      document.getElementById('status').textContent = '';
+
+      setTimeout(markDone, 65000);
+
+      var frame = document.createElement('iframe');
+      frame.src = 'frame.html?' + Math.random();
+      frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';
+      document.body.appendChild(frame);
+    }
+  </script>
+</body>
+</html>

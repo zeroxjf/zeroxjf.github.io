@@ -2211,7 +2211,7 @@
    }
 };
 
-  sbx0_offsets = {
+  Object.assign(sbx0_offsets, {
    "iPhone11,2_4_6_22F76": {
       GPUConnectionToWebProcess_CreateGraphicsContextGL: 0x29,
       GPUConnectionToWebProcess_CreateRenderingBackend: 0x2b,
@@ -3306,7 +3306,7 @@
    }
 });
 
-  sbx0_offsets = {
+  Object.assign(sbx0_offsets, {
    "iPhone11,2_4_6_22G86": {
       GPUConnectionToWebProcess_CreateGraphicsContextGL: 0x29,
       GPUConnectionToWebProcess_CreateRenderingBackend: 0x2b,

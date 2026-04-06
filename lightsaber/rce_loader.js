@@ -5,7 +5,7 @@ var offsets = {};
 var slide;
 var chipset;
 var device_model;
-try { sessionStorage.setItem('ls_running', '1'); } catch(e) {}
+try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSession', '1'); } catch(e) {}
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {

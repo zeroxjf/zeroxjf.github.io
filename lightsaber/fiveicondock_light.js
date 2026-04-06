@@ -400,9 +400,15 @@
 
   function runOnMainEvaluate(script) {
     const jsctxObj = globalThis.__fiveicon_jsctx_obj;
-    if (!isNonZero(jsctxObj)) return false;
+    log("runOnMainEvaluate: jsctxObj=0x" + u64(jsctxObj).toString(16) + " scriptLen=" + script.length);
+    if (!isNonZero(jsctxObj)) {
+      log("runOnMainEvaluate: jsctxObj is NULL, aborting");
+      return false;
+    }
     const s = cfstr(script);
+    log("runOnMainEvaluate: cfstr=0x" + u64(s).toString(16) + " calling performSelectorOnMainThread (waitUntilDone:NO)");
     objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), s, 0);
+    log("runOnMainEvaluate: performSelector returned");
     Native.callSymbol("CFRelease", s);
     return true;
   }
@@ -420,11 +426,13 @@
   }
 
   function applyDockPatch(passTag) {
+    log("applyDockPatch(" + passTag + ") entered — running on main thread");
     const SBIconController = Native.callSymbol("objc_getClass", "SBIconController");
     if (!isNonZero(SBIconController)) {
-      log("SBIconController missing");
+      log("SBIconController missing — are we in SpringBoard?");
       return false;
     }
+    log("SBIconController=0x" + u64(SBIconController).toString(16));
 
     const iconCtrl = objc(SBIconController, "sharedInstance");
     if (!isNonZero(iconCtrl)) {
@@ -477,19 +485,45 @@
   }
 
   try {
+    log("=== fiveicondock_light.js entry ===");
     Native.init();
+    log("Native.init() ok, baseAddr=0x" + new BigUint64Array(nativeCallBuff)[20].toString(16));
     const bi = Native.bridgeInfo();
     globalThis.__fiveicon_jsctx_obj = bi.jsContextObj;
     globalThis.__fiveicon_apply_once = applyDockPatch;
     globalThis.__fiveicon_log = log;
 
     log("loaded jsctx=0x" + u64(bi.jsctx).toString(16) + " jsContextObj=0x" + u64(bi.jsContextObj).toString(16));
-    runOnMainEvaluate("try{__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}");
+
+    // PAC diagnostic: verify dlsym/memcpy/malloc pointers are non-zero
+    const diagBuff = new BigUint64Array(nativeCallBuff);
+    log("PAC ptrs: dlsym=0x" + diagBuff[21].toString(16) + " memcpy=0x" + diagBuff[22].toString(16) + " malloc=0x" + diagBuff[23].toString(16));
+    log("PAC ptrs: paciaGadget=0x" + diagBuff[31].toString(16) + " kbase=0x" + diagBuff[30].toString(16));
+
+    // Test a simple native call before touching ObjC
+    const testMalloc = Native.callSymbol("malloc", 16n);
+    log("test malloc=0x" + u64(testMalloc).toString(16) + (testMalloc ? " OK" : " FAILED"));
+    if (testMalloc) Native.callSymbol("free", testMalloc);
+
+    // Test dlsym works
+    const testObjcGetClass = Native.callSymbol("dlsym", 0xfffffffffffffffen, "objc_getClass");
+    log("test dlsym(objc_getClass)=0x" + u64(testObjcGetClass).toString(16));
+
+    // Test objc_getClass before main dispatch
+    const testSB = Native.callSymbol("objc_getClass", "SBIconController");
+    log("test SBIconController=0x" + u64(testSB).toString(16) + (testSB ? " (found)" : " (NOT FOUND - wrong process?)"));
+
+    log("about to runOnMainEvaluate (performSelectorOnMainThread) — PAC violation happens here if PAC context is stale");
+    runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}");
+    log("runOnMainEvaluate returned (async dispatch, no crash on injected thread)");
+
     if (ENABLE_SECOND_PASS) {
       Native.callSymbol("usleep", 1200000);
+      log("about to runOnMainEvaluate pass 2");
       runOnMainEvaluate("try{__fiveicon_apply_once('main-pass-2');}catch(e){__fiveicon_log('main-pass-2 err: '+e);}");
+      log("pass 2 dispatched");
     }
   } catch (e) {
-    log("fatal: " + String(e));
+    log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));
   }
 })();

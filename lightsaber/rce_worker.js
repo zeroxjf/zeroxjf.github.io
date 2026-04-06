@@ -215,6 +215,14 @@ self[1] = boxed_arr;
   let logEntryID = 0;
   function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
+    try {
+      self.postMessage({
+        type: 'log',
+        text: out,
+        reportError: !!reportError,
+        dumphex: !!dumphex
+      });
+    } catch (e) {}
     if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
@@ -906,6 +914,9 @@ self[1] = boxed_arr;
           const fopen_mode_str = 'w';
           const fopen_mode_ptr = p.read64(p.read64(p.addrof(fopen_mode_str) + 8n) + 8n);
           function log(msg) {
+            try {
+              print(msg.toString());
+            } catch (e) {}
             if (true) {
               const elapsed = parseInt(Date.now() - rce_begin);
               const path = ("/(" + elapsed + ") ").padEnd(15) + msg.toString().replaceAll('/', '|') + '\0';

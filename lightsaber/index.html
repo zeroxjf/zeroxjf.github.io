@@ -265,7 +265,10 @@
     window.addEventListener('message', function(event) {
       var data = event.data || {};
       if (data.type === 'lightsaber_done') markDone();
-      if (data.type === 'lightsaber_log' && data.text) appendLog(data.text);
+      if (data.type === 'lightsaber_log') {
+        var items = data.lines || (data.text ? [data.text] : []);
+        for (var i = 0; i < items.length; i++) appendLog(items[i]);
+      }
     });
 
     function confirmInstall() {

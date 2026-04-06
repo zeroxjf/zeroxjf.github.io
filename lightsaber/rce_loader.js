@@ -8,10 +8,19 @@ var device_model;
 try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSession', '1'); } catch(e) {}
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
+var _logQueue = [];
+var _logTimer = null;
+function _flushLogs() {
+    _logTimer = null;
+    if (!_logQueue.length) return;
+    try { window.parent.postMessage({ type: 'lightsaber_log', lines: _logQueue }, location.origin); } catch(e) {}
+    _logQueue = [];
+}
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
     console.log(out);
-    try { window.parent.postMessage({ type: 'lightsaber_log', text: out }, location.origin); } catch(e) {}
+    _logQueue.push(out);
+    if (!_logTimer) _logTimer = setTimeout(_flushLogs, 150);
     if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
@@ -130,7 +139,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
         document.body.appendChild(iframe);
         async function message_handler(e) {
         const data = e.data;
-        print("[MSG] Worker message: " + data.type);
+        if (data.type !== 'log') print("[MSG] " + data.type);
         switch (data.type) {
             case 'redirect':
             {
@@ -200,7 +209,8 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
             case 'log':
             {
                 if (data.text) {
-                    try { window.parent.postMessage({ type: 'lightsaber_log', text: data.text }, location.origin); } catch(e) {}
+                    _logQueue.push(data.text);
+                    if (!_logTimer) _logTimer = setTimeout(_flushLogs, 150);
                 }
                 break;
             }

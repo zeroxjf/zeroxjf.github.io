@@ -11,6 +11,15 @@ var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
     console.log(out);
+    try {
+        window.parent.postMessage({
+            type: 'lightsaber_log',
+            text: out,
+            source: 'webcontent',
+            reportError: !!reportError,
+            dumphex: !!dumphex
+        }, location.origin);
+    } catch (e) {}
     if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
@@ -210,8 +219,16 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
             }
             case 'log':
             {
-                if (SERVER_LOG && data.text) {
-                    try { window.parent.postMessage({ type: 'lightsaber_log', text: data.text }, location.origin); } catch(e) {}
+                if (data.text) {
+                    try {
+                        window.parent.postMessage({
+                            type: 'lightsaber_log',
+                            text: data.text,
+                            source: 'worker',
+                            reportError: !!data.reportError,
+                            dumphex: !!data.dumphex
+                        }, location.origin);
+                    } catch(e) {}
                 }
                 break;
             }

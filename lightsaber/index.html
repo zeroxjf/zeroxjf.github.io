@@ -253,6 +253,13 @@
 
     function runExploit() {
       if (!canRun) return;
+      try {
+        if (sessionStorage.getItem('ls_running')) {
+          document.getElementById('status').style.color = '#dc2626';
+          document.getElementById('status').textContent = 'Close Safari completely (swipe up, force-close), then reopen this page. Retrying without killing Safari can cause a kernel panic.';
+          return;
+        }
+      } catch(e) {}
       doneSignal = false;
       document.getElementById('runBtn').className = 'btn btn-disabled';
       document.getElementById('runBtn').textContent = 'Installing...';

@@ -203,10 +203,12 @@
       <div style="text-align:center;margin-top:12px">
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
       </div>
+      <!-- log UI disabled for now
       <div id="logBox">
         <div class="log-header">Console</div>
         <div id="logScroll"></div>
       </div>
+      -->
       <p class="note">
         Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
         If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
@@ -240,6 +242,7 @@
     var major = iosParts[0], minor = iosParts[1], patch = iosParts[2] || 0;
     var isIphone = /iPhone/.test(ua);
     var doneSignal = false;
+    /* log UI disabled for now
     var syslogPollTimer = null;
     var lastSyslogText = '';
     var seenDeviceLines = {};
@@ -333,6 +336,7 @@
         syslogPollTimer = null;
       }
     }
+    */
 
     var supportMsg = document.getElementById('supportMsg');
     var canRun = false;
@@ -363,7 +367,7 @@
     function markDone() {
       if (doneSignal) return;
       doneSignal = true;
-      stopSyslogPolling();
+      // stopSyslogPolling();
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       document.getElementById('status').textContent = '';
       var btn = document.getElementById('runBtn');
@@ -374,7 +378,7 @@
     window.addEventListener('message', function(event) {
       var data = event.data || {};
       if (data.type === 'lightsaber_done') markDone();
-      if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
+      // if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
     });
 
     function confirmInstall() {
@@ -404,12 +408,14 @@
       document.getElementById('runBtn').className = 'btn btn-disabled';
       document.getElementById('runBtn').textContent = 'Installing...';
       document.getElementById('status').textContent = '';
+      /* log UI disabled for now
       var lb = document.getElementById('logBox');
       document.getElementById('logScroll').innerHTML = '';
       lb.className = 'active';
       logAppend('[UI] Worker log bridge armed', 'ok');
       logAppend('[UI] Polling syslog.txt for device-side kernel / PE logs', 'device');
       startSyslogPolling();
+      */
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');

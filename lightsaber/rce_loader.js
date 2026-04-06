@@ -5,6 +5,16 @@ var offsets = {};
 var slide;
 var chipset;
 var device_model;
+var crashRetry = false;
+try {
+    var prevAttempt = parseInt(sessionStorage.getItem('ls_attempt') || '0');
+    var prevTime = parseInt(sessionStorage.getItem('ls_time') || '0');
+    if (prevTime && (Date.now() - prevTime) < 15000) {
+        crashRetry = true;
+    }
+    sessionStorage.setItem('ls_attempt', String(prevAttempt + 1));
+    sessionStorage.setItem('ls_time', String(Date.now()));
+} catch(e) {}
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
@@ -28,6 +38,7 @@ function print(x, reportError = false, dumphex = false) {
 }
 function redirect()
 {
+    try { sessionStorage.removeItem('ls_attempt'); sessionStorage.removeItem('ls_time'); } catch(e) {}
     try { window.parent.postMessage({ type: 'lightsaber_done' }, location.origin); } catch (e) {}
 }
 function getJS(fname,method = 'GET')
@@ -98,7 +109,11 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
     function doRedirect() {
       redirect();
     }
-    function main() {
+    async function main() {
+        if (crashRetry) {
+            print("=== crash-retry detected, waiting 2s for heap to settle ===");
+            await new Promise(r => setTimeout(r, 2000));
+        }
         print("=== main() started ===");
         const randomValues = new Uint32Array(32);
         const begin = Date.now();

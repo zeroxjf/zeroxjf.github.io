@@ -215,8 +215,7 @@ self[1] = boxed_arr;
   let logEntryID = 0;
   function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
-    try { self.postMessage({ type: 'log', text: out }); } catch(e) {}
-    if (!SERVER_LOG) return;
+    if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
         text: out,
@@ -930,18 +929,12 @@ self[1] = boxed_arr;
           log(`-`.repeat(0x28));
           try {
             // local version
-            const sbx0_script = getJS('/sbx0_main_18.4.js?' + Date.now());
-            print("sbx0 fetched, length: " + (sbx0_script ? sbx0_script.length : "null"));
+            const sbx0_script = getJS('/sbx0_main_18.4.js');
             log("after get js");
             eval(sbx0_script);
-            print("sbx0 eval completed successfully");
         } catch (e) {
-            print("SBX0 ERROR: " + e, true);
-            print("SBX0 ERROR stack: " + (e.stack || "no stack"), true);
             log(btoa(e));
         }
-          // Token saved locally, user retrieves via Shortcuts app
-
           fcall_close();
           print(`all done`);
           self.postMessage({

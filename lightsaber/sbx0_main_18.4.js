@@ -2211,7 +2211,7 @@
    }
 };
 
-  Object.assign(sbx0_offsets, {
+  sbx0_offsets = {
    "iPhone11,2_4_6_22F76": {
       GPUConnectionToWebProcess_CreateGraphicsContextGL: 0x29,
       GPUConnectionToWebProcess_CreateRenderingBackend: 0x2b,
@@ -3306,7 +3306,7 @@
    }
 });
 
-  Object.assign(sbx0_offsets, {
+  sbx0_offsets = {
    "iPhone11,2_4_6_22G86": {
       GPUConnectionToWebProcess_CreateGraphicsContextGL: 0x29,
       GPUConnectionToWebProcess_CreateRenderingBackend: 0x2b,
@@ -8418,8 +8418,8 @@
         gpu_write64(myWebProcessConnection + 0xe8n, 0n);
         gpu_write64(myWebProcessConnection + 0xf0n, 0n);
         LOG('Invalidated');
-        //LOG("Calling _exit()");
-        //fcall(offsets.exit, 0n);
+        LOG("Calling _exit()");
+        fcall(offsets.exit, 0n);
 
         gpu_fcall_close();
       } catch (e) {

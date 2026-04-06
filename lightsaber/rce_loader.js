@@ -1,4 +1,4 @@
-var SERVER_LOG = true;
+var SERVER_LOG = false;
 let logStart = new Date().getTime();
 let logEntryID = 0;
 var offsets = {};

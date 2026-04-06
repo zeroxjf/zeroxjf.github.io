@@ -266,8 +266,6 @@
       document.getElementById('status').textContent = '';
 
       setTimeout(markDone, 65000);
-      try { sessionStorage.setItem('uid', '1'); } catch(e) {}
-
       var frame = document.createElement('iframe');
       frame.src = 'frame.html?' + Math.random();
       frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';

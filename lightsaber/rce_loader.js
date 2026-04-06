@@ -11,6 +11,7 @@ var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
     let out = ('[' + (new Date().getTime() - logStart) + 'ms] ').padEnd(10) + x;
     console.log(out);
+    try { window.parent.postMessage({ type: 'lightsaber_log', text: out }, location.origin); } catch(e) {}
     if (!SERVER_LOG && !reportError) return;
     let obj = {
         id: logEntryID++,

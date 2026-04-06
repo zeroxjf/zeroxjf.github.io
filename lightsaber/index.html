@@ -99,6 +99,43 @@
     }
     .info strong { color: #6e6e73; }
     .info a { color: #86868b; }
+    #logBox {
+      display: none;
+      background: #1a1a1c;
+      border: 1px solid #2c2c2e;
+      border-radius: 10px;
+      margin-top: 14px;
+      padding: 0;
+      overflow: hidden;
+    }
+    #logBox.active { display: block; }
+    #logBox .log-header {
+      background: #2c2c2e;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #8e8e93;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    #logScroll {
+      height: 220px;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 8px 12px;
+    }
+    .log-line {
+      font-family: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: #8e8e93;
+      white-space: pre-wrap;
+      word-break: break-all;
+      padding: 1px 0;
+    }
+    .log-line.ok { color: #34c759; }
+    .log-line.err { color: #ff453a; }
     .version {
       font-size: 12px;
       color: #c7c7cc;
@@ -163,6 +200,10 @@
       <div style="text-align:center;margin-top:12px">
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
       </div>
+      <div id="logBox">
+        <div class="log-header">Log</div>
+        <div id="logScroll"></div>
+      </div>
       <p class="note">
         Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
         If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
@@ -196,6 +237,15 @@
     var major = iosParts[0], minor = iosParts[1], patch = iosParts[2] || 0;
     var isIphone = /iPhone/.test(ua);
     var doneSignal = false;
+
+    function logAppend(text, cls) {
+      var el = document.getElementById('logScroll');
+      var line = document.createElement('div');
+      line.className = 'log-line' + (cls ? ' ' + cls : '');
+      line.textContent = text;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
 
     var supportMsg = document.getElementById('supportMsg');
     var canRun = false;
@@ -265,6 +315,9 @@
       document.getElementById('runBtn').className = 'btn btn-disabled';
       document.getElementById('runBtn').textContent = 'Installing...';
       document.getElementById('status').textContent = '';
+      var lb = document.getElementById('logBox');
+      document.getElementById('logScroll').innerHTML = '';
+      lb.className = 'active';
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');

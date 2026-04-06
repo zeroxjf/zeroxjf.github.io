@@ -426,10 +426,10 @@
   }
 
   function applyDockPatch(passTag) {
-    log("applyDockPatch(" + passTag + ") entered — running on main thread");
+    log("applyDockPatch(" + passTag + ") entered - running on main thread");
     const SBIconController = Native.callSymbol("objc_getClass", "SBIconController");
     if (!isNonZero(SBIconController)) {
-      log("SBIconController missing — are we in SpringBoard?");
+      log("SBIconController missing - are we in SpringBoard?");
       return false;
     }
     log("SBIconController=0x" + u64(SBIconController).toString(16));
@@ -513,7 +513,7 @@
     const testSB = Native.callSymbol("objc_getClass", "SBIconController");
     log("test SBIconController=0x" + u64(testSB).toString(16) + (testSB ? " (found)" : " (NOT FOUND - wrong process?)"));
 
-    log("about to runOnMainEvaluate (performSelectorOnMainThread) — PAC violation happens here if PAC context is stale");
+    log("about to runOnMainEvaluate (performSelectorOnMainThread) - PAC violation happens here if PAC context is stale");
     runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}");
     log("runOnMainEvaluate returned (async dispatch, no crash on injected thread)");
 

@@ -1778,7 +1778,7 @@ class InjectJS {
 		//console.log(TAG, "loaderStr: " + Utils.hex(loaderStr));
 
 		console.log(TAG, "Starting JS script for target: " + this.#target + " scriptStr=" + libs_JSUtils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].hex(scriptStr));
-		console.log(TAG, "About to evaluateScript — PAC violation would crash here or inside fiveicondock");
+		console.log(TAG, "About to evaluateScript - PAC violation would crash here or inside fiveicondock");
 
 		this.#callObjc(jscontext, "evaluateScript:", scriptStr);
 

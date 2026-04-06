@@ -99,28 +99,6 @@
     }
     .info strong { color: #6e6e73; }
     .info a { color: #86868b; }
-    .log-panel {
-      display: none;
-      background: #1d1d1f;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 12px;
-      max-height: 240px;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      font-family: 'SF Mono', SFMono-Regular, Menlo, monospace;
-      font-size: 10px;
-      line-height: 1.4;
-      color: #86868b;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      margin-left: -20px;
-      margin-right: -20px;
-      border-radius: 0;
-    }
-    .log-panel.active { display: block; }
-    .log-line { white-space: pre; overflow-x: hidden; text-overflow: ellipsis; padding: 1px 0; }
-    .log-line.highlight { color: #34c759; }
     .version {
       font-size: 12px;
       color: #c7c7cc;
@@ -187,7 +165,6 @@
       <div style="text-align:center;margin-top:12px">
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
       </div>
-      <div id="logPanel" class="log-panel"></div>
       <p class="note">
         <strong>Takes up to 60 seconds.</strong> Do not switch apps or lock your device while running. If the page refreshes immediately after pressing Install, try again.<br><br>
         <strong>There is no elegant way to detect completion.</strong> After about a minute, try dragging a 5th icon into your dock. If it doesn't work, reboot and retry.<br><br>
@@ -259,21 +236,9 @@
       btn.className = 'btn btn-done';
     }
 
-    var logHighlightWords = /main\(\)|Worker created|RCE module|stage1|sbx0|sbx1|PE|inject|fiveicon|done|error|fail/i;
-
-    function appendLog(text) {
-      var panel = document.getElementById('logPanel');
-      var line = document.createElement('div');
-      line.className = 'log-line' + (logHighlightWords.test(text) ? ' highlight' : '');
-      line.textContent = text;
-      panel.appendChild(line);
-      panel.scrollTop = panel.scrollHeight;
-    }
-
     window.addEventListener('message', function(event) {
       var data = event.data || {};
       if (data.type === 'lightsaber_done') markDone();
-      if (data.type === 'lightsaber_log' && data.text) appendLog(data.text);
     });
 
     function confirmInstall() {
@@ -303,9 +268,6 @@
       document.getElementById('runBtn').className = 'btn btn-disabled';
       document.getElementById('runBtn').textContent = 'Installing...';
       document.getElementById('status').textContent = '';
-      var lp = document.getElementById('logPanel');
-      lp.innerHTML = '';
-      lp.className = 'log-panel active';
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');

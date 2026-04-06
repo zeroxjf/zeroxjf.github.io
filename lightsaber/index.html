@@ -101,183 +101,39 @@
     .info a { color: #86868b; }
     #logBox {
       display: none;
-      background: linear-gradient(180deg, #1f1f21 0%, #18181a 100%);
-      border: 1px solid #2f2f33;
-      border-radius: 16px;
-      margin-top: 16px;
+      background: #1a1a1c;
+      border: 1px solid #2c2c2e;
+      border-radius: 12px;
+      margin-top: 14px;
       overflow: hidden;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.16);
     }
     #logBox.active { display: block; }
-    .console-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.03);
-      border-bottom: 1px solid #2f2f33;
-    }
-    .console-title {
-      min-width: 0;
-    }
-    .console-title strong {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: #f5f5f7;
-    }
-    .console-subtitle {
-      font-size: 10px;
-      color: #8e8e93;
-      margin-top: 1px;
-    }
-    .console-dots {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .console-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4a4a4f;
-    }
-    .console-dot.red { background: #ff5f57; }
-    .console-dot.yellow { background: #febc2e; }
-    .console-dot.green { background: #28c840; }
-    .console-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-bottom: 1px solid #2a2a2d;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .console-pill {
-      border: 1px solid #3a3a3f;
-      border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 10px;
-      line-height: 1;
-      color: #8e8e93;
-      white-space: nowrap;
-      background: rgba(255,255,255,0.02);
-    }
-    .console-pill.active {
-      color: #f5f5f7;
-      border-color: #5c5c63;
-      background: rgba(255,255,255,0.08);
-    }
-    .console-pill.process-webcontent.active {
-      border-color: rgba(10,132,255,0.8);
-      background: rgba(10,132,255,0.16);
-    }
-    .console-pill.process-kernel.active {
-      border-color: rgba(255,159,10,0.8);
-      background: rgba(255,159,10,0.16);
-    }
-    .console-pill.process-springboard.active {
-      border-color: rgba(94,92,230,0.8);
-      background: rgba(94,92,230,0.16);
-    }
-    .console-pill.process-pe.active {
-      border-color: rgba(48,209,88,0.8);
-      background: rgba(48,209,88,0.16);
-    }
-    .console-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-family: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 10.5px;
-      color: #d2d2d7;
-    }
-    .console-table thead th {
-      padding: 8px 10px;
-      text-align: left;
-      font-size: 10px;
+    #logBox .log-header {
+      padding: 8px 12px;
+      font-size: 11px;
       font-weight: 600;
       color: #8e8e93;
-      border-bottom: 1px solid #2a2a2d;
-      background: rgba(255,255,255,0.02);
+      background: #222224;
+      border-bottom: 1px solid #2c2c2e;
     }
-    .console-table thead th:nth-child(1) { width: 58px; }
-    .console-table thead th:nth-child(2) { width: 66px; }
-    .console-table thead th:nth-child(3) { width: 84px; }
     #logScroll {
-      max-height: 280px;
-      overflow-y: auto;
+      height: 200px;
+      overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      padding: 8px 12px;
     }
-    #logTableBody td {
-      padding: 7px 10px;
-      vertical-align: top;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      word-break: break-word;
-    }
-    #logTableBody tr:last-child td {
-      border-bottom: 0;
-    }
-    .row-type {
+    .log-line {
+      font-family: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      line-height: 1.5;
       color: #8e8e93;
-      text-transform: uppercase;
-      letter-spacing: 0.2px;
-    }
-    .row-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .row-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: #5e5ce6;
-      box-shadow: 0 0 0 3px rgba(94,92,230,0.12);
-    }
-    .row-type.info .row-dot { background: #5e5ce6; box-shadow: 0 0 0 3px rgba(94,92,230,0.12); }
-    .row-type.ok .row-dot { background: #30d158; box-shadow: 0 0 0 3px rgba(48,209,88,0.12); }
-    .row-type.warn .row-dot { background: #ff9f0a; box-shadow: 0 0 0 3px rgba(255,159,10,0.12); }
-    .row-type.err .row-dot { background: #ff453a; box-shadow: 0 0 0 3px rgba(255,69,58,0.12); }
-    .process-badge {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 3px 7px;
-      font-size: 9.5px;
-      line-height: 1;
-      color: #f5f5f7;
-      background: rgba(142,142,147,0.18);
-      border: 1px solid rgba(142,142,147,0.3);
-    }
-    .process-webcontent { background: rgba(10,132,255,0.16); border-color: rgba(10,132,255,0.3); }
-    .process-kernel { background: rgba(255,159,10,0.16); border-color: rgba(255,159,10,0.3); }
-    .process-springboard { background: rgba(94,92,230,0.16); border-color: rgba(94,92,230,0.3); }
-    .process-pe { background: rgba(48,209,88,0.16); border-color: rgba(48,209,88,0.3); }
-    .row-message {
-      color: #d2d2d7;
       white-space: pre-wrap;
+      word-break: break-all;
+      padding: 1px 0;
     }
-    .row-message.err { color: #ffb4ae; }
-    .row-message.ok { color: #8ff0a4; }
-    .console-empty {
-      padding: 16px 12px 18px;
-      color: #8e8e93;
-      font-size: 11px;
-    }
-    @media (max-width: 420px) {
-      .console-table thead th:nth-child(1) { width: 52px; }
-      .console-table thead th:nth-child(2) { width: 62px; }
-      .console-table thead th:nth-child(3) { width: 78px; }
-      #logTableBody td,
-      .console-table thead th {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-    }
+    .log-line.ok { color: #30d158; }
+    .log-line.err { color: #ff453a; }
     .version {
       font-size: 12px;
       color: #c7c7cc;
@@ -343,38 +199,8 @@
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
       </div>
       <div id="logBox">
-        <div class="console-topbar">
-          <div class="console-dots">
-            <span class="console-dot red"></span>
-            <span class="console-dot yellow"></span>
-            <span class="console-dot green"></span>
-          </div>
-          <div class="console-title">
-            <strong>Console</strong>
-            <div class="console-subtitle"><span id="logCount">0</span> messages tracked</div>
-          </div>
-        </div>
-        <div class="console-toolbar">
-          <span id="pillAll" class="console-pill active">All</span>
-          <span id="pillWebContent" class="console-pill process-webcontent">WebContent</span>
-          <span id="pillKernel" class="console-pill process-kernel">Kernel</span>
-          <span id="pillSpringBoard" class="console-pill process-springboard">SpringBoard</span>
-          <span id="pillPE" class="console-pill process-pe">PE</span>
-        </div>
-        <div id="logScroll">
-          <table class="console-table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Time</th>
-                <th>Process</th>
-                <th>Message</th>
-              </tr>
-            </thead>
-            <tbody id="logTableBody"></tbody>
-          </table>
-          <div id="logEmpty" class="console-empty">Waiting for WebContent and kernel-stage messages...</div>
-        </div>
+        <div class="log-header">Console</div>
+        <div id="logScroll"></div>
       </div>
       <p class="note">
         Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
@@ -410,103 +236,13 @@
     var isIphone = /iPhone/.test(ua);
     var doneSignal = false;
 
-    var logRows = [];
-    var logFilter = 'all';
-
-    function pad2(value) {
-      return value < 10 ? '0' + value : '' + value;
-    }
-
-    function getTimeStamp() {
-      var now = new Date();
-      return pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds());
-    }
-
-    function classifyProcess(text, source) {
-      var msg = (text || '').toLowerCase();
-      if (msg.indexOf('springboard') !== -1 || msg.indexOf('fiveicondock') !== -1 || msg.indexOf('injectjs') !== -1) return 'springboard';
-      if (msg.indexOf('[pe]') !== -1 || msg.indexOf('mediaplaybackd') !== -1 || msg.indexOf('xpc gadget') !== -1) return 'pe';
-      if (msg.indexOf('sbx0') !== -1 || msg.indexOf('sbx1') !== -1 || msg.indexOf('[mpo]') !== -1 || msg.indexOf('kernel') !== -1) return 'kernel';
-      if (msg.indexOf('webcontent') !== -1 || msg.indexOf('worker') !== -1 || source === 'webcontent') return 'webcontent';
-      return source === 'worker' ? 'kernel' : 'webcontent';
-    }
-
-    function classifyType(text, reportError) {
-      var msg = (text || '').toLowerCase();
-      if (reportError || msg.indexOf('error') !== -1 || msg.indexOf('failed') !== -1 || msg.indexOf('exception') !== -1 || msg.indexOf('panic') !== -1) return 'err';
-      if (msg.indexOf('done') !== -1 || msg.indexOf('success') !== -1 || msg.indexOf('spawned') !== -1 || msg.indexOf('completed') !== -1 || msg.indexOf('installed') !== -1) return 'ok';
-      if (msg.indexOf('warning') !== -1 || msg.indexOf('retry') !== -1 || msg.indexOf('fallback') !== -1) return 'warn';
-      return 'info';
-    }
-
-    function formatTypeLabel(type) {
-      if (type === 'ok') return 'notice';
-      if (type === 'warn') return 'warn';
-      if (type === 'err') return 'fault';
-      return 'info';
-    }
-
-    function formatProcessLabel(process) {
-      if (process === 'webcontent') return 'WebContent';
-      if (process === 'springboard') return 'SpringBoard';
-      if (process === 'pe') return 'PE';
-      return 'Kernel';
-    }
-
-    function updatePills() {
-      document.getElementById('pillAll').className = 'console-pill' + (logFilter === 'all' ? ' active' : '');
-      document.getElementById('pillWebContent').className = 'console-pill process-webcontent' + (logFilter === 'webcontent' ? ' active' : '');
-      document.getElementById('pillKernel').className = 'console-pill process-kernel' + (logFilter === 'kernel' ? ' active' : '');
-      document.getElementById('pillSpringBoard').className = 'console-pill process-springboard' + (logFilter === 'springboard' ? ' active' : '');
-      document.getElementById('pillPE').className = 'console-pill process-pe' + (logFilter === 'pe' ? ' active' : '');
-    }
-
-    function renderLogs() {
-      var tbody = document.getElementById('logTableBody');
-      var empty = document.getElementById('logEmpty');
-      var scroller = document.getElementById('logScroll');
-      var rows = logRows.filter(function(row) {
-        return logFilter === 'all' || row.process === logFilter;
-      });
-      tbody.innerHTML = rows.map(function(row) {
-        return '' +
-          '<tr>' +
-            '<td class="row-type ' + row.type + '">' +
-              '<span class="row-type-badge"><span class="row-dot"></span>' + row.typeLabel + '</span>' +
-            '</td>' +
-            '<td>' + row.time + '</td>' +
-            '<td><span class="process-badge process-' + row.process + '">' + row.processLabel + '</span></td>' +
-            '<td class="row-message ' + row.type + '"></td>' +
-          '</tr>';
-      }).join('');
-      var messageCells = tbody.querySelectorAll('.row-message');
-      for (var i = 0; i < rows.length; i++) {
-        messageCells[i].textContent = rows[i].text;
-      }
-      document.getElementById('logCount').textContent = logRows.length;
-      empty.style.display = rows.length ? 'none' : 'block';
-      scroller.scrollTop = scroller.scrollHeight;
-    }
-
-    function appendTrackedLog(text, source, reportError) {
-      var row = {
-        text: text,
-        time: getTimeStamp(),
-        process: classifyProcess(text, source),
-        type: classifyType(text, reportError)
-      };
-      row.typeLabel = formatTypeLabel(row.type);
-      row.processLabel = formatProcessLabel(row.process);
-      logRows.push(row);
-      if (logRows.length > 300) logRows.shift();
-      renderLogs();
-    }
-
-    function resetLogs() {
-      logRows = [];
-      logFilter = 'all';
-      updatePills();
-      renderLogs();
+    function logAppend(text, cls) {
+      var el = document.getElementById('logScroll');
+      var line = document.createElement('div');
+      line.className = 'log-line' + (cls ? ' ' + cls : '');
+      line.textContent = text;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
     }
 
     var supportMsg = document.getElementById('supportMsg');
@@ -540,7 +276,6 @@
       doneSignal = true;
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       document.getElementById('status').textContent = '';
-      appendTrackedLog('Install flow marked complete', 'webcontent', false);
       var btn = document.getElementById('runBtn');
       btn.textContent = 'Installed';
       btn.className = 'btn btn-done';
@@ -548,11 +283,8 @@
 
     window.addEventListener('message', function(event) {
       var data = event.data || {};
-      if (data.type === 'lightsaber_log' && data.text) {
-        appendTrackedLog(data.text, data.source || 'webcontent', !!data.reportError);
-        return;
-      }
       if (data.type === 'lightsaber_done') markDone();
+      if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
     });
 
     function confirmInstall() {
@@ -583,9 +315,8 @@
       document.getElementById('runBtn').textContent = 'Installing...';
       document.getElementById('status').textContent = '';
       var lb = document.getElementById('logBox');
-      resetLogs();
+      document.getElementById('logScroll').innerHTML = '';
       lb.className = 'active';
-      appendTrackedLog('Session armed. Waiting for WebContent worker bootstrap...', 'webcontent', false);
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');
@@ -594,13 +325,6 @@
       document.body.appendChild(frame);
     }
 
-    document.getElementById('pillAll').onclick = function() { logFilter = 'all'; updatePills(); renderLogs(); };
-    document.getElementById('pillWebContent').onclick = function() { logFilter = 'webcontent'; updatePills(); renderLogs(); };
-    document.getElementById('pillKernel').onclick = function() { logFilter = 'kernel'; updatePills(); renderLogs(); };
-    document.getElementById('pillSpringBoard').onclick = function() { logFilter = 'springboard'; updatePills(); renderLogs(); };
-    document.getElementById('pillPE').onclick = function() { logFilter = 'pe'; updatePills(); renderLogs(); };
-    updatePills();
-    renderLogs();
   </script>
 </body>
 </html>

@@ -5,16 +5,13 @@ var offsets = {};
 var slide;
 var chipset;
 var device_model;
-var crashRetry = false;
 try {
-    var prevAttempt = parseInt(sessionStorage.getItem('ls_attempt') || '0');
-    var prevTime = parseInt(sessionStorage.getItem('ls_time') || '0');
-    if (prevTime && (Date.now() - prevTime) < 15000) {
-        crashRetry = true;
+    if (sessionStorage.getItem('ls_running')) {
+        document.write('<div style="font-family:-apple-system,sans-serif;padding:48px 24px;text-align:center;color:#1d1d1f"><h2 style="margin-bottom:12px">Close Safari and try again</h2><p style="color:#86868b;font-size:15px;line-height:1.6">A previous attempt was detected. Retrying without killing Safari first can cause a kernel panic.<br><br>Swipe up, force-close Safari, then reopen this page.</p></div>');
+        throw 'stale session';
     }
-    sessionStorage.setItem('ls_attempt', String(prevAttempt + 1));
-    sessionStorage.setItem('ls_time', String(Date.now()));
-} catch(e) {}
+    sessionStorage.setItem('ls_running', '1');
+} catch(e) { if (e === 'stale session') throw e; }
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
@@ -38,7 +35,7 @@ function print(x, reportError = false, dumphex = false) {
 }
 function redirect()
 {
-    try { sessionStorage.removeItem('ls_attempt'); sessionStorage.removeItem('ls_time'); } catch(e) {}
+    try { sessionStorage.removeItem('ls_running'); } catch(e) {}
     try { window.parent.postMessage({ type: 'lightsaber_done' }, location.origin); } catch (e) {}
 }
 function getJS(fname,method = 'GET')
@@ -109,11 +106,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
     function doRedirect() {
       redirect();
     }
-    async function main() {
-        if (crashRetry) {
-            print("=== crash-retry detected, waiting 2s for heap to settle ===");
-            await new Promise(r => setTimeout(r, 2000));
-        }
+    function main() {
         print("=== main() started ===");
         const randomValues = new Uint32Array(32);
         const begin = Date.now();

@@ -408,8 +408,12 @@
     const s = cfstr(script);
     log("runOnMainEvaluate: cfstr=0x" + u64(s).toString(16) + " calling performSelectorOnMainThread (waitUntilDone:NO)");
     objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), s, 0);
-    log("runOnMainEvaluate: performSelector returned");
-    Native.callSymbol("CFRelease", s);
+    log("runOnMainEvaluate: performSelector returned, skipping CFRelease (main thread owns cfstr now)");
+    // NOTE: Do NOT CFRelease the cfstr here. With waitUntilDone:NO, the main
+    // thread retains/releases the object via performSelector's autorelease pool.
+    // Releasing on the injected thread races with main thread access and causes
+    // PAC violations on the release path (objc_release -> objc_msgSend with a
+    // PAC-signed isa that was signed for main thread context).
     return true;
   }
 

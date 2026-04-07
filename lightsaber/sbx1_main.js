@@ -6765,10 +6765,22 @@
       ]);
       pe_stage1_js_data = gpuCopyBuffer(read64(addrof(pe_stage1_js_data_array) + 0x10n), BigInt(pe_stage1_js_data_array.length));
       let pe_main_js_str = getJS('pe_main.js?' + Date.now());
-      let fiveicon_js_str = getJS('fiveicondock_light.js?' + Date.now());
-      if (fiveicon_js_str) {
-        pe_main_js_str = 'globalThis.__fiveicondock_code = decodeURIComponent("' + encodeURIComponent(fiveicon_js_str) + '");\n' + pe_main_js_str;
+      let lsTweak = (typeof globalThis.__ls_tweak === 'string' && globalThis.__ls_tweak.length > 0) ? globalThis.__ls_tweak : 'fiveicon';
+      let prelude = 'globalThis.__ls_tweak = "' + lsTweak.replace(/[^a-z_0-9]/gi, '') + '";\n';
+      prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweak === 'fiveicon' ? 'true' : 'false') + ';\n';
+      prelude += 'globalThis.__ls_enable_powercuff_heavy = ' + (lsTweak === 'powercuff_heavy' ? 'true' : 'false') + ';\n';
+      if (lsTweak === 'fiveicon') {
+        let fiveicon_js_str = getJS('fiveicondock_light.js?' + Date.now());
+        if (fiveicon_js_str) {
+          prelude += 'globalThis.__fiveicondock_code = decodeURIComponent("' + encodeURIComponent(fiveicon_js_str) + '");\n';
+        }
+      } else if (lsTweak === 'powercuff_heavy') {
+        let powercuff_js_str = getJS('powercuff_light_heavy.js?' + Date.now());
+        if (powercuff_js_str) {
+          prelude += 'globalThis.__powercuff_heavy_code = decodeURIComponent("' + encodeURIComponent(powercuff_js_str) + '");\n';
+        }
       }
+      pe_main_js_str = prelude + pe_main_js_str;
       pe_main_js_data = get_cstring(pe_main_js_str);
     } else {
       pe_stage1_js_data = g_pe_stage1_js_data;

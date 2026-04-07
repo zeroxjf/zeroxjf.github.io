@@ -6,6 +6,10 @@ var slide;
 var chipset;
 var device_model;
 try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSession', '1'); } catch(e) {}
+try {
+    var __lsTweakMatch = /[?&]tweak=([a-z_0-9]+)/i.exec(location.search || '');
+    globalThis.__ls_tweak = __lsTweakMatch ? __lsTweakMatch[1] : 'fiveicon';
+} catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {

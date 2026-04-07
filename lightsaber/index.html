@@ -216,11 +216,28 @@
       <p id="supportMsg" style="font-size:13px;margin-bottom:6px"></p>
       <div id="status" style="font-size:14px;color:#86868b"></div>
       <div style="text-align:center;margin-top:12px">
-        <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install</button>
+        <button id="runBtn" class="btn btn-run" onclick="confirmInstall('fiveicon')">Install</button>
       </div>
       <p class="note">
         Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
         If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Powercuff Heavy</div>
+      <p class="section-desc">Force thermalmonitord to simulate heavy thermal pressure</p>
+      <div class="info">
+        <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more coming soon)
+      </div>
+      <p id="supportMsgPC" style="font-size:13px;margin-bottom:6px"></p>
+      <div id="statusPC" style="font-size:14px;color:#86868b"></div>
+      <div style="text-align:center;margin-top:12px">
+        <button id="runBtnPC" class="btn btn-run" onclick="confirmInstall('powercuff_heavy')">Install</button>
+      </div>
+      <p class="note">
+        Injects into thermalmonitord and triggers the daemon's built-in &ldquo;heavy&rdquo; thermal simulation mode. Persists until reboot or until the daemon re-evaluates state. Adds a second injection target on top of the SpringBoard pivot &mdash; expect a slightly lower success rate than FiveIconDock.<br><br>
+        If it fails or resprings, reboot and retry.
       </p>
     </div>
 
@@ -348,40 +365,64 @@
     */
 
     var supportMsg = document.getElementById('supportMsg');
+    var supportMsgPC = document.getElementById('supportMsgPC');
     var canRun = false;
+    var pendingTweak = null;
 
+    var supportText = '';
+    var supportClass = '';
     if (!isIphone) {
-      supportMsg.className = 'unsupported';
-      supportMsg.textContent = 'iPhone only.';
+      supportClass = 'unsupported';
+      supportText = 'iPhone only.';
     } else if (major < 18 || (major === 18 && minor < 4)) {
-      supportMsg.className = 'unsupported';
-      supportMsg.textContent = 'iOS ' + iosVer + ' is not supported.';
+      supportClass = 'unsupported';
+      supportText = 'iOS ' + iosVer + ' is not supported.';
     } else if (major === 18 && minor >= 4 && (minor < 6 || (minor === 6 && patch <= 2))) {
-      supportMsg.className = 'supported';
-      supportMsg.textContent = 'iOS ' + iosVer;
+      supportClass = 'supported';
+      supportText = 'iOS ' + iosVer;
       canRun = true;
     } else {
-      supportMsg.className = 'unsupported';
-      supportMsg.textContent = 'iOS ' + iosVer + ' is not yet supported.';
+      supportClass = 'unsupported';
+      supportText = 'iOS ' + iosVer + ' is not yet supported.';
     }
+    supportMsg.className = supportClass;
+    supportMsg.textContent = supportText;
+    supportMsgPC.className = supportClass;
+    supportMsgPC.textContent = supportText;
 
     if (!canRun) {
-      document.getElementById('runBtn').className = 'btn btn-disabled';
-      document.getElementById('runBtn').textContent = 'Not available';
-      document.getElementById('runBtn').onclick = null;
+      var disable = function(id) {
+        var b = document.getElementById(id);
+        if (!b) return;
+        b.className = 'btn btn-disabled';
+        b.textContent = 'Not available';
+        b.onclick = null;
+      };
+      disable('runBtn');
+      disable('runBtnPC');
     }
 
     window.scrollTo(0, 0);
+
+    function tweakUiIds(tweak) {
+      return tweak === 'powercuff_heavy'
+        ? { btn: 'runBtnPC', status: 'statusPC' }
+        : { btn: 'runBtn', status: 'status' };
+    }
 
     function markDone() {
       if (doneSignal) return;
       doneSignal = true;
       // stopSyslogPolling();
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
-      document.getElementById('status').textContent = '';
-      var btn = document.getElementById('runBtn');
-      btn.textContent = 'Installed';
-      btn.className = 'btn btn-done';
+      var ids = tweakUiIds(pendingTweak);
+      var statusEl = document.getElementById(ids.status);
+      if (statusEl) statusEl.textContent = '';
+      var btn = document.getElementById(ids.btn);
+      if (btn) {
+        btn.textContent = 'Installed';
+        btn.className = 'btn btn-done';
+      }
     }
 
     window.addEventListener('message', function(event) {
@@ -390,8 +431,9 @@
       // if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
     });
 
-    function confirmInstall() {
+    function confirmInstall(tweak) {
       if (!canRun) return;
+      pendingTweak = tweak || 'fiveicon';
       document.getElementById('confirmOverlay').className = 'overlay active';
     }
 
@@ -401,22 +443,31 @@
 
     function proceedInstall() {
       document.getElementById('confirmOverlay').className = 'overlay';
-      runExploit();
+      runExploit(pendingTweak || 'fiveicon');
     }
 
-    function runExploit() {
+    function runExploit(tweak) {
       if (!canRun) return;
+      tweak = tweak || 'fiveicon';
+      pendingTweak = tweak;
+      var ids = tweakUiIds(tweak);
+      var statusEl = document.getElementById(ids.status);
       try {
         if (sessionStorage.getItem('ls_running')) {
-          document.getElementById('status').style.color = '#dc2626';
-          document.getElementById('status').textContent = 'Close Safari completely (swipe up, force-close), then reopen this page. Retrying without killing Safari can cause a kernel panic.';
+          if (statusEl) {
+            statusEl.style.color = '#dc2626';
+            statusEl.textContent = 'Close Safari completely (swipe up, force-close), then reopen this page. Retrying without killing Safari can cause a kernel panic.';
+          }
           return;
         }
       } catch(e) {}
       doneSignal = false;
-      document.getElementById('runBtn').className = 'btn btn-disabled';
-      document.getElementById('runBtn').textContent = 'Installing...';
-      document.getElementById('status').textContent = '';
+      var btn = document.getElementById(ids.btn);
+      if (btn) {
+        btn.className = 'btn btn-disabled';
+        btn.textContent = 'Installing...';
+      }
+      if (statusEl) statusEl.textContent = '';
       /* log UI disabled for now
       var lb = document.getElementById('logBox');
       document.getElementById('logScroll').innerHTML = '';
@@ -428,7 +479,7 @@
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?' + Math.random();
+      frame.src = 'frame.html?tweak=' + encodeURIComponent(tweak) + '&_=' + Math.random();
       frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';
       document.body.appendChild(frame);
 

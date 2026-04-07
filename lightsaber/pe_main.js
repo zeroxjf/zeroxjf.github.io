@@ -8405,9 +8405,15 @@ const TAG = "MAIN";
 //const targetProcess = "bluetoothd";
 const targetProcess = "SpringBoard";
 const ENABLE_CORUNA_TWEAKLOADER = false;
-const ENABLE_SPRINGBOARD_JS_TWEAK = true;
+// Tweak enable flags are driven by globalThis values prepended to pe_main.js by
+// sbx1_main.js's spawn_pe(). This lets index.html pick which tweak to install
+// without rebuilding pe_main.js. Default to fiveicon if no flag is set.
+const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined') ? true : !!globalThis.__ls_enable_fiveicon;
 const SPRINGBOARD_JS_TWEAK_PATH = "/fiveicondock_light.js";
 const SPRINGBOARD_JS_TWEAK_LABEL = "FiveIconDock JS";
+const ENABLE_POWERCUFF_TWEAK_HEAVY = !!globalThis.__ls_enable_powercuff_heavy;
+const POWERCUFF_TWEAK_HEAVY_PATH = "/powercuff_light_heavy.js";
+const POWERCUFF_TWEAK_HEAVY_LABEL = "Powercuff Heavy";
 const ENABLE_UNRELATED_DUMPS = false;
 const ENABLE_KEYCHAIN_DUMP = false;
 const ENABLE_WIFI_DUMP = false;
@@ -8561,6 +8567,37 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 	}
 }
 
+function injectThermalmonitordPayload(migFilterBypass, path, label) {
+	LOG("[PE] Injecting " + label + " into thermalmonitord...");
+	LOG("[PE] code source: " + (typeof globalThis.__powercuff_heavy_code === 'string' && globalThis.__powercuff_heavy_code.length > 0 ? "prefetched (" + globalThis.__powercuff_heavy_code.length + " bytes)" : "fetchRemoteScript(" + path + ")"));
+	let code = (typeof globalThis.__powercuff_heavy_code === 'string' && globalThis.__powercuff_heavy_code.length > 0) ? globalThis.__powercuff_heavy_code : fetchRemoteScript(path);
+	if (!code) {
+		LOG("[PE] " + label + " fetch failed");
+		return false;
+	}
+	LOG("[PE] " + label + " code loaded: " + code.length + " bytes");
+	let loader = null;
+	try {
+		LOG("[PE] Creating InjectJS loader for " + label + " (target=thermalmonitord)...");
+		loader = new _InjectJS__WEBPACK_IMPORTED_MODULE_6__["default"]("thermalmonitord", code, migFilterBypass);
+		LOG("[PE] InjectJS loader created, calling inject()...");
+		let ok = loader.inject();
+		LOG("[PE] " + label + " inject result: " + ok);
+		if (ok && loader.task) {
+			libs_TaskRop_Sandbox__WEBPACK_IMPORTED_MODULE_4__["default"].applyTokensForRemoteTask(loader.task);
+		}
+		return ok;
+	} catch (e) {
+		LOG("[PE] " + label + " inject exception: " + String(e));
+		LOG("[PE] " + label + " stack: " + (e.stack || "no stack"));
+		return false;
+	} finally {
+		if (loader) {
+			try { loader.destroy(); } catch (_) {}
+		}
+	}
+}
+
 function runOptionalStage(label, enabled, fn) {
 	if (!enabled) {
 		LOG("[PE] " + label + " disabled");
@@ -8632,6 +8669,11 @@ function start() { LOG("[+] PE start() called");
 
 			agentLoader.destroy();
 		}
+
+		if (ENABLE_POWERCUFF_TWEAK_HEAVY)
+			injectThermalmonitordPayload(migFilterBypass, POWERCUFF_TWEAK_HEAVY_PATH, POWERCUFF_TWEAK_HEAVY_LABEL);
+		else
+			LOG("[PE] Powercuff Heavy tweak disabled");
 
 	runOptionalStage("Unrelated dumps master switch", ENABLE_UNRELATED_DUMPS, () => true);
 

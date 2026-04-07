@@ -302,6 +302,7 @@
     new DataView(ab).setFloat64(0, value, true);
     Native.write(buf, ab);
     objc(inv, "setArgument:atIndex:", buf, BigInt(idx));
+    Native.callSymbol("free", buf);
   }
 
   function setInvPointerArg(inv, ptr, idx) {
@@ -310,6 +311,7 @@
     new DataView(ab).setBigUint64(0, u64(ptr), true);
     Native.write(buf, ab);
     objc(inv, "setArgument:atIndex:", buf, BigInt(idx));
+    Native.callSymbol("free", buf);
   }
 
   function setInvBoolArg(inv, value, idx) {
@@ -318,6 +320,7 @@
     new Uint8Array(ab)[0] = value ? 1 : 0;
     Native.write(buf, ab);
     objc(inv, "setArgument:atIndex:", buf, BigInt(idx));
+    Native.callSymbol("free", buf);
   }
 
   // CGRect = struct { CGFloat x, y, w, h; } = 4 doubles = 32 bytes.
@@ -331,6 +334,7 @@
     dv.setFloat64(24, rect.h, true);
     Native.write(buf, ab);
     objc(inv, "setArgument:atIndex:", buf, BigInt(idx));
+    Native.callSymbol("free", buf);
   }
 
   // After invoke, retrieve a pointer-typed return value.
@@ -433,26 +437,13 @@
   }
 
   // === Tick (runs on main thread when timer fires) =====================
-  // Log the first few ticks verbosely so if the PAC crash happens on tick #N
-  // rather than during tsSetup we can see exactly which step of tsTick fired
-  // it. After a few successful ticks we go silent so we don't spam syslog.
-  let _tsTickCount = 0;
   function tsTick() {
     try {
-      _tsTickCount++;
-      const verbose = _tsTickCount <= 3;
-      if (verbose) log("tsTick[1] #" + _tsTickCount + " entry");
-
       const state = globalThis.__ts_state;
       if (!state || !isNonZero(state.label)) {
-        if (verbose) log("tsTick[1a] no state/label, skipping");
         return;
       }
-      if (verbose) log("tsTick[2] state.label=0x" + u64(state.label).toString(16));
-
-      if (verbose) log("tsTick[3] getNetworkBytes");
       const cur = getNetworkBytes();
-      if (verbose) log("tsTick[4] in=" + cur.in.toString() + " out=" + cur.out.toString());
       let inDiff = 0n;
       let outDiff = 0n;
       if (state.prevIn > 0n && cur.in >= state.prevIn) inDiff = cur.in - state.prevIn;
@@ -465,153 +456,91 @@
       // \u25BC = down arrow, \u25B2 = up arrow. JS escapes keep this source
       // file ASCII clean while still rendering as unicode glyphs at runtime.
       const text = "\u25BC " + downStr + "   \u25B2 " + upStr;
-      if (verbose) log("tsTick[5] cfstrUtf8 text");
       const cf = cfstrUtf8(text);
-      if (verbose) log("tsTick[6] cf=0x" + u64(cf).toString(16));
       if (isNonZero(cf)) {
-        if (verbose) log("tsTick[7] setText:");
         objc(state.label, "setText:", cf);
         // setText: copies the string into the label, so we can release ours.
-        if (verbose) log("tsTick[8] CFRelease cf");
         Native.callSymbol("CFRelease", cf);
       }
-      if (verbose) log("tsTick[9] tick done");
     } catch (e) {
-      if (_tsTickCount <= 3) log("tsTick ERR: " + String(e) + " stack: " + (e.stack || "N/A"));
+      log("tsTick ERR: " + String(e));
     }
   }
 
   // === Setup (runs on main thread, builds the HUD + schedules timer) ===
   function tsSetup() {
     try {
-      log("tsSetup[1] entry (main thread)");
-
-      log("tsSetup[2] objc_getClass UIApplication");
       const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
-      log("tsSetup[3] UIApplication=0x" + u64(UIApplication).toString(16));
-      log("tsSetup[4] [UIApplication sharedApplication]");
       const app = objc(UIApplication, "sharedApplication");
-      log("tsSetup[5] app=0x" + u64(app).toString(16));
-      if (!isNonZero(app)) { log("tsSetup[5a] no UIApplication"); return; }
+      if (!isNonZero(app)) { log("tsSetup: no UIApplication"); return; }
 
-      log("tsSetup[6] [app keyWindow]");
       let keyWindow = objc(app, "keyWindow");
-      log("tsSetup[7] keyWindow=0x" + u64(keyWindow).toString(16));
       if (!isNonZero(keyWindow)) {
-        log("tsSetup[7a] keyWindow nil, trying [app windows]");
         const windows = objc(app, "windows");
-        log("tsSetup[7b] windows=0x" + u64(windows).toString(16));
         if (isNonZero(windows)) {
           const count = u64(objc(windows, "count"));
-          log("tsSetup[7c] windows.count=" + count.toString());
           if (count > 0n) {
             keyWindow = objc(windows, "objectAtIndex:", 0n);
-            log("tsSetup[7d] windows[0]=0x" + u64(keyWindow).toString(16));
           }
         }
       }
-      if (!isNonZero(keyWindow)) { log("tsSetup[7e] no keyWindow"); return; }
-      log("tsSetup[8] keyWindow resolved=0x" + u64(keyWindow).toString(16));
+      if (!isNonZero(keyWindow)) { log("tsSetup: no keyWindow"); return; }
 
       // Create the label
-      log("tsSetup[9] objc_getClass UILabel");
       const UILabel = Native.callSymbol("objc_getClass", "UILabel");
-      log("tsSetup[10] UILabel=0x" + u64(UILabel).toString(16));
-      log("tsSetup[11] [[UILabel alloc] init]");
       const labelAlloc = objc(UILabel, "alloc");
-      log("tsSetup[12] labelAlloc=0x" + u64(labelAlloc).toString(16));
       const label = objc(labelAlloc, "init");
-      log("tsSetup[13] label=0x" + u64(label).toString(16));
-      if (!isNonZero(label)) { log("tsSetup[13a] UILabel init failed"); return; }
+      if (!isNonZero(label)) { log("tsSetup: UILabel init failed"); return; }
 
       // Set frame via NSInvocation (CGRect is HFA, can't pass via X regs)
-      log("tsSetup[14] build setFrame: invocation");
       const setFrameInv = newInvocationFromTarget(label, "setFrame:");
-      log("tsSetup[15] setFrameInv=0x" + u64(setFrameInv).toString(16));
-      if (!isNonZero(setFrameInv)) { log("tsSetup[15a] setFrame: invocation build failed"); return; }
-      log("tsSetup[16] setInvCGRectArg");
+      if (!isNonZero(setFrameInv)) { log("tsSetup: setFrame invocation failed"); return; }
       setInvCGRectArg(setFrameInv, HUD_FRAME, 2);
-      log("tsSetup[17] [setFrameInv invoke]");
       objc(setFrameInv, "invoke");
-      log("tsSetup[18] setFrameInv done");
 
       // Style: white text on opaque black background, centered, monospaced
-      log("tsSetup[19] objc_getClass UIColor");
       const UIColor = Native.callSymbol("objc_getClass", "UIColor");
-      log("tsSetup[20] UIColor=0x" + u64(UIColor).toString(16));
       const whiteColor = objc(UIColor, "whiteColor");
-      log("tsSetup[21] whiteColor=0x" + u64(whiteColor).toString(16));
       const blackColor = objc(UIColor, "blackColor");
-      log("tsSetup[22] blackColor=0x" + u64(blackColor).toString(16));
-      log("tsSetup[23] setTextColor:");
       objc(label, "setTextColor:", whiteColor);
-      log("tsSetup[24] setBackgroundColor:");
       objc(label, "setBackgroundColor:", blackColor);
-      log("tsSetup[25] setTextAlignment:");
       objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter = 1
-      log("tsSetup[26] label style done");
 
       // Set font: [UIFont systemFontOfSize:HUD_FONT_SIZE] - takes a double
-      log("tsSetup[27] objc_getClass UIFont");
       const UIFont = Native.callSymbol("objc_getClass", "UIFont");
-      log("tsSetup[28] UIFont=0x" + u64(UIFont).toString(16));
-      log("tsSetup[29] build systemFontOfSize: invocation");
       const fontInv = newInvocationFromClass(UIFont, "systemFontOfSize:");
-      log("tsSetup[30] fontInv=0x" + u64(fontInv).toString(16));
       if (isNonZero(fontInv)) {
-        log("tsSetup[31] setInvDoubleArg");
         setInvDoubleArg(fontInv, HUD_FONT_SIZE, 2);
-        log("tsSetup[32] [fontInv invoke]");
         objc(fontInv, "invoke");
-        log("tsSetup[33] getInvPointerReturn");
         const font = getInvPointerReturn(fontInv);
-        log("tsSetup[34] font=0x" + u64(font).toString(16));
         if (isNonZero(font)) {
-          log("tsSetup[35] setFont:");
           objc(label, "setFont:", font);
         }
       }
-      log("tsSetup[36] font done");
 
       // Initial text so the user sees something immediately even before the
       // first timer tick.
-      log("tsSetup[37] cfstrUtf8 initialText");
       const initialText = cfstrUtf8("\u25BC 0 KB/s   \u25B2 0 KB/s");
-      log("tsSetup[38] initialText=0x" + u64(initialText).toString(16));
       if (isNonZero(initialText)) {
-        log("tsSetup[39] setText: initialText");
         objc(label, "setText:", initialText);
-        log("tsSetup[40] CFRelease initialText");
         Native.callSymbol("CFRelease", initialText);
       }
-      log("tsSetup[41] initialText done");
 
       // Round the corners a bit so it doesn't look like a debug overlay
-      log("tsSetup[42] [label layer]");
       const labelLayer = objc(label, "layer");
-      log("tsSetup[43] labelLayer=0x" + u64(labelLayer).toString(16));
       if (isNonZero(labelLayer)) {
-        log("tsSetup[44] build setCornerRadius: invocation");
         const setCRInv = newInvocationFromTarget(labelLayer, "setCornerRadius:");
-        log("tsSetup[45] setCRInv=0x" + u64(setCRInv).toString(16));
         if (isNonZero(setCRInv)) {
-          log("tsSetup[46] setInvDoubleArg");
           setInvDoubleArg(setCRInv, 6.0, 2);
-          log("tsSetup[47] [setCRInv invoke]");
           objc(setCRInv, "invoke");
         }
-        log("tsSetup[48] setMasksToBounds:");
         objc(labelLayer, "setMasksToBounds:", 1n);
       }
-      log("tsSetup[49] corner radius done");
 
       // Add to keyWindow so it actually shows up
-      log("tsSetup[50] [keyWindow addSubview:label]");
       objc(keyWindow, "addSubview:", label);
-      log("tsSetup[51] addSubview done");
 
       // Stash the label + state so the tick handler can find it
-      log("tsSetup[52] stash __ts_state");
       globalThis.__ts_state = {
         label: label,
         prevIn: 0n,
@@ -619,32 +548,20 @@
       };
 
       // Retain the label so it survives any ARC fallout from this scope
-      log("tsSetup[53] [label retain]");
       objc(label, "retain");
-      log("tsSetup[54] label installed and retained");
 
       // Build the inner NSInvocation: [jsctx evaluateScript:@"__ts_tick()"]
-      log("tsSetup[55] read __ts_jsctx_obj");
       const jsctxObj = globalThis.__ts_jsctx_obj;
-      log("tsSetup[56] jsctxObj=0x" + u64(jsctxObj).toString(16));
-      if (!isNonZero(jsctxObj)) { log("tsSetup[56a] no jsctxObj for timer"); return; }
+      if (!isNonZero(jsctxObj)) { log("tsSetup: no jsctxObj for timer"); return; }
 
-      log("tsSetup[57] build evaluateScript: invocation");
       const innerInv = newInvocationFromTarget(jsctxObj, "evaluateScript:");
-      log("tsSetup[58] innerInv=0x" + u64(innerInv).toString(16));
-      if (!isNonZero(innerInv)) { log("tsSetup[58a] evaluateScript: invocation build failed"); return; }
-      log("tsSetup[59] cfstrUtf8 tickScript");
+      if (!isNonZero(innerInv)) { log("tsSetup: evaluateScript invocation build failed"); return; }
       const tickScript = cfstrUtf8("globalThis.__ts_tick && __ts_tick()");
-      log("tsSetup[60] tickScript=0x" + u64(tickScript).toString(16));
-      log("tsSetup[61] setInvPointerArg tickScript");
       setInvPointerArg(innerInv, tickScript, 2);
       // retainArguments tells the invocation to retain everything we passed,
       // so the cfstring stays alive for as long as the invocation lives.
-      log("tsSetup[62] [innerInv retainArguments]");
       objc(innerInv, "retainArguments");
-      log("tsSetup[63] [innerInv retain]");
       objc(innerInv, "retain");
-      log("tsSetup[64] innerInv ready");
 
       // Build the outer NSInvocation:
       //   [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -652,36 +569,23 @@
       //                                   repeats:YES]
       // The first arg (NSTimeInterval = double) is the reason we have to use
       // NSInvocation here instead of a direct objc_msgSend.
-      log("tsSetup[65] objc_getClass NSTimer");
       const NSTimer = Native.callSymbol("objc_getClass", "NSTimer");
-      log("tsSetup[66] NSTimer=0x" + u64(NSTimer).toString(16));
-      log("tsSetup[67] build scheduledTimerWithTimeInterval:invocation:repeats: invocation");
       const outerInv = newInvocationFromClass(NSTimer, "scheduledTimerWithTimeInterval:invocation:repeats:");
-      log("tsSetup[68] outerInv=0x" + u64(outerInv).toString(16));
-      if (!isNonZero(outerInv)) { log("tsSetup[68a] scheduledTimer: invocation build failed"); return; }
-      log("tsSetup[69] setInvDoubleArg interval");
+      if (!isNonZero(outerInv)) { log("tsSetup: scheduledTimer invocation build failed"); return; }
       setInvDoubleArg(outerInv, HUD_UPDATE_INTERVAL_SEC, 2);
-      log("tsSetup[70] setInvPointerArg innerInv");
       setInvPointerArg(outerInv, innerInv, 3);
-      log("tsSetup[71] setInvBoolArg repeats");
       setInvBoolArg(outerInv, true, 4);
-      log("tsSetup[72] [outerInv invoke]");
       objc(outerInv, "invoke");
-      log("tsSetup[73] outerInv invoke returned");
 
-      log("tsSetup[74] getInvPointerReturn timer");
       const timer = getInvPointerReturn(outerInv);
-      log("tsSetup[75] timer=0x" + u64(timer).toString(16));
       if (isNonZero(timer)) {
-        log("tsSetup[76] [timer retain]");
         objc(timer, "retain");
         globalThis.__ts_state.timer = timer;
       }
       globalThis.__ts_state.innerInv = innerInv;
-      log("tsSetup[77] timer scheduled, ts=0x" + u64(timer).toString(16));
-      log("tsSetup[78] tsSetup done");
+      log("tsSetup done");
     } catch (e) {
-      log("tsSetup ERR: " + String(e) + " stack: " + (e.stack || "N/A"));
+      log("tsSetup ERR: " + String(e));
     }
   }
 

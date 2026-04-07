@@ -627,7 +627,18 @@
     // loop, calling __ts_tick() once per second.
     log("dispatching tsSetup to main thread");
     runOnMainEvaluate("try{globalThis.__ts_setup && __ts_setup()}catch(e){globalThis.__ts_log && __ts_log('setup dispatch err: '+e)}");
-    log("setup dispatched, worker thread exiting");
+    log("setup dispatched, sleeping to let main thread finish");
+    // Keep the injected worker thread alive past the main-thread completion
+    // window. tsSetup is heavy (UILabel alloc + several NSInvocations +
+    // setFrame/setFont via NSInvocation + NSTimer scheduling) and is still
+    // running on main thread when we return from runOnMainEvaluate. If this
+    // thread tears down its PAC/frame context before main finishes the
+    // objc_msgSend chain we dispatched, we hit a PAC violation inside
+    // SpringBoard (same shape as the original fiveicondock_light.js bug fixed
+    // in fbfd56a + c4d788a). fiveicondock used 1.2s for its lighter pass;
+    // tsSetup does a lot more, so sleep longer.
+    Native.callSymbol("usleep", 3000000n);
+    log("worker thread exiting");
   } catch (e) {
     log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));
   }

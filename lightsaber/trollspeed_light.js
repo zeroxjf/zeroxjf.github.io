@@ -30,6 +30,14 @@
   const HUD_FONT_SIZE = 10.0;
   const HUD_UPDATE_INTERVAL_SEC = 1.0;
   const HUD_VIEW_TAG = 0x54530001;
+  // Safe mode is on by default. It avoids the riskiest bridge paths
+  // (NSInvocation-heavy CGFloat/CGRect/timer calls) that can destabilize
+  // SpringBoard on some iOS 18 builds. Set __ts_unsafe_mode=true before
+  // injection to restore full behavior.
+  const TS_SAFE_MODE = !(
+    globalThis.__ts_unsafe_mode === true ||
+    globalThis.__ts_unsafe_mode === 1
+  );
   // Hardcoded frame for now (no prefs UI in v1). Top-center of a ~390pt wide
   // iPhone screen, just below the notch / Dynamic Island.
   const HUD_FRAME = { x: 75.0, y: 58.0, w: 240.0, h: 22.0 };
@@ -53,10 +61,14 @@
     TS_STAGE_ADD_SUBVIEW |
     TS_STAGE_TIMER
   );
+  const TS_STAGE_SAFE_DEFAULT = (
+    TS_STAGE_STYLE |
+    TS_STAGE_ADD_SUBVIEW
+  );
   const TS_STAGE_MASK = (
     typeof globalThis.__ts_stage_mask === "number" &&
     (globalThis.__ts_stage_mask | 0) > 0
-  ) ? (globalThis.__ts_stage_mask | 0) : TS_STAGE_ALL;
+  ) ? (globalThis.__ts_stage_mask | 0) : (TS_SAFE_MODE ? TS_STAGE_SAFE_DEFAULT : TS_STAGE_ALL);
 
   const KB = 1024;
   const MB = 1024 * 1024;
@@ -668,6 +680,9 @@
         objc(label, "setText:", initialText);
         Native.callSymbol("CFRelease", initialText);
       }
+      if (TS_SAFE_MODE && canRespond(label, "sizeToFit")) {
+        objc(label, "sizeToFit");
+      }
 
       // Round the corners a bit so it doesn't look like a debug overlay
       if (stageEnabled(TS_STAGE_LAYER)) {
@@ -802,7 +817,10 @@
     globalThis.__ts_stage_mask = TS_STAGE_MASK;
     log("jsctxObj=0x" + u64(bi.jsContextObj).toString(16));
 
-    const required = ["UIApplication", "UILabel", "UIColor", "UIFont", "NSTimer", "NSInvocation", "NSMethodSignature", "JSContext"];
+    const required = ["UIApplication", "UILabel", "UIColor", "JSContext"];
+    if (!TS_SAFE_MODE) {
+      required.push("UIFont", "NSTimer", "NSInvocation", "NSMethodSignature");
+    }
     const missing = [];
     for (let i = 0; i < required.length; i++) {
       const c = Native.callSymbol("objc_getClass", required[i]);
@@ -813,6 +831,9 @@
       return;
     }
     probe("class preflight ok");
+    if (TS_SAFE_MODE) {
+      log("safe mode active (stage mask=0x" + TS_STAGE_MASK.toString(16) + ")");
+    }
 
     // Sanity check we are inside SpringBoard
     const sbIconControllerClass = Native.callSymbol("objc_getClass", "SBIconController");

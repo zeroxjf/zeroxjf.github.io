@@ -47,15 +47,25 @@ function print(x, reportError = false, dumphex = false) {
     xhr.open("GET", host + "/log.html?" + req , false);
     xhr.send(null);
 }
-  function getJS(fname,method = 'POST') 
+  function getJS(fname,method = 'POST')
   {
-      try 
+      try
       {
           let url = "";
           url = host + (fname.startsWith('/') ? fname : '/' + fname);
+          // Add a per-request cache buster on top of any caller-supplied
+          // query params, in case Safari or the CDN normalizes / ignores
+          // the existing Date.now() query string and serves a stale file.
+          let bust = '_lsbust=' + Date.now() + '_' + Math.random().toString(36).slice(2);
+          if (url.indexOf('?') >= 0) url = url + '&' + bust;
+          else url = url + '?' + bust;
           print("trying to fetch from:" + url);
           let xhr = new XMLHttpRequest();
           xhr.open("GET", `${url}` , false);
+          try {
+              xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+              xhr.setRequestHeader('Pragma', 'no-cache');
+          } catch (he) {}
           xhr.send(null);
           return xhr.responseText;
       }

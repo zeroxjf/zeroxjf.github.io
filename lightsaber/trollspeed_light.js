@@ -736,9 +736,10 @@
     }
     const cf = cfstrUtf8(script);
     if (!isNonZero(cf)) return false;
-    // Synchronous dispatch here avoids any overlap between this worker thread's
-    // native bridge calls and the main-thread setup script's bridge calls.
-    objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), cf, 1);
+    // Keep this asynchronous. waitUntilDone:YES can deadlock because the worker
+    // thread still holds JavaScriptCore VM state while the main thread tries to
+    // evaluate the script and take the same VM lock.
+    objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), cf, 0);
     // Don't CFRelease the cfstring on this thread - the main thread retains
     // it via performSelector's autorelease pool. Releasing here would race
     // and cause PAC violations on the release path. Same lesson learned in

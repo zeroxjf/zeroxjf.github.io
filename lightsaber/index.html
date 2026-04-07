@@ -560,6 +560,19 @@
   </div>
 
   <script>
+    // Force the page to start at the top on every load, even if Safari
+    // tries to restore the previous scroll position from cache. iOS Safari
+    // restores scroll position aggressively for back-forward / bfcache
+    // navigations and can also leave the URL bar mid-collapse, both of
+    // which were leaving the LightSaber header partially scrolled out of
+    // view on first paint. Disabling history.scrollRestoration plus three
+    // explicit scrollTo(0,0) calls (immediate, on DOMContentLoaded, and
+    // on the load event) covers every iOS Safari path I've seen.
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e) {}
+    window.scrollTo(0, 0);
+    document.addEventListener('DOMContentLoaded', function() { window.scrollTo(0, 0); });
+    window.addEventListener('load', function() { window.scrollTo(0, 0); });
+    window.addEventListener('pageshow', function() { window.scrollTo(0, 0); });
     // Show the intro warnings overlay on first visit per session. Persists
     // dismissal in sessionStorage so users don't get re-prompted on every
     // navigation, but it does come back if they fully close + reopen Safari.
@@ -575,6 +588,7 @@
       try { sessionStorage.setItem('ls_intro_dismissed', '1'); } catch(e) {}
       var el = document.getElementById('introOverlay');
       if (el) el.className = 'overlay';
+      window.scrollTo(0, 0);
     }
     var ua = navigator.userAgent;
     var iosMatch = /iPhone OS ([0-9_]+)/g.exec(ua);

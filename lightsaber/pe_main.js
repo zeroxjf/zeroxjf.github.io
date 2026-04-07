@@ -8570,14 +8570,27 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 }
 
 function injectThermalmonitordPayload(migFilterBypass, path, label) {
-	LOG("[PE] Injecting " + label + " (level=" + (globalThis.__powercuff_level || "heavy") + ") into thermalmonitord...");
+	// Validate the requested level here (in mediaplaybackd's pe_main.js context)
+	// and bake it into a prelude that runs inside thermalmonitord's JSC realm,
+	// because powercuff_light.js reads globalThis.__powercuff_level from the
+	// target process, not from this one. Without this, the payload always falls
+	// back to "heavy" regardless of what the user picked.
+	const POWERCUFF_VALID_LEVELS = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
+	const __pcRequested = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
+	const powercuffLevel = POWERCUFF_VALID_LEVELS[__pcRequested] ? __pcRequested : 'heavy';
+	LOG("[PE] Injecting " + label + " (level=" + powercuffLevel + ") into thermalmonitord...");
 	LOG("[PE] code source: " + (typeof globalThis.__powercuff_code === 'string' && globalThis.__powercuff_code.length > 0 ? "prefetched (" + globalThis.__powercuff_code.length + " bytes)" : "fetchRemoteScript(" + path + ")"));
 	let code = (typeof globalThis.__powercuff_code === 'string' && globalThis.__powercuff_code.length > 0) ? globalThis.__powercuff_code : fetchRemoteScript(path);
 	if (!code) {
 		LOG("[PE] " + label + " fetch failed");
 		return false;
 	}
-	LOG("[PE] " + label + " code loaded: " + code.length + " bytes");
+	// Prepend the level setter so powercuff_light.js sees the chosen value
+	// when it reads globalThis.__powercuff_level inside thermalmonitord. The
+	// level has already been validated against POWERCUFF_VALID_LEVELS above,
+	// so it's safe to interpolate directly into a string literal here.
+	code = 'globalThis.__powercuff_level = "' + powercuffLevel + '";\n' + code;
+	LOG("[PE] " + label + " code loaded: " + code.length + " bytes (with level prelude)");
 	let loader = null;
 	try {
 		LOG("[PE] Creating InjectJS loader for " + label + " (target=thermalmonitord)...");

@@ -202,7 +202,7 @@
   }
 
   function applyThermal() {
-    log("=== powercuff_light_heavy entry === target=" + THERMAL_MODE);
+    log("=== powercuff_light entry === target=" + THERMAL_MODE);
 
     // CPMSHelper is thermalmonitord's PPM-side singleton; -[CPMSHelper setProduct:]
     // is called from -[CommonProduct initProduct:] right at the end of init, so by
@@ -246,7 +246,7 @@
   }
 
   try {
-    log("=== powercuff_light_heavy.js loaded ===");
+    log("=== powercuff_light.js loaded === requested level=" + THERMAL_MODE);
     Native.init();
     log("Native.init ok, baseAddr=0x" + new BigUint64Array(nativeCallBuff)[20].toString(16));
 
@@ -255,7 +255,7 @@
     log("probe CPMSHelper=0x" + u64(probe).toString(16) + (probe ? " (thermalmonitord OK)" : " (WRONG PROCESS)"));
 
     const ok = applyThermal();
-    log("powercuff_light_heavy result=" + ok);
+    log("powercuff_light result=" + ok + " level=" + THERMAL_MODE);
   } catch (e) {
     log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));
   }

@@ -753,9 +753,9 @@
     probe("class preflight ok");
 
     // Sanity check we are inside SpringBoard
-    const probe = Native.callSymbol("objc_getClass", "SBIconController");
-    log("probe SBIconController=0x" + u64(probe).toString(16) + (probe ? " (SpringBoard OK)" : " (WRONG PROCESS)"));
-    if (!isNonZero(probe)) {
+    const sbIconControllerClass = Native.callSymbol("objc_getClass", "SBIconController");
+    log("probe SBIconController=0x" + u64(sbIconControllerClass).toString(16) + (sbIconControllerClass ? " (SpringBoard OK)" : " (WRONG PROCESS)"));
+    if (!isNonZero(sbIconControllerClass)) {
       log("aborting - not running inside SpringBoard");
       return;
     }

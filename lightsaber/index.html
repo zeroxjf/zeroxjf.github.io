@@ -678,8 +678,13 @@
       */
 
       setTimeout(markDone, 65000);
+      // Encode each tweak name individually so the comma between names stays
+      // a literal "," in the URL instead of becoming "%2C". rce_loader.js's
+      // URLSearchParams parser handles either form, but a literal comma is
+      // also more readable in logs and proxies.
+      var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweaks=' + encodeURIComponent(tweaks.join(',')) + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
+      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
       frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';
       document.body.appendChild(frame);
 

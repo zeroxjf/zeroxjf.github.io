@@ -6,32 +6,31 @@ var slide;
 var chipset;
 var device_model;
 try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSession', '1'); } catch(e) {}
+// Parse the iframe's ?tweaks=... and ?level=... query params using
+// URLSearchParams so URL-encoded characters (notably the comma between
+// tweak names becoming %2C) are decoded correctly. The previous regex
+// approach silently dropped any tweak that came after a %2C because the
+// character class did not include %, so checking both fiveicon and
+// powercuff in the picker would only propagate fiveicon.
 try {
+    var __lsParams = new URLSearchParams(location.search || '');
     var __validTweaks = { fiveicon: 1, powercuff: 1 };
-    var __lsTweaksMatch = /[?&]tweaks=([a-z_0-9,]+)/i.exec(location.search || '');
     var __tweaksList = [];
-    if (__lsTweaksMatch) {
-        var __parts = __lsTweaksMatch[1].split(',');
+    var __rawTweaks = __lsParams.get('tweaks') || __lsParams.get('tweak') || '';
+    if (__rawTweaks) {
+        var __parts = String(__rawTweaks).split(',');
         for (var __i = 0; __i < __parts.length; __i++) {
-            var __t = __parts[__i].toLowerCase();
+            var __t = (__parts[__i] || '').toLowerCase().trim();
             if (__validTweaks[__t] && __tweaksList.indexOf(__t) < 0) __tweaksList.push(__t);
         }
     }
-    if (__tweaksList.length === 0) {
-        // Backward-compat: accept legacy singular ?tweak=
-        var __lsTweakMatch = /[?&]tweak=([a-z_0-9]+)/i.exec(location.search || '');
-        if (__lsTweakMatch && __validTweaks[__lsTweakMatch[1].toLowerCase()]) {
-            __tweaksList.push(__lsTweakMatch[1].toLowerCase());
-        } else {
-            __tweaksList.push('fiveicon');
-        }
-    }
+    if (__tweaksList.length === 0) __tweaksList.push('fiveicon');
     globalThis.__ls_tweaks = __tweaksList.join(',');
 } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
 try {
-    var __lsLevelMatch = /[?&]level=([a-z]+)/i.exec(location.search || '');
+    var __lsParams2 = new URLSearchParams(location.search || '');
     var __validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
-    var __lvl = __lsLevelMatch ? __lsLevelMatch[1].toLowerCase() : 'heavy';
+    var __lvl = (__lsParams2.get('level') || 'heavy').toLowerCase().trim();
     globalThis.__ls_powercuff_level = __validLevels[__lvl] ? __lvl : 'heavy';
 } catch (e) { globalThis.__ls_powercuff_level = 'heavy'; }
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
@@ -127,6 +126,7 @@ const ios_version = (function() {
     print("WARNING: Could not detect iOS version from UA!");
     return null;
 })();
+print("Tweak selection: tweaks=" + (globalThis.__ls_tweaks || '(none)') + " level=" + (globalThis.__ls_powercuff_level || '(none)') + " rawSearch=" + (location.search || '(empty)'));
 print("Loading worker code...");
 let workerCode = "";
 if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2') {

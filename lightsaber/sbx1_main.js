@@ -6781,24 +6781,33 @@
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
       if (lsTweakSet.trollspeed) lsTweaksOut.push('trollspeed');
+      let selectedTweakCount = lsTweaksOut.length;
+      // Inlining multiple tweak scripts inflates pe_main prelude size heavily
+      // (URI-encoding expands JS by ~1.6x) and can perturb heap layout before
+      // primitives are fully stabilized. Keep inline prefetch only for single
+      // tweak runs; multi-tweak runs fetch scripts on-demand in pe_main.
+      let inlinePayloadPrefetch = selectedTweakCount <= 1;
+      if (!inlinePayloadPrefetch) {
+        LOG("[SBX1] Multi-tweak selection (" + selectedTweakCount + "), skipping inline payload prefetch for heap stability");
+      }
       let prelude = 'globalThis.__ls_tweaks = "' + lsTweaksOut.join(',') + '";\n';
       prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_trollspeed = ' + (lsTweakSet.trollspeed ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
-      if (lsTweakSet.fiveicon) {
+      if (lsTweakSet.fiveicon && inlinePayloadPrefetch) {
         let fiveicon_js_str = getJS('fiveicondock_light.js?' + Date.now());
         if (fiveicon_js_str) {
           prelude += 'globalThis.__fiveicondock_code = decodeURIComponent("' + encodeURIComponent(fiveicon_js_str) + '");\n';
         }
       }
-      if (lsTweakSet.powercuff) {
+      if (lsTweakSet.powercuff && inlinePayloadPrefetch) {
         let powercuff_js_str = getJS('powercuff_light.js?' + Date.now());
         if (powercuff_js_str) {
           prelude += 'globalThis.__powercuff_code = decodeURIComponent("' + encodeURIComponent(powercuff_js_str) + '");\n';
         }
       }
-      if (lsTweakSet.trollspeed) {
+      if (lsTweakSet.trollspeed && inlinePayloadPrefetch) {
         let trollspeed_js_str = getJS('trollspeed_light.js?' + Date.now());
         if (trollspeed_js_str) {
           prelude += 'globalThis.__trollspeed_code = decodeURIComponent("' + encodeURIComponent(trollspeed_js_str) + '");\n';

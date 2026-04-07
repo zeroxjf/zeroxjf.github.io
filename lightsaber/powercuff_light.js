@@ -1,8 +1,11 @@
 (() => {
   // powercuff_light.js
   //
-  // Mimics rpetrich's Powercuff thermal-throttle tweak via the lightsaber
-  // chain's daemon-injection primitive instead of a Cydia-style dylib.
+  // Port of rpetrich's Powercuff thermal-throttle tweak
+  // (https://github.com/rpetrich/Powercuff) to the lightsaber JS-injection
+  // chain's daemon-injection primitive instead of a Cydia-style dylib. All
+  // credit for the original tweak design and the discovery of the
+  // putDeviceInThermalSimulationMode: API goes to rpetrich.
   //
   // Runs *inside thermalmonitord*, walks +[CPMSHelper sharedInstance] to the
   // live CommonProduct singleton, and calls putDeviceInThermalSimulationMode:

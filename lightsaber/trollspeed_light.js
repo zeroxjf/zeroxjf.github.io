@@ -32,6 +32,27 @@
   // Hardcoded frame for now (no prefs UI in v1). Top-center of a ~390pt wide
   // iPhone screen, just below the notch / Dynamic Island.
   const HUD_FRAME = { x: 75.0, y: 58.0, w: 240.0, h: 22.0 };
+  // Probe mode: keep logs sparse but deterministic so PAC crash location can be
+  // inferred from the last emitted stage marker.
+  const TS_PROBE_MODE = true;
+  const TS_STAGE_SET_FRAME = 1;
+  const TS_STAGE_STYLE = 2;
+  const TS_STAGE_FONT = 4;
+  const TS_STAGE_LAYER = 8;
+  const TS_STAGE_ADD_SUBVIEW = 16;
+  const TS_STAGE_TIMER = 32;
+  const TS_STAGE_ALL = (
+    TS_STAGE_SET_FRAME |
+    TS_STAGE_STYLE |
+    TS_STAGE_FONT |
+    TS_STAGE_LAYER |
+    TS_STAGE_ADD_SUBVIEW |
+    TS_STAGE_TIMER
+  );
+  const TS_STAGE_MASK = (
+    typeof globalThis.__ts_stage_mask === "number" &&
+    (globalThis.__ts_stage_mask | 0) > 0
+  ) ? (globalThis.__ts_stage_mask | 0) : TS_STAGE_ALL;
 
   const KB = 1024;
   const MB = 1024 * 1024;
@@ -215,6 +236,25 @@
 
   function objc(obj, selectorName, ...args) {
     return Native.callSymbol("objc_msgSend", obj, sel(selectorName), ...args);
+  }
+
+  function probe(msg) {
+    if (TS_PROBE_MODE) log("[PROBE] " + msg);
+  }
+
+  function stageEnabled(stageBit) {
+    return (TS_STAGE_MASK & stageBit) !== 0;
+  }
+
+  function canRespond(obj, selectorName) {
+    if (!isNonZero(obj)) return false;
+    return isNonZero(objc(obj, "respondsToSelector:", sel(selectorName)));
+  }
+
+  function requireSelector(obj, selectorName, who) {
+    const ok = canRespond(obj, selectorName);
+    probe((ok ? "ok " : "miss ") + who + " -> " + selectorName);
+    return ok;
   }
 
   // Build a CFString from a JS string. Handles non-ASCII codepoints by
@@ -470,56 +510,103 @@
   // === Setup (runs on main thread, builds the HUD + schedules timer) ===
   function tsSetup() {
     try {
+      probe("tsSetup begin mask=0x" + TS_STAGE_MASK.toString(16));
       const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
+      if (!isNonZero(UIApplication)) { log("tsSetup: UIApplication class missing"); return; }
+      if (!requireSelector(UIApplication, "sharedApplication", "UIApplication")) { log("tsSetup: no sharedApplication"); return; }
       const app = objc(UIApplication, "sharedApplication");
       if (!isNonZero(app)) { log("tsSetup: no UIApplication"); return; }
 
-      let keyWindow = objc(app, "keyWindow");
+      let keyWindow = 0n;
+      if (requireSelector(app, "keyWindow", "app")) {
+        probe("before app keyWindow");
+        keyWindow = objc(app, "keyWindow");
+        probe("after app keyWindow=0x" + u64(keyWindow).toString(16));
+      }
       if (!isNonZero(keyWindow)) {
+        if (!requireSelector(app, "windows", "app")) { log("tsSetup: no windows selector"); return; }
+        probe("before app windows");
         const windows = objc(app, "windows");
+        probe("after app windows=0x" + u64(windows).toString(16));
         if (isNonZero(windows)) {
+          if (!requireSelector(windows, "count", "windows")) { log("tsSetup: windows missing count"); return; }
           const count = u64(objc(windows, "count"));
           if (count > 0n) {
+            if (!requireSelector(windows, "objectAtIndex:", "windows")) { log("tsSetup: windows missing objectAtIndex:"); return; }
             keyWindow = objc(windows, "objectAtIndex:", 0n);
           }
         }
       }
       if (!isNonZero(keyWindow)) { log("tsSetup: no keyWindow"); return; }
+      probe("window ok=0x" + u64(keyWindow).toString(16));
 
       // Create the label
       const UILabel = Native.callSymbol("objc_getClass", "UILabel");
+      if (!isNonZero(UILabel)) { log("tsSetup: UILabel class missing"); return; }
+      if (!requireSelector(UILabel, "alloc", "UILabel")) { log("tsSetup: UILabel alloc missing"); return; }
       const labelAlloc = objc(UILabel, "alloc");
+      if (!requireSelector(labelAlloc, "init", "UILabel alloc")) { log("tsSetup: UILabel init missing"); return; }
       const label = objc(labelAlloc, "init");
       if (!isNonZero(label)) { log("tsSetup: UILabel init failed"); return; }
+      probe("label ok=0x" + u64(label).toString(16));
 
       // Set frame via NSInvocation (CGRect is HFA, can't pass via X regs)
-      const setFrameInv = newInvocationFromTarget(label, "setFrame:");
-      if (!isNonZero(setFrameInv)) { log("tsSetup: setFrame invocation failed"); return; }
-      setInvCGRectArg(setFrameInv, HUD_FRAME, 2);
-      objc(setFrameInv, "invoke");
+      if (stageEnabled(TS_STAGE_SET_FRAME)) {
+        if (!requireSelector(label, "setFrame:", "UILabel")) { log("tsSetup: setFrame selector missing"); return; }
+        probe("S1 before setFrame");
+        const setFrameInv = newInvocationFromTarget(label, "setFrame:");
+        if (!isNonZero(setFrameInv)) { log("tsSetup: setFrame invocation failed"); return; }
+        setInvCGRectArg(setFrameInv, HUD_FRAME, 2);
+        objc(setFrameInv, "invoke");
+        probe("S1 after setFrame");
+      } else {
+        probe("S1 skipped setFrame");
+      }
 
       // Style: white text on opaque black background, centered, monospaced
-      const UIColor = Native.callSymbol("objc_getClass", "UIColor");
-      const whiteColor = objc(UIColor, "whiteColor");
-      const blackColor = objc(UIColor, "blackColor");
-      objc(label, "setTextColor:", whiteColor);
-      objc(label, "setBackgroundColor:", blackColor);
-      objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter = 1
+      if (stageEnabled(TS_STAGE_STYLE)) {
+        const UIColor = Native.callSymbol("objc_getClass", "UIColor");
+        if (!isNonZero(UIColor)) { log("tsSetup: UIColor class missing"); return; }
+        if (!requireSelector(UIColor, "whiteColor", "UIColor")) { log("tsSetup: whiteColor missing"); return; }
+        if (!requireSelector(UIColor, "blackColor", "UIColor")) { log("tsSetup: blackColor missing"); return; }
+        if (!requireSelector(label, "setTextColor:", "UILabel")) { log("tsSetup: setTextColor missing"); return; }
+        if (!requireSelector(label, "setBackgroundColor:", "UILabel")) { log("tsSetup: setBackgroundColor missing"); return; }
+        if (!requireSelector(label, "setTextAlignment:", "UILabel")) { log("tsSetup: setTextAlignment missing"); return; }
+        probe("S2 before style");
+        const whiteColor = objc(UIColor, "whiteColor");
+        const blackColor = objc(UIColor, "blackColor");
+        objc(label, "setTextColor:", whiteColor);
+        objc(label, "setBackgroundColor:", blackColor);
+        objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter = 1
+        probe("S2 after style");
+      } else {
+        probe("S2 skipped style");
+      }
 
       // Set font: [UIFont systemFontOfSize:HUD_FONT_SIZE] - takes a double
-      const UIFont = Native.callSymbol("objc_getClass", "UIFont");
-      const fontInv = newInvocationFromClass(UIFont, "systemFontOfSize:");
-      if (isNonZero(fontInv)) {
-        setInvDoubleArg(fontInv, HUD_FONT_SIZE, 2);
-        objc(fontInv, "invoke");
-        const font = getInvPointerReturn(fontInv);
-        if (isNonZero(font)) {
-          objc(label, "setFont:", font);
+      if (stageEnabled(TS_STAGE_FONT)) {
+        const UIFont = Native.callSymbol("objc_getClass", "UIFont");
+        if (!isNonZero(UIFont)) { log("tsSetup: UIFont class missing"); return; }
+        if (!requireSelector(UIFont, "systemFontOfSize:", "UIFont")) { log("tsSetup: systemFontOfSize missing"); return; }
+        if (!requireSelector(label, "setFont:", "UILabel")) { log("tsSetup: setFont missing"); return; }
+        probe("S3 before font");
+        const fontInv = newInvocationFromClass(UIFont, "systemFontOfSize:");
+        if (isNonZero(fontInv)) {
+          setInvDoubleArg(fontInv, HUD_FONT_SIZE, 2);
+          objc(fontInv, "invoke");
+          const font = getInvPointerReturn(fontInv);
+          if (isNonZero(font)) {
+            objc(label, "setFont:", font);
+          }
         }
+        probe("S3 after font");
+      } else {
+        probe("S3 skipped font");
       }
 
       // Initial text so the user sees something immediately even before the
       // first timer tick.
+      if (!requireSelector(label, "setText:", "UILabel")) { log("tsSetup: setText missing"); return; }
       const initialText = cfstrUtf8("\u25BC 0 KB/s   \u25B2 0 KB/s");
       if (isNonZero(initialText)) {
         objc(label, "setText:", initialText);
@@ -527,18 +614,34 @@
       }
 
       // Round the corners a bit so it doesn't look like a debug overlay
-      const labelLayer = objc(label, "layer");
-      if (isNonZero(labelLayer)) {
-        const setCRInv = newInvocationFromTarget(labelLayer, "setCornerRadius:");
-        if (isNonZero(setCRInv)) {
-          setInvDoubleArg(setCRInv, 6.0, 2);
-          objc(setCRInv, "invoke");
+      if (stageEnabled(TS_STAGE_LAYER)) {
+        if (!requireSelector(label, "layer", "UILabel")) { log("tsSetup: layer selector missing"); return; }
+        probe("S4 before layer");
+        const labelLayer = objc(label, "layer");
+        if (isNonZero(labelLayer)) {
+          if (!requireSelector(labelLayer, "setCornerRadius:", "CALayer")) { log("tsSetup: setCornerRadius missing"); return; }
+          if (!requireSelector(labelLayer, "setMasksToBounds:", "CALayer")) { log("tsSetup: setMasksToBounds missing"); return; }
+          const setCRInv = newInvocationFromTarget(labelLayer, "setCornerRadius:");
+          if (isNonZero(setCRInv)) {
+            setInvDoubleArg(setCRInv, 6.0, 2);
+            objc(setCRInv, "invoke");
+          }
+          objc(labelLayer, "setMasksToBounds:", 1n);
         }
-        objc(labelLayer, "setMasksToBounds:", 1n);
+        probe("S4 after layer");
+      } else {
+        probe("S4 skipped layer");
       }
 
       // Add to keyWindow so it actually shows up
-      objc(keyWindow, "addSubview:", label);
+      if (stageEnabled(TS_STAGE_ADD_SUBVIEW)) {
+        if (!requireSelector(keyWindow, "addSubview:", "keyWindow")) { log("tsSetup: addSubview missing"); return; }
+        probe("S5 before addSubview");
+        objc(keyWindow, "addSubview:", label);
+        probe("S5 after addSubview");
+      } else {
+        probe("S5 skipped addSubview");
+      }
 
       // Stash the label + state so the tick handler can find it
       globalThis.__ts_state = {
@@ -553,36 +656,47 @@
       // Build the inner NSInvocation: [jsctx evaluateScript:@"__ts_tick()"]
       const jsctxObj = globalThis.__ts_jsctx_obj;
       if (!isNonZero(jsctxObj)) { log("tsSetup: no jsctxObj for timer"); return; }
+      if (stageEnabled(TS_STAGE_TIMER)) {
+        if (!requireSelector(jsctxObj, "evaluateScript:", "JSContext")) { log("tsSetup: evaluateScript missing"); return; }
+        probe("S6 before timer");
+        const innerInv = newInvocationFromTarget(jsctxObj, "evaluateScript:");
+        if (!isNonZero(innerInv)) { log("tsSetup: evaluateScript invocation build failed"); return; }
+        const tickScript = cfstrUtf8("globalThis.__ts_tick && __ts_tick()");
+        setInvPointerArg(innerInv, tickScript, 2);
+        // retainArguments tells the invocation to retain everything we passed,
+        // so the cfstring stays alive for as long as the invocation lives.
+        objc(innerInv, "retainArguments");
+        objc(innerInv, "retain");
 
-      const innerInv = newInvocationFromTarget(jsctxObj, "evaluateScript:");
-      if (!isNonZero(innerInv)) { log("tsSetup: evaluateScript invocation build failed"); return; }
-      const tickScript = cfstrUtf8("globalThis.__ts_tick && __ts_tick()");
-      setInvPointerArg(innerInv, tickScript, 2);
-      // retainArguments tells the invocation to retain everything we passed,
-      // so the cfstring stays alive for as long as the invocation lives.
-      objc(innerInv, "retainArguments");
-      objc(innerInv, "retain");
+        // Build the outer NSInvocation:
+        //   [NSTimer scheduledTimerWithTimeInterval:1.0
+        //                                invocation:innerInv
+        //                                   repeats:YES]
+        // The first arg (NSTimeInterval = double) is the reason we have to use
+        // NSInvocation here instead of a direct objc_msgSend.
+        const NSTimer = Native.callSymbol("objc_getClass", "NSTimer");
+        if (!isNonZero(NSTimer)) { log("tsSetup: NSTimer class missing"); return; }
+        if (!requireSelector(NSTimer, "scheduledTimerWithTimeInterval:invocation:repeats:", "NSTimer")) {
+          log("tsSetup: scheduledTimerWithTimeInterval:invocation:repeats: missing");
+          return;
+        }
+        const outerInv = newInvocationFromClass(NSTimer, "scheduledTimerWithTimeInterval:invocation:repeats:");
+        if (!isNonZero(outerInv)) { log("tsSetup: scheduledTimer invocation build failed"); return; }
+        setInvDoubleArg(outerInv, HUD_UPDATE_INTERVAL_SEC, 2);
+        setInvPointerArg(outerInv, innerInv, 3);
+        setInvBoolArg(outerInv, true, 4);
+        objc(outerInv, "invoke");
 
-      // Build the outer NSInvocation:
-      //   [NSTimer scheduledTimerWithTimeInterval:1.0
-      //                                invocation:innerInv
-      //                                   repeats:YES]
-      // The first arg (NSTimeInterval = double) is the reason we have to use
-      // NSInvocation here instead of a direct objc_msgSend.
-      const NSTimer = Native.callSymbol("objc_getClass", "NSTimer");
-      const outerInv = newInvocationFromClass(NSTimer, "scheduledTimerWithTimeInterval:invocation:repeats:");
-      if (!isNonZero(outerInv)) { log("tsSetup: scheduledTimer invocation build failed"); return; }
-      setInvDoubleArg(outerInv, HUD_UPDATE_INTERVAL_SEC, 2);
-      setInvPointerArg(outerInv, innerInv, 3);
-      setInvBoolArg(outerInv, true, 4);
-      objc(outerInv, "invoke");
-
-      const timer = getInvPointerReturn(outerInv);
-      if (isNonZero(timer)) {
-        objc(timer, "retain");
-        globalThis.__ts_state.timer = timer;
+        const timer = getInvPointerReturn(outerInv);
+        if (isNonZero(timer)) {
+          objc(timer, "retain");
+          globalThis.__ts_state.timer = timer;
+        }
+        globalThis.__ts_state.innerInv = innerInv;
+        probe("S6 after timer");
+      } else {
+        probe("S6 skipped timer");
       }
-      globalThis.__ts_state.innerInv = innerInv;
       log("tsSetup done");
     } catch (e) {
       log("tsSetup ERR: " + String(e));
@@ -593,6 +707,14 @@
     const jsctxObj = globalThis.__ts_jsctx_obj;
     if (!isNonZero(jsctxObj)) {
       log("runOnMainEvaluate: no jsctxObj");
+      return false;
+    }
+    if (!canRespond(jsctxObj, "evaluateScript:")) {
+      log("runOnMainEvaluate: jsctxObj missing evaluateScript:");
+      return false;
+    }
+    if (!canRespond(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:")) {
+      log("runOnMainEvaluate: jsctxObj missing performSelectorOnMainThread");
       return false;
     }
     const cf = cfstrUtf8(script);
@@ -615,7 +737,20 @@
     globalThis.__ts_setup = tsSetup;
     globalThis.__ts_tick = tsTick;
     globalThis.__ts_log = log;
+    globalThis.__ts_stage_mask = TS_STAGE_MASK;
     log("jsctxObj=0x" + u64(bi.jsContextObj).toString(16));
+
+    const required = ["UIApplication", "UILabel", "UIColor", "UIFont", "NSTimer", "NSInvocation", "NSMethodSignature", "JSContext"];
+    const missing = [];
+    for (let i = 0; i < required.length; i++) {
+      const c = Native.callSymbol("objc_getClass", required[i]);
+      if (!isNonZero(c)) missing.push(required[i]);
+    }
+    if (missing.length > 0) {
+      log("aborting - missing classes: " + missing.join(","));
+      return;
+    }
+    probe("class preflight ok");
 
     // Sanity check we are inside SpringBoard
     const probe = Native.callSymbol("objc_getClass", "SBIconController");

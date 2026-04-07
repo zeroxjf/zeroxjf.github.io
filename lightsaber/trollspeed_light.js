@@ -323,7 +323,24 @@
       log("methodSignatureForSelector: nil for " + selectorName);
       return 0n;
     }
-    const inv = objc(nsInvocationClass(), "invocationWithMethodSignature:", sig);
+    const invClass = nsInvocationClass();
+    if (!isNonZero(invClass)) {
+      log("newInvocationFromTarget: NSInvocation class missing");
+      return 0n;
+    }
+    // Prefer alloc/init over +invocationWithMethodSignature: so we do not rely
+    // on autorelease return-value behavior inside this cross-thread JS bridge.
+    const invAlloc = objc(invClass, "alloc");
+    if (!isNonZero(invAlloc)) {
+      log("newInvocationFromTarget: NSInvocation alloc failed for " + selectorName);
+      return 0n;
+    }
+    const inv = objc(invAlloc, "initWithMethodSignature:", sig);
+    if (!isNonZero(inv)) {
+      log("newInvocationFromTarget: initWithMethodSignature failed for " + selectorName);
+      return 0n;
+    }
+    probe("newInvocationFromTarget sel=" + selectorName + " target=0x" + u64(target).toString(16) + " inv=0x" + u64(inv).toString(16));
     objc(inv, "setTarget:", target);
     objc(inv, "setSelector:", sel(selectorName));
     return inv;
@@ -719,7 +736,9 @@
     }
     const cf = cfstrUtf8(script);
     if (!isNonZero(cf)) return false;
-    objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), cf, 0);
+    // Synchronous dispatch here avoids any overlap between this worker thread's
+    // native bridge calls and the main-thread setup script's bridge calls.
+    objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), cf, 1);
     // Don't CFRelease the cfstring on this thread - the main thread retains
     // it via performSelector's autorelease pool. Releasing here would race
     // and cause PAC violations on the release path. Same lesson learned in

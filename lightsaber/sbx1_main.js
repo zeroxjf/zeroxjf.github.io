@@ -6781,37 +6781,34 @@
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
       if (lsTweakSet.trollspeed) lsTweaksOut.push('trollspeed');
-      let selectedTweakCount = lsTweaksOut.length;
-      // Inlining multiple tweak scripts inflates pe_main prelude size heavily
-      // (URI-encoding expands JS by ~1.6x) and can perturb heap layout before
-      // primitives are fully stabilized. Keep inline prefetch only for single
-      // tweak runs; multi-tweak runs fetch scripts on-demand in pe_main.
-      let inlinePayloadPrefetch = selectedTweakCount <= 1;
-      if (!inlinePayloadPrefetch) {
-        LOG("[SBX1] Multi-tweak selection (" + selectedTweakCount + "), skipping inline payload prefetch for heap stability");
-      }
+      const INLINE_PREFETCH_MAX_BYTES = 96 * 1024;
       let prelude = 'globalThis.__ls_tweaks = "' + lsTweaksOut.join(',') + '";\n';
       prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_trollspeed = ' + (lsTweakSet.trollspeed ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
-      if (lsTweakSet.fiveicon && inlinePayloadPrefetch) {
-        let fiveicon_js_str = getJS('fiveicondock_light.js?' + Date.now());
-        if (fiveicon_js_str) {
-          prelude += 'globalThis.__fiveicondock_code = decodeURIComponent("' + encodeURIComponent(fiveicon_js_str) + '");\n';
+      let tweakPrefetchPrelude = '';
+      let tweakPrefetchBytes = 0;
+      function addTweakPrefetch(enabled, scriptPath, globalName, label) {
+        if (!enabled) return;
+        let code = getJS(scriptPath + '?' + Date.now());
+        if (!code || !code.length) {
+          LOG("[SBX1] Prefetch failed for " + label + " (" + scriptPath + "), pe_main will fallback to fetchRemoteScript");
+          return;
         }
+        tweakPrefetchBytes += code.length;
+        // JSON string literal embedding is far smaller than URI-encoding and
+        // avoids decodeURIComponent() overhead in pe_main.
+        tweakPrefetchPrelude += 'globalThis.' + globalName + ' = ' + JSON.stringify(code) + ';\n';
+        LOG("[SBX1] Prefetched " + label + " bytes=" + code.length);
       }
-      if (lsTweakSet.powercuff && inlinePayloadPrefetch) {
-        let powercuff_js_str = getJS('powercuff_light.js?' + Date.now());
-        if (powercuff_js_str) {
-          prelude += 'globalThis.__powercuff_code = decodeURIComponent("' + encodeURIComponent(powercuff_js_str) + '");\n';
-        }
-      }
-      if (lsTweakSet.trollspeed && inlinePayloadPrefetch) {
-        let trollspeed_js_str = getJS('trollspeed_light.js?' + Date.now());
-        if (trollspeed_js_str) {
-          prelude += 'globalThis.__trollspeed_code = decodeURIComponent("' + encodeURIComponent(trollspeed_js_str) + '");\n';
-        }
+      addTweakPrefetch(lsTweakSet.fiveicon, 'fiveicondock_light.js', '__fiveicondock_code', 'FiveIconDock');
+      addTweakPrefetch(lsTweakSet.powercuff, 'powercuff_light.js', '__powercuff_code', 'Powercuff');
+      addTweakPrefetch(lsTweakSet.trollspeed, 'trollspeed_light.js', '__trollspeed_code', 'TrollSpeed');
+      if (tweakPrefetchBytes > INLINE_PREFETCH_MAX_BYTES) {
+        LOG("[SBX1] Prefetched tweak payloads exceed budget (" + tweakPrefetchBytes + " > " + INLINE_PREFETCH_MAX_BYTES + "), disabling inline payload prefetch for stability");
+      } else if (tweakPrefetchPrelude.length > 0) {
+        prelude += tweakPrefetchPrelude;
       }
       pe_main_js_str = prelude + pe_main_js_str;
       pe_main_js_data = get_cstring(pe_main_js_str);

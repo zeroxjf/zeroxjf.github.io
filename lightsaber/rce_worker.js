@@ -289,7 +289,8 @@ self[1] = boxed_arr;
           const slide = data.slide;
           host = data.desiredHost;
           SERVER_LOG = data.SERVER_LOG;
-          print("inside stage1");
+          try { globalThis.__ls_tweak = (typeof data.ls_tweak === 'string' && data.ls_tweak.length > 0) ? data.ls_tweak : 'fiveicon'; } catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
+          print("inside stage1, tweak=" + globalThis.__ls_tweak);
           p.addrof = function addrof(o) {
             boxed_arr[0] = o;
             return BigInt.fromDouble(unboxed_arr[0]);

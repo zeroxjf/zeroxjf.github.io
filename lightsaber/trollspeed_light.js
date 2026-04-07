@@ -29,12 +29,16 @@
 
   const HUD_FONT_SIZE = 10.0;
   const HUD_UPDATE_INTERVAL_SEC = 1.0;
+  const HUD_VIEW_TAG = 0x54530001;
   // Hardcoded frame for now (no prefs UI in v1). Top-center of a ~390pt wide
   // iPhone screen, just below the notch / Dynamic Island.
   const HUD_FRAME = { x: 75.0, y: 58.0, w: 240.0, h: 22.0 };
-  // Probe mode: keep logs sparse but deterministic so PAC crash location can be
-  // inferred from the last emitted stage marker.
-  const TS_PROBE_MODE = true;
+  // Probe mode is opt-in to avoid excessive bridge/syslog churn during normal
+  // installs. Enable by setting globalThis.__ts_probe_mode = true before inject.
+  const TS_PROBE_MODE = (
+    globalThis.__ts_probe_mode === true ||
+    globalThis.__ts_probe_mode === 1
+  );
   const TS_STAGE_SET_FRAME = 1;
   const TS_STAGE_STYLE = 2;
   const TS_STAGE_FONT = 4;
@@ -533,6 +537,16 @@
 
   // === Setup (runs on main thread, builds the HUD + schedules timer) ===
   function tsSetup() {
+    const existing = globalThis.__ts_state;
+    if (existing && existing.installed && isNonZero(existing.label)) {
+      probe("tsSetup skipped: already installed");
+      return;
+    }
+    if (globalThis.__ts_setup_inflight) {
+      probe("tsSetup skipped: inflight");
+      return;
+    }
+    globalThis.__ts_setup_inflight = true;
     try {
       probe("tsSetup begin mask=0x" + TS_STAGE_MASK.toString(16));
       const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
@@ -563,6 +577,21 @@
       }
       if (!isNonZero(keyWindow)) { log("tsSetup: no keyWindow"); return; }
       probe("window ok=0x" + u64(keyWindow).toString(16));
+      // Injection runs in a fresh JSContext each time, so JS globals do not
+      // prevent duplicates across retries. Use a UIKit-level tag check instead.
+      if (canRespond(keyWindow, "viewWithTag:")) {
+        const existingHud = objc(keyWindow, "viewWithTag:", BigInt(HUD_VIEW_TAG));
+        if (isNonZero(existingHud)) {
+          log("tsSetup: existing TrollSpeed HUD found; skipping duplicate install");
+          globalThis.__ts_state = {
+            label: existingHud,
+            prevIn: 0n,
+            prevOut: 0n,
+            installed: true,
+          };
+          return;
+        }
+      }
 
       // Create the label
       const UILabel = Native.callSymbol("objc_getClass", "UILabel");
@@ -573,6 +602,9 @@
       const label = objc(labelAlloc, "init");
       if (!isNonZero(label)) { log("tsSetup: UILabel init failed"); return; }
       probe("label ok=0x" + u64(label).toString(16));
+      if (canRespond(label, "setTag:")) {
+        objc(label, "setTag:", BigInt(HUD_VIEW_TAG));
+      }
 
       // Set frame via NSInvocation (CGRect is HFA, can't pass via X regs)
       if (stageEnabled(TS_STAGE_SET_FRAME)) {
@@ -672,6 +704,7 @@
         label: label,
         prevIn: 0n,
         prevOut: 0n,
+        installed: true,
       };
 
       // Retain the label so it survives any ARC fallout from this scope
@@ -724,6 +757,8 @@
       log("tsSetup done");
     } catch (e) {
       log("tsSetup ERR: " + String(e));
+    } finally {
+      globalThis.__ts_setup_inflight = false;
     }
   }
 
@@ -784,6 +819,10 @@
     log("probe SBIconController=0x" + u64(sbIconControllerClass).toString(16) + (sbIconControllerClass ? " (SpringBoard OK)" : " (WRONG PROCESS)"));
     if (!isNonZero(sbIconControllerClass)) {
       log("aborting - not running inside SpringBoard");
+      return;
+    }
+    if (globalThis.__ts_state && globalThis.__ts_state.installed && isNonZero(globalThis.__ts_state.label)) {
+      log("TrollSpeed already active; skipping duplicate install");
       return;
     }
 

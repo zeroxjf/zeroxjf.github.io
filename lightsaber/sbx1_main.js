@@ -6765,20 +6765,32 @@
       ]);
       pe_stage1_js_data = gpuCopyBuffer(read64(addrof(pe_stage1_js_data_array) + 0x10n), BigInt(pe_stage1_js_data_array.length));
       let pe_main_js_str = getJS('pe_main.js?' + Date.now());
-      let lsTweak = (typeof globalThis.__ls_tweak === 'string' && globalThis.__ls_tweak.length > 0) ? globalThis.__ls_tweak : 'fiveicon';
+      let lsTweaksRaw = (typeof globalThis.__ls_tweaks === 'string' && globalThis.__ls_tweaks.length > 0) ? globalThis.__ls_tweaks : 'fiveicon';
+      let validTweaks = { fiveicon: 1, powercuff: 1 };
+      let lsTweakSet = {};
+      let lsTweakParts = lsTweaksRaw.split(',');
+      for (let ti = 0; ti < lsTweakParts.length; ti++) {
+        let tname = (lsTweakParts[ti] || '').replace(/[^a-z_0-9]/gi, '');
+        if (validTweaks[tname]) lsTweakSet[tname] = true;
+      }
+      if (!lsTweakSet.fiveicon && !lsTweakSet.powercuff) lsTweakSet.fiveicon = true; // safe default
       let lsLevelRaw = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
       let validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
       let lsLevel = validLevels[lsLevelRaw] ? lsLevelRaw : 'heavy';
-      let prelude = 'globalThis.__ls_tweak = "' + lsTweak.replace(/[^a-z_0-9]/gi, '') + '";\n';
-      prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweak === 'fiveicon' ? 'true' : 'false') + ';\n';
-      prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweak === 'powercuff' ? 'true' : 'false') + ';\n';
+      let lsTweaksOut = [];
+      if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
+      if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
+      let prelude = 'globalThis.__ls_tweaks = "' + lsTweaksOut.join(',') + '";\n';
+      prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
+      prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
-      if (lsTweak === 'fiveicon') {
+      if (lsTweakSet.fiveicon) {
         let fiveicon_js_str = getJS('fiveicondock_light.js?' + Date.now());
         if (fiveicon_js_str) {
           prelude += 'globalThis.__fiveicondock_code = decodeURIComponent("' + encodeURIComponent(fiveicon_js_str) + '");\n';
         }
-      } else if (lsTweak === 'powercuff') {
+      }
+      if (lsTweakSet.powercuff) {
         let powercuff_js_str = getJS('powercuff_light.js?' + Date.now());
         if (powercuff_js_str) {
           prelude += 'globalThis.__powercuff_code = decodeURIComponent("' + encodeURIComponent(powercuff_js_str) + '");\n';

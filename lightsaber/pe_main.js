@@ -8406,9 +8406,11 @@ const TAG = "MAIN";
 const targetProcess = "SpringBoard";
 const ENABLE_CORUNA_TWEAKLOADER = false;
 // Tweak enable flags are driven by globalThis values prepended to pe_main.js by
-// sbx1_main.js's spawn_pe(). This lets index.html pick which tweak to install
-// without rebuilding pe_main.js. Default to fiveicon if no flag is set.
-const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined') ? true : !!globalThis.__ls_enable_fiveicon;
+// sbx1_main.js's spawn_pe(). This lets index.html pick which tweaks to install
+// in a single chain run. index.html can select any subset; each flag drives an
+// independent payload injection. Defaults to fiveicon if neither is specified
+// (e.g. when pe_main.js is run standalone without the sbx1 prelude).
+const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined' && typeof globalThis.__ls_enable_powercuff === 'undefined') ? true : !!globalThis.__ls_enable_fiveicon;
 const SPRINGBOARD_JS_TWEAK_PATH = "/fiveicondock_light.js";
 const SPRINGBOARD_JS_TWEAK_LABEL = "FiveIconDock JS";
 const ENABLE_POWERCUFF_TWEAK = !!globalThis.__ls_enable_powercuff;

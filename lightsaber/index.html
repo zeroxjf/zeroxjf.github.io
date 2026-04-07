@@ -216,6 +216,95 @@
     }
     .level-list .lvl-name { font-weight: 600; }
     .level-list .lvl-desc { font-size: 12px; color: #86868b; margin-left: auto; }
+    .tweak-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 14px 0 10px;
+    }
+    .tweak-row {
+      border: 1px solid #e5e5e7;
+      border-radius: 12px;
+      padding: 12px 14px;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .tweak-row.checked {
+      border-color: #1d1d1f;
+      background: #f5f5f7;
+    }
+    .tweak-row-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .tweak-row-head input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: #1d1d1f;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .tweak-row-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .tweak-row-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1d1d1f;
+      line-height: 1.3;
+    }
+    .tweak-row-desc {
+      font-size: 12px;
+      color: #86868b;
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+    .tweak-row-options {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e5e7;
+    }
+    .tweak-row.checked .tweak-row-options { display: block; }
+    .tweak-row-options-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6e6e73;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .tweak-row-options select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      background: #fff;
+      color: #1d1d1f;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%236e6e73" d="M6 8.5L1.5 4h9z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .tweak-row-options .tweak-row-opt-help {
+      font-size: 11px;
+      color: #86868b;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .tweak-row-notes {
+      font-size: 11px;
+      color: #86868b;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+    .tweak-row-notes a { color: #6e6e73; }
+    .tweak-row-notes strong { color: #6e6e73; }
   </style>
 </head>
 <body>
@@ -234,37 +323,57 @@
     </div>
 
     <div class="section">
-      <div class="section-title">FiveIconDock</div>
-      <p class="section-desc">5 icons on your dock, no jailbreak required</p>
+      <div class="section-title">Install tweaks</div>
+      <p class="section-desc">Pick one or more. Selected payloads run together in a single chain execution.</p>
       <div class="info">
         <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more coming soon)
       </div>
       <p id="supportMsg" style="font-size:13px;margin-bottom:6px"></p>
-      <div id="status" style="font-size:14px;color:#86868b"></div>
-      <div style="text-align:center;margin-top:12px">
-        <button id="runBtn" class="btn btn-run" onclick="confirmInstall('fiveicon')">Install</button>
-      </div>
-      <p class="note">
-        Takes up to 60 seconds. Don't switch apps or lock the device. After a minute, try dragging a 5th icon into your dock.<br><br>
-        If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
-      </p>
-    </div>
 
-    <div class="section">
-      <div class="section-title">Powercuff</div>
-      <p class="section-desc">Force thermalmonitord to simulate thermal pressure</p>
-      <div class="info">
-        <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more coming soon)
+      <div class="tweak-list">
+        <div class="tweak-row checked" id="tweakRowFiveicon">
+          <label class="tweak-row-head">
+            <input type="checkbox" id="tweakFiveicon" checked>
+            <div class="tweak-row-meta">
+              <div class="tweak-row-name">FiveIconDock</div>
+              <div class="tweak-row-desc">Adds a 5th dock slot by patching SpringBoard at runtime.</div>
+            </div>
+          </label>
+          <div class="tweak-row-notes">
+            <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot. After install, try dragging a 5th icon into your dock.
+          </div>
+        </div>
+
+        <div class="tweak-row" id="tweakRowPowercuff">
+          <label class="tweak-row-head">
+            <input type="checkbox" id="tweakPowercuff">
+            <div class="tweak-row-meta">
+              <div class="tweak-row-name">Powercuff</div>
+              <div class="tweak-row-desc">Port of <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a> &mdash; injects into thermalmonitord and triggers a built-in thermal-simulation level.</div>
+            </div>
+          </label>
+          <div class="tweak-row-options">
+            <span class="tweak-row-options-label">Throttle level</span>
+            <select id="powercuffLevel">
+              <option value="off">Off &mdash; clear any active simulation</option>
+              <option value="nominal">Nominal &mdash; baseline</option>
+              <option value="light">Light &mdash; mild pressure</option>
+              <option value="moderate">Moderate &mdash; noticeable throttle</option>
+              <option value="heavy" selected>Heavy &mdash; aggressive throttle</option>
+            </select>
+            <div class="tweak-row-opt-help">
+              <strong>Persistence:</strong> thermalmonitord is a daemon (not SpringBoard), so the selected level <strong>survives respring</strong>. To change the level or clear it, fully reboot and re-run the chain.
+            </div>
+          </div>
+        </div>
       </div>
-      <p id="supportMsgPC" style="font-size:13px;margin-bottom:6px"></p>
-      <div id="statusPC" style="font-size:14px;color:#86868b"></div>
+
+      <div id="status" style="font-size:14px;color:#86868b;min-height:18px"></div>
       <div style="text-align:center;margin-top:12px">
-        <button id="runBtnPC" class="btn btn-run" onclick="openLevelPicker()">Install</button>
+        <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install Selected</button>
       </div>
       <p class="note">
-        Ports <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a> tweak to the lightsaber JS-injection chain. Injects into thermalmonitord and triggers one of the daemon's built-in thermal-simulation modes (off, nominal, light, moderate, heavy).<br><br>
-        Because thermalmonitord is a system daemon (not SpringBoard), the simulated thermal pressure <strong>survives respring</strong> &mdash; to change levels or clear it, you must <strong>fully reboot</strong> the device and then re-run the chain with the new level.<br><br>
-        If it fails or resprings, reboot and retry.
+        Takes up to 60 seconds. Don't switch apps or lock the device. If it fails or resprings, reboot and retry. This chain is fragile &mdash; if it works, don't press your luck.
       </p>
     </div>
 
@@ -283,24 +392,6 @@
       <div class="dialog-btns">
         <button class="btn-cancel" onclick="dismissConfirm()">Cancel</button>
         <button class="btn-confirm" onclick="proceedInstall()">Proceed</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="levelOverlay" class="overlay">
-    <div class="dialog" style="text-align:left">
-      <h2 style="color:#1d1d1f;text-align:center">Pick a throttle level</h2>
-      <p style="text-align:center">Each level corresponds to one of thermalmonitord's built-in thermal-simulation modes. Heavy is the most aggressive.</p>
-      <div class="level-list" id="levelList">
-        <label><input type="radio" name="pcLevel" value="off"><span class="lvl-name">Off</span><span class="lvl-desc">no throttle</span></label>
-        <label><input type="radio" name="pcLevel" value="nominal"><span class="lvl-name">Nominal</span><span class="lvl-desc">baseline</span></label>
-        <label><input type="radio" name="pcLevel" value="light"><span class="lvl-name">Light</span><span class="lvl-desc">mild</span></label>
-        <label><input type="radio" name="pcLevel" value="moderate"><span class="lvl-name">Moderate</span><span class="lvl-desc">noticeable</span></label>
-        <label class="selected"><input type="radio" name="pcLevel" value="heavy" checked><span class="lvl-name">Heavy</span><span class="lvl-desc">aggressive</span></label>
-      </div>
-      <div class="dialog-btns">
-        <button class="btn-cancel" onclick="dismissLevelPicker()">Cancel</button>
-        <button class="btn-confirm" onclick="confirmLevelPicker()">Continue</button>
       </div>
     </div>
   </div>
@@ -410,10 +501,7 @@
     */
 
     var supportMsg = document.getElementById('supportMsg');
-    var supportMsgPC = document.getElementById('supportMsgPC');
     var canRun = false;
-    var pendingTweak = null;
-    var pendingLevel = 'heavy';
 
     var supportText = '';
     var supportClass = '';
@@ -433,66 +521,56 @@
     }
     supportMsg.className = supportClass;
     supportMsg.textContent = supportText;
-    supportMsgPC.className = supportClass;
-    supportMsgPC.textContent = supportText;
 
+    var runBtn = document.getElementById('runBtn');
     if (!canRun) {
-      var disable = function(id) {
-        var b = document.getElementById(id);
-        if (!b) return;
-        b.className = 'btn btn-disabled';
-        b.textContent = 'Not available';
-        b.onclick = null;
-      };
-      disable('runBtn');
-      disable('runBtnPC');
+      runBtn.className = 'btn btn-disabled';
+      runBtn.textContent = 'Not available';
+      runBtn.onclick = null;
+    }
+
+    // Wire tweak rows: clicking anywhere on the row head toggles the checkbox
+    // and adds/removes the .checked class so the row lights up and any inline
+    // options (e.g. Powercuff level) slide into view.
+    var tweakRows = [
+      { rowId: 'tweakRowFiveicon', cbId: 'tweakFiveicon', name: 'fiveicon' },
+      { rowId: 'tweakRowPowercuff', cbId: 'tweakPowercuff', name: 'powercuff' }
+    ];
+    function syncTweakRow(row) {
+      var el = document.getElementById(row.rowId);
+      var cb = document.getElementById(row.cbId);
+      if (!el || !cb) return;
+      if (cb.checked) el.classList.add('checked');
+      else el.classList.remove('checked');
+    }
+    for (var ti = 0; ti < tweakRows.length; ti++) {
+      (function(row) {
+        var cb = document.getElementById(row.cbId);
+        if (!cb) return;
+        cb.addEventListener('change', function() { syncTweakRow(row); });
+        syncTweakRow(row);
+      })(tweakRows[ti]);
+    }
+
+    // Keep clicks on the inline options (level select) from also toggling the
+    // parent checkbox label.
+    var pcOptionsWrap = document.querySelector('#tweakRowPowercuff .tweak-row-options');
+    if (pcOptionsWrap) {
+      pcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
+      pcOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
     }
 
     window.scrollTo(0, 0);
 
-    function tweakUiIds(tweak) {
-      return tweak === 'powercuff'
-        ? { btn: 'runBtnPC', status: 'statusPC' }
-        : { btn: 'runBtn', status: 'status' };
-    }
-
-    function openLevelPicker() {
-      if (!canRun) return;
-      pendingTweak = 'powercuff';
-      var list = document.getElementById('levelList');
-      var labels = list.querySelectorAll('label');
-      for (var i = 0; i < labels.length; i++) {
-        var inp = labels[i].querySelector('input[type=radio]');
-        var isHeavy = inp && inp.value === pendingLevel;
-        if (isHeavy) {
-          inp.checked = true;
-          labels[i].classList.add('selected');
-        } else {
-          labels[i].classList.remove('selected');
-        }
+    function gatherSelection() {
+      var tweaks = [];
+      for (var i = 0; i < tweakRows.length; i++) {
+        var cb = document.getElementById(tweakRows[i].cbId);
+        if (cb && cb.checked) tweaks.push(tweakRows[i].name);
       }
-      list.onclick = function(e) {
-        var lab = e.target;
-        while (lab && lab.tagName !== 'LABEL') lab = lab.parentNode;
-        if (!lab) return;
-        var inp = lab.querySelector('input[type=radio]');
-        if (!inp) return;
-        for (var j = 0; j < labels.length; j++) labels[j].classList.remove('selected');
-        lab.classList.add('selected');
-        inp.checked = true;
-      };
-      document.getElementById('levelOverlay').className = 'overlay active';
-    }
-
-    function dismissLevelPicker() {
-      document.getElementById('levelOverlay').className = 'overlay';
-    }
-
-    function confirmLevelPicker() {
-      var checked = document.querySelector('input[name=pcLevel]:checked');
-      pendingLevel = checked ? checked.value : 'heavy';
-      document.getElementById('levelOverlay').className = 'overlay';
-      confirmInstall('powercuff');
+      var levelSel = document.getElementById('powercuffLevel');
+      var level = levelSel ? levelSel.value : 'heavy';
+      return { tweaks: tweaks, level: level };
     }
 
     function markDone() {
@@ -500,10 +578,9 @@
       doneSignal = true;
       // stopSyslogPolling();
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
-      var ids = tweakUiIds(pendingTweak);
-      var statusEl = document.getElementById(ids.status);
+      var statusEl = document.getElementById('status');
       if (statusEl) statusEl.textContent = '';
-      var btn = document.getElementById(ids.btn);
+      var btn = document.getElementById('runBtn');
       if (btn) {
         btn.textContent = 'Installed';
         btn.className = 'btn btn-done';
@@ -516,9 +593,18 @@
       // if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
     });
 
-    function confirmInstall(tweak) {
+    function confirmInstall() {
       if (!canRun) return;
-      pendingTweak = tweak || 'fiveicon';
+      var sel = gatherSelection();
+      var statusEl = document.getElementById('status');
+      if (sel.tweaks.length === 0) {
+        if (statusEl) {
+          statusEl.style.color = '#dc2626';
+          statusEl.textContent = 'Select at least one tweak to install.';
+        }
+        return;
+      }
+      if (statusEl) { statusEl.style.color = ''; statusEl.textContent = ''; }
       document.getElementById('confirmOverlay').className = 'overlay active';
     }
 
@@ -528,17 +614,15 @@
 
     function proceedInstall() {
       document.getElementById('confirmOverlay').className = 'overlay';
-      runExploit(pendingTweak || 'fiveicon', pendingLevel || 'heavy');
+      var sel = gatherSelection();
+      runExploit(sel.tweaks, sel.level);
     }
 
-    function runExploit(tweak, level) {
+    function runExploit(tweaks, level) {
       if (!canRun) return;
-      tweak = tweak || 'fiveicon';
+      if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
-      pendingTweak = tweak;
-      pendingLevel = level;
-      var ids = tweakUiIds(tweak);
-      var statusEl = document.getElementById(ids.status);
+      var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {
           if (statusEl) {
@@ -549,10 +633,10 @@
         }
       } catch(e) {}
       doneSignal = false;
-      var btn = document.getElementById(ids.btn);
+      var btn = document.getElementById('runBtn');
       if (btn) {
         btn.className = 'btn btn-disabled';
-        btn.textContent = 'Installing...';
+        btn.textContent = 'Installing (' + tweaks.join(' + ') + ')...';
       }
       if (statusEl) statusEl.textContent = '';
       /* log UI disabled for now
@@ -566,7 +650,7 @@
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweak=' + encodeURIComponent(tweak) + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
+      frame.src = 'frame.html?tweaks=' + encodeURIComponent(tweaks.join(',')) + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
       frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';
       document.body.appendChild(frame);
 

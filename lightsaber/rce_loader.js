@@ -7,9 +7,27 @@ var chipset;
 var device_model;
 try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSession', '1'); } catch(e) {}
 try {
-    var __lsTweakMatch = /[?&]tweak=([a-z_0-9]+)/i.exec(location.search || '');
-    globalThis.__ls_tweak = __lsTweakMatch ? __lsTweakMatch[1] : 'fiveicon';
-} catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
+    var __validTweaks = { fiveicon: 1, powercuff: 1 };
+    var __lsTweaksMatch = /[?&]tweaks=([a-z_0-9,]+)/i.exec(location.search || '');
+    var __tweaksList = [];
+    if (__lsTweaksMatch) {
+        var __parts = __lsTweaksMatch[1].split(',');
+        for (var __i = 0; __i < __parts.length; __i++) {
+            var __t = __parts[__i].toLowerCase();
+            if (__validTweaks[__t] && __tweaksList.indexOf(__t) < 0) __tweaksList.push(__t);
+        }
+    }
+    if (__tweaksList.length === 0) {
+        // Backward-compat: accept legacy singular ?tweak=
+        var __lsTweakMatch = /[?&]tweak=([a-z_0-9]+)/i.exec(location.search || '');
+        if (__lsTweakMatch && __validTweaks[__lsTweakMatch[1].toLowerCase()]) {
+            __tweaksList.push(__lsTweakMatch[1].toLowerCase());
+        } else {
+            __tweaksList.push('fiveicon');
+        }
+    }
+    globalThis.__ls_tweaks = __tweaksList.join(',');
+} catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
 try {
     var __lsLevelMatch = /[?&]level=([a-z]+)/i.exec(location.search || '');
     var __validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
@@ -277,13 +295,13 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
         print("desiredHost = " + desiredHost);
             if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2')
             {
-                print("Sending stage1_rce to worker (iOS 18.6 path) tweak=" + (globalThis.__ls_tweak || 'fiveicon') + " level=" + (globalThis.__ls_powercuff_level || 'heavy'));
+                print("Sending stage1_rce to worker (iOS 18.6 path) tweaks=" + (globalThis.__ls_tweaks || 'fiveicon') + " level=" + (globalThis.__ls_powercuff_level || 'heavy'));
                 worker.postMessage({
                     type: 'stage1_rce',
                     desiredHost,
                     randomValues,
                     SERVER_LOG,
-                    ls_tweak: globalThis.__ls_tweak || 'fiveicon',
+                    ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
                     ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
                 });
             }
@@ -311,7 +329,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                         device_model,
                         desiredHost,
                         SERVER_LOG,
-                        ls_tweak: globalThis.__ls_tweak || 'fiveicon',
+                        ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
                         ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
                 });
                             }
@@ -331,7 +349,7 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 device_model,
                 desiredHost,
                 SERVER_LOG,
-                ls_tweak: globalThis.__ls_tweak || 'fiveicon',
+                ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
                 ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
             });
                     }

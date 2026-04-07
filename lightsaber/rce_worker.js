@@ -289,9 +289,9 @@ self[1] = boxed_arr;
           const slide = data.slide;
           host = data.desiredHost;
           SERVER_LOG = data.SERVER_LOG;
-          try { globalThis.__ls_tweak = (typeof data.ls_tweak === 'string' && data.ls_tweak.length > 0) ? data.ls_tweak : 'fiveicon'; } catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
+          try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
           try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
-          print("inside stage1, tweak=" + globalThis.__ls_tweak + " level=" + globalThis.__powercuff_level);
+          print("inside stage1, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
           p.addrof = function addrof(o) {
             boxed_arr[0] = o;
             return BigInt.fromDouble(unboxed_arr[0]);

@@ -8450,6 +8450,11 @@ function fetchRemoteScript(path) {
 		const SERVER_PORT = 8888;
 		const AF_INET = 2;
 		const SOCK_STREAM = 1;
+		const ipOctets = SERVER_IP.split(".").map((part) => Number(part));
+		if (ipOctets.length !== 4 || ipOctets.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) {
+			LOG("[PE] socket fetch invalid SERVER_IP: " + SERVER_IP);
+			return null;
+		}
 
 		let sock = Native.callSymbol("socket", AF_INET, SOCK_STREAM, 0);
 		if (Number(sock) < 0) {
@@ -8463,10 +8468,10 @@ function fetchRemoteScript(path) {
 		addrView.setUint8(0, 16);
 		addrView.setUint8(1, AF_INET);
 		addrView.setUint16(2, SERVER_PORT, false);
-		addrView.setUint8(4, 192);
-		addrView.setUint8(5, 168);
-		addrView.setUint8(6, 2);
-		addrView.setUint8(7, 1);
+		addrView.setUint8(4, ipOctets[0]);
+		addrView.setUint8(5, ipOctets[1]);
+		addrView.setUint8(6, ipOctets[2]);
+		addrView.setUint8(7, ipOctets[3]);
 		Native.write(sockaddr, addrBuf);
 
 		let conn = Native.callSymbol("connect", sock, sockaddr, 16);

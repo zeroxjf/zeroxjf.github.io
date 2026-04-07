@@ -130,6 +130,17 @@
       line-height: 1.6;
     }
     .disclaimer strong { color: #422006; font-weight: 700; }
+    .caution {
+      background: #fff7ed;
+      border: 1px solid #fb923c;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #7c2d12;
+      line-height: 1.6;
+    }
+    .caution strong { color: #431407; font-weight: 700; }
     .info {
       font-size: 12px;
       color: #86868b;
@@ -350,6 +361,10 @@
 
     <div class="disclaimer">
       <strong>This is not tweak injection.</strong> This is JavaScript injection during the exploit chain that modifies processes at runtime. While changes persist until respring or reboot, this is not a standard dylib injection found with a full jailbreak &mdash; it is limited in nature and only some things can be done with it.
+    </div>
+
+    <div class="caution">
+      <strong>Compatibility warning.</strong> This may cause compatibility issues with modifications made by Nugget and other similar tools. While I will work on resolving this, use caution in the interim.
     </div>
 
     <div class="warning">

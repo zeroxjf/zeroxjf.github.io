@@ -36,22 +36,32 @@
     }
     .page-author {
       font-size: 13px;
-      color: #6e6e73;
-      margin-top: 6px;
+      color: #86868b;
+      margin-top: 8px;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
     }
     .page-author a {
-      color: inherit;
+      color: #0071e3;
       text-decoration: none;
+      font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(0, 113, 227, 0.08);
+      border: 1px solid rgba(0, 113, 227, 0.18);
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
-    .page-author a:hover { color: #1d1d1f; }
+    .page-author a:hover {
+      background: rgba(0, 113, 227, 0.15);
+      border-color: rgba(0, 113, 227, 0.32);
+    }
+    .page-author a svg { opacity: 0.85; }
     .section {
       background: #fff;
       border: 1px solid #e5e5e7;
@@ -332,9 +342,9 @@
       <div class="page-subtitle">iOS research tool(s)? 👀</div>
       <div class="page-author">
         by
-        <a href="https://twitter.com/zeroxjf" target="_blank" title="X / Twitter">
-          zeroxjf
-          <svg height="12" width="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
+        <a href="https://twitter.com/zeroxjf" target="_blank" rel="noopener" title="Follow @zeroxjf on X / Twitter">
+          @zeroxjf
+          <svg height="11" width="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
         </a>
       </div>
     </div>

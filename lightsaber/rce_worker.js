@@ -290,7 +290,8 @@ self[1] = boxed_arr;
           host = data.desiredHost;
           SERVER_LOG = data.SERVER_LOG;
           try { globalThis.__ls_tweak = (typeof data.ls_tweak === 'string' && data.ls_tweak.length > 0) ? data.ls_tweak : 'fiveicon'; } catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
-          print("inside stage1, tweak=" + globalThis.__ls_tweak);
+          try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
+          print("inside stage1, tweak=" + globalThis.__ls_tweak + " level=" + globalThis.__powercuff_level);
           p.addrof = function addrof(o) {
             boxed_arr[0] = o;
             return BigInt.fromDouble(unboxed_arr[0]);

@@ -1,21 +1,24 @@
 (() => {
-  // powercuff_light_heavy.js
+  // powercuff_light.js
   //
   // Mimics rpetrich's Powercuff thermal-throttle tweak via the lightsaber
   // chain's daemon-injection primitive instead of a Cydia-style dylib.
   //
   // Runs *inside thermalmonitord*, walks +[CPMSHelper sharedInstance] to the
   // live CommonProduct singleton, and calls putDeviceInThermalSimulationMode:
-  // with the most aggressive throttle level ("heavy"). The daemon then
+  // with whichever level the user picked at install time. The daemon then
   // synthesises that thermal pressure for every CLTM client until reboot or
   // until thermalmonitord re-evaluates and overrides simulation state.
   //
-  // Thermal levels accepted by CommonProduct: off / nominal / light /
-  // moderate / heavy. Future variants of this payload will hardcode the other
-  // levels (powercuff_light_moderate.js, etc.) so the chain can pick the
-  // right strength without parsing prefs at runtime.
+  // The level is selected in index.html's level-picker dialog and propagated
+  // through the worker postMessage chain into globalThis.__powercuff_level
+  // before this payload is sent to thermalmonitord. Accepted values:
+  // off / nominal / light / moderate / heavy. Defaults to heavy if unset.
 
-  const THERMAL_MODE = "heavy";
+  const VALID_MODES = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
+  let __requested = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
+  if (!VALID_MODES[__requested]) __requested = 'heavy';
+  const THERMAL_MODE = __requested;
 
   class Native {
     static #baseAddr;

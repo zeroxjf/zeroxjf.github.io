@@ -8411,9 +8411,9 @@ const ENABLE_CORUNA_TWEAKLOADER = false;
 const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined') ? true : !!globalThis.__ls_enable_fiveicon;
 const SPRINGBOARD_JS_TWEAK_PATH = "/fiveicondock_light.js";
 const SPRINGBOARD_JS_TWEAK_LABEL = "FiveIconDock JS";
-const ENABLE_POWERCUFF_TWEAK_HEAVY = !!globalThis.__ls_enable_powercuff_heavy;
-const POWERCUFF_TWEAK_HEAVY_PATH = "/powercuff_light_heavy.js";
-const POWERCUFF_TWEAK_HEAVY_LABEL = "Powercuff Heavy";
+const ENABLE_POWERCUFF_TWEAK = !!globalThis.__ls_enable_powercuff;
+const POWERCUFF_TWEAK_PATH = "/powercuff_light.js";
+const POWERCUFF_TWEAK_LABEL = "Powercuff";
 const ENABLE_UNRELATED_DUMPS = false;
 const ENABLE_KEYCHAIN_DUMP = false;
 const ENABLE_WIFI_DUMP = false;
@@ -8568,9 +8568,9 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 }
 
 function injectThermalmonitordPayload(migFilterBypass, path, label) {
-	LOG("[PE] Injecting " + label + " into thermalmonitord...");
-	LOG("[PE] code source: " + (typeof globalThis.__powercuff_heavy_code === 'string' && globalThis.__powercuff_heavy_code.length > 0 ? "prefetched (" + globalThis.__powercuff_heavy_code.length + " bytes)" : "fetchRemoteScript(" + path + ")"));
-	let code = (typeof globalThis.__powercuff_heavy_code === 'string' && globalThis.__powercuff_heavy_code.length > 0) ? globalThis.__powercuff_heavy_code : fetchRemoteScript(path);
+	LOG("[PE] Injecting " + label + " (level=" + (globalThis.__powercuff_level || "heavy") + ") into thermalmonitord...");
+	LOG("[PE] code source: " + (typeof globalThis.__powercuff_code === 'string' && globalThis.__powercuff_code.length > 0 ? "prefetched (" + globalThis.__powercuff_code.length + " bytes)" : "fetchRemoteScript(" + path + ")"));
+	let code = (typeof globalThis.__powercuff_code === 'string' && globalThis.__powercuff_code.length > 0) ? globalThis.__powercuff_code : fetchRemoteScript(path);
 	if (!code) {
 		LOG("[PE] " + label + " fetch failed");
 		return false;
@@ -8670,10 +8670,10 @@ function start() { LOG("[+] PE start() called");
 			agentLoader.destroy();
 		}
 
-		if (ENABLE_POWERCUFF_TWEAK_HEAVY)
-			injectThermalmonitordPayload(migFilterBypass, POWERCUFF_TWEAK_HEAVY_PATH, POWERCUFF_TWEAK_HEAVY_LABEL);
+		if (ENABLE_POWERCUFF_TWEAK)
+			injectThermalmonitordPayload(migFilterBypass, POWERCUFF_TWEAK_PATH, POWERCUFF_TWEAK_LABEL);
 		else
-			LOG("[PE] Powercuff Heavy tweak disabled");
+			LOG("[PE] Powercuff tweak disabled");
 
 	runOptionalStage("Unrelated dumps master switch", ENABLE_UNRELATED_DUMPS, () => true);
 

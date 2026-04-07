@@ -190,6 +190,32 @@
     }
     .btn-cancel { background: #f5f5f7; color: #6e6e73; }
     .btn-confirm { background: #1d1d1f; color: #fff; }
+    .level-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 18px;
+    }
+    .level-list label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #e5e5e7;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #1d1d1f;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .level-list label:hover { background: #f5f5f7; }
+    .level-list input[type="radio"] { accent-color: #1d1d1f; }
+    .level-list label.selected {
+      border-color: #1d1d1f;
+      background: #f5f5f7;
+    }
+    .level-list .lvl-name { font-weight: 600; }
+    .level-list .lvl-desc { font-size: 12px; color: #86868b; margin-left: auto; }
   </style>
 </head>
 <body>
@@ -225,18 +251,18 @@
     </div>
 
     <div class="section">
-      <div class="section-title">Powercuff Heavy</div>
-      <p class="section-desc">Force thermalmonitord to simulate heavy thermal pressure</p>
+      <div class="section-title">Powercuff</div>
+      <p class="section-desc">Force thermalmonitord to simulate thermal pressure</p>
       <div class="info">
         <strong>Supported:</strong> iPhone, iOS 18.4 &ndash; 18.6.2 (more coming soon)
       </div>
       <p id="supportMsgPC" style="font-size:13px;margin-bottom:6px"></p>
       <div id="statusPC" style="font-size:14px;color:#86868b"></div>
       <div style="text-align:center;margin-top:12px">
-        <button id="runBtnPC" class="btn btn-run" onclick="confirmInstall('powercuff_heavy')">Install</button>
+        <button id="runBtnPC" class="btn btn-run" onclick="openLevelPicker()">Install</button>
       </div>
       <p class="note">
-        Injects into thermalmonitord and triggers the daemon's built-in &ldquo;heavy&rdquo; thermal simulation mode. Persists until reboot or until the daemon re-evaluates state. Adds a second injection target on top of the SpringBoard pivot &mdash; expect a slightly lower success rate than FiveIconDock.<br><br>
+        Injects into thermalmonitord and triggers one of the daemon's built-in thermal-simulation modes (off, nominal, light, moderate, heavy). Persists until reboot or until the daemon re-evaluates state. Adds a second injection target on top of the SpringBoard pivot &mdash; expect a slightly lower success rate than FiveIconDock.<br><br>
         If it fails or resprings, reboot and retry.
       </p>
     </div>
@@ -256,6 +282,24 @@
       <div class="dialog-btns">
         <button class="btn-cancel" onclick="dismissConfirm()">Cancel</button>
         <button class="btn-confirm" onclick="proceedInstall()">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="levelOverlay" class="overlay">
+    <div class="dialog" style="text-align:left">
+      <h2 style="color:#1d1d1f;text-align:center">Pick a throttle level</h2>
+      <p style="text-align:center">Each level corresponds to one of thermalmonitord's built-in thermal-simulation modes. Heavy is the most aggressive.</p>
+      <div class="level-list" id="levelList">
+        <label><input type="radio" name="pcLevel" value="off"><span class="lvl-name">Off</span><span class="lvl-desc">no throttle</span></label>
+        <label><input type="radio" name="pcLevel" value="nominal"><span class="lvl-name">Nominal</span><span class="lvl-desc">baseline</span></label>
+        <label><input type="radio" name="pcLevel" value="light"><span class="lvl-name">Light</span><span class="lvl-desc">mild</span></label>
+        <label><input type="radio" name="pcLevel" value="moderate"><span class="lvl-name">Moderate</span><span class="lvl-desc">noticeable</span></label>
+        <label class="selected"><input type="radio" name="pcLevel" value="heavy" checked><span class="lvl-name">Heavy</span><span class="lvl-desc">aggressive</span></label>
+      </div>
+      <div class="dialog-btns">
+        <button class="btn-cancel" onclick="dismissLevelPicker()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmLevelPicker()">Continue</button>
       </div>
     </div>
   </div>
@@ -368,6 +412,7 @@
     var supportMsgPC = document.getElementById('supportMsgPC');
     var canRun = false;
     var pendingTweak = null;
+    var pendingLevel = 'heavy';
 
     var supportText = '';
     var supportClass = '';
@@ -405,9 +450,48 @@
     window.scrollTo(0, 0);
 
     function tweakUiIds(tweak) {
-      return tweak === 'powercuff_heavy'
+      return tweak === 'powercuff'
         ? { btn: 'runBtnPC', status: 'statusPC' }
         : { btn: 'runBtn', status: 'status' };
+    }
+
+    function openLevelPicker() {
+      if (!canRun) return;
+      pendingTweak = 'powercuff';
+      var list = document.getElementById('levelList');
+      var labels = list.querySelectorAll('label');
+      for (var i = 0; i < labels.length; i++) {
+        var inp = labels[i].querySelector('input[type=radio]');
+        var isHeavy = inp && inp.value === pendingLevel;
+        if (isHeavy) {
+          inp.checked = true;
+          labels[i].classList.add('selected');
+        } else {
+          labels[i].classList.remove('selected');
+        }
+      }
+      list.onclick = function(e) {
+        var lab = e.target;
+        while (lab && lab.tagName !== 'LABEL') lab = lab.parentNode;
+        if (!lab) return;
+        var inp = lab.querySelector('input[type=radio]');
+        if (!inp) return;
+        for (var j = 0; j < labels.length; j++) labels[j].classList.remove('selected');
+        lab.classList.add('selected');
+        inp.checked = true;
+      };
+      document.getElementById('levelOverlay').className = 'overlay active';
+    }
+
+    function dismissLevelPicker() {
+      document.getElementById('levelOverlay').className = 'overlay';
+    }
+
+    function confirmLevelPicker() {
+      var checked = document.querySelector('input[name=pcLevel]:checked');
+      pendingLevel = checked ? checked.value : 'heavy';
+      document.getElementById('levelOverlay').className = 'overlay';
+      confirmInstall('powercuff');
     }
 
     function markDone() {
@@ -443,13 +527,15 @@
 
     function proceedInstall() {
       document.getElementById('confirmOverlay').className = 'overlay';
-      runExploit(pendingTweak || 'fiveicon');
+      runExploit(pendingTweak || 'fiveicon', pendingLevel || 'heavy');
     }
 
-    function runExploit(tweak) {
+    function runExploit(tweak, level) {
       if (!canRun) return;
       tweak = tweak || 'fiveicon';
+      level = level || 'heavy';
       pendingTweak = tweak;
+      pendingLevel = level;
       var ids = tweakUiIds(tweak);
       var statusEl = document.getElementById(ids.status);
       try {
@@ -479,7 +565,7 @@
 
       setTimeout(markDone, 65000);
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweak=' + encodeURIComponent(tweak) + '&_=' + Math.random();
+      frame.src = 'frame.html?tweak=' + encodeURIComponent(tweak) + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
       frame.style.cssText = 'width:1px;height:1px;opacity:0.01;position:absolute;left:-9999px;border:none';
       document.body.appendChild(frame);
 

@@ -10201,7 +10201,8 @@ async function main() {
             host = data.desiredHost;
             SERVER_LOG = data.SERVER_LOG;
             try { globalThis.__ls_tweak = (typeof data.ls_tweak === 'string' && data.ls_tweak.length > 0) ? data.ls_tweak : 'fiveicon'; } catch (e) { globalThis.__ls_tweak = 'fiveicon'; }
-            print("inside stage1_rce from worker, tweak=" + globalThis.__ls_tweak);
+            try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
+            print("inside stage1_rce from worker, tweak=" + globalThis.__ls_tweak + " level=" + globalThis.__powercuff_level);
             main().then(async (p_temp) => {
               if(!p_temp.addrof)
               {

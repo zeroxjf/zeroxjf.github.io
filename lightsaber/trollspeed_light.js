@@ -30,10 +30,10 @@
   const HUD_FONT_SIZE = 10.0;
   const HUD_UPDATE_INTERVAL_SEC = 1.0;
   const HUD_VIEW_TAG = 0x54530001;
-  // Safe mode is on by default. It avoids the riskiest bridge paths
-  // (NSInvocation-heavy CGFloat/CGRect/timer calls) that can destabilize
-  // SpringBoard on some iOS 18 builds. Set __ts_unsafe_mode=true before
-  // injection to restore full behavior.
+  // Safe mode is on by default. It keeps TrollSpeed functional while avoiding
+  // the highest-risk visual paths (font/layer customization) that can
+  // destabilize SpringBoard on some iOS 18 builds. Set
+  // __ts_unsafe_mode=true before injection to restore full behavior.
   const TS_SAFE_MODE = !(
     globalThis.__ts_unsafe_mode === true ||
     globalThis.__ts_unsafe_mode === 1
@@ -62,8 +62,10 @@
     TS_STAGE_TIMER
   );
   const TS_STAGE_SAFE_DEFAULT = (
+    TS_STAGE_SET_FRAME |
     TS_STAGE_STYLE |
-    TS_STAGE_ADD_SUBVIEW
+    TS_STAGE_ADD_SUBVIEW |
+    TS_STAGE_TIMER
   );
   const TS_STAGE_MASK = (
     typeof globalThis.__ts_stage_mask === "number" &&
@@ -680,10 +682,6 @@
         objc(label, "setText:", initialText);
         Native.callSymbol("CFRelease", initialText);
       }
-      if (TS_SAFE_MODE && canRespond(label, "sizeToFit")) {
-        objc(label, "sizeToFit");
-      }
-
       // Round the corners a bit so it doesn't look like a debug overlay
       if (stageEnabled(TS_STAGE_LAYER)) {
         if (!requireSelector(label, "layer", "UILabel")) { log("tsSetup: layer selector missing"); return; }
@@ -721,6 +719,11 @@
         prevOut: 0n,
         installed: true,
       };
+      // Prime counters so the first timer tick reports real per-second speed
+      // instead of an initial forced 0/0 sample.
+      const snap = getNetworkBytes();
+      globalThis.__ts_state.prevIn = snap.in;
+      globalThis.__ts_state.prevOut = snap.out;
 
       // Retain the label so it survives any ARC fallout from this scope
       objc(label, "retain");

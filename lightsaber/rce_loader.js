@@ -75,20 +75,9 @@ function getJS(fname,method = 'GET')
     try
     {
         let url = fname;
-        // Add a per-request cache buster on top of any existing query params
-        // so two getJS calls in the same chain run never collide on a stale
-        // entry, in case Safari's HTTP cache or GitHub Pages' CDN normalizes
-        // or ignores the existing Date.now() query string.
-        let bust = '_lsbust=' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        if (url.indexOf('?') >= 0) url = url + '&' + bust;
-        else url = url + '?' + bust;
         print("getJS: fetching " + url);
         let xhr = new XMLHttpRequest();
         xhr.open(method, `${url}` , false);
-        try {
-            xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
-            xhr.setRequestHeader('Pragma', 'no-cache');
-        } catch (he) {}
         xhr.send(null);
         if (xhr.status < 200 || xhr.status >= 300) {
             throw new Error("HTTP " + xhr.status + " for " + url);

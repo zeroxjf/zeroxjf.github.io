@@ -827,6 +827,16 @@
         return;
       }
       if (statusEl) { statusEl.style.color = ''; statusEl.textContent = ''; }
+      // If a previous chain run left ls_running set, Safari is in a dirty
+      // state and the user has to force-quit it before anything else will
+      // work. Skip the "Are you sure?" confirm in that case and go straight
+      // to the kill-safari prompt - that's the only useful action available.
+      try {
+        if (sessionStorage.getItem('ls_running')) {
+          showKillSafari();
+          return;
+        }
+      } catch(e) {}
       document.getElementById('confirmOverlay').className = 'overlay active';
     }
 

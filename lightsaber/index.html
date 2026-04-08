@@ -288,10 +288,13 @@
       color: #1d1d1f;
       font-weight: 600;
     }
-    .header-card-modelmark svg {
-      width: 11px;
-      height: 11px;
+    .header-card-modelmark svg,
+    .header-card-modelmark-img {
+      width: 12px;
+      height: 12px;
       flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
     }
     #logBox {
       display: none;
@@ -759,18 +762,7 @@
           </span>
           <span class="header-card-label">and</span>
           <span class="header-card-modelmark">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <g transform="translate(12,12)">
-                <ellipse rx="1.6" ry="9" />
-                <ellipse rx="1.6" ry="9" transform="rotate(22.5)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(45)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(67.5)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(90)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(112.5)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(135)" />
-                <ellipse rx="1.6" ry="9" transform="rotate(157.5)" />
-              </g>
-            </svg>
+            <img src="claude-mark.svg" alt="" aria-hidden="true" class="header-card-modelmark-img">
             Claude
           </span>
           <span class="header-card-label">models</span>
@@ -926,7 +918,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.43</p>
+    <p class="version">v0.0.44</p>
   </div>
 
   <div id="introOverlay" class="overlay">

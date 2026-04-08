@@ -753,50 +753,87 @@
     log("statbar: pill=" + pillW + "x" + labelH + " x=" + pillX);
 
     // UIWindow
+    log("statbar: pre UIWindow class");
     const UIWindow = Native.callSymbol("objc_getClass", "UIWindow");
-    const win = objc(objc(UIWindow, "alloc"), "initWithWindowScene:", scene);
+    log("statbar: UIWindow=0x" + u64(UIWindow).toString(16));
+    log("statbar: pre UIWindow alloc");
+    const winAlloc = objc(UIWindow, "alloc");
+    log("statbar: winAlloc=0x" + u64(winAlloc).toString(16));
+    log("statbar: pre initWithWindowScene:");
+    const win = objc(winAlloc, "initWithWindowScene:", scene);
+    log("statbar: win=0x" + u64(win).toString(16));
     if (!isNonZero(win)) { log("statbar: window init failed"); return false; }
 
+    log("statbar: pre nsValueFromCGRect winFrame");
     const winFrame = nsValueFromCGRect(0, 0, screenW, windowH);
+    log("statbar: winFrame=0x" + u64(winFrame).toString(16));
+    log("statbar: pre setValue frame");
     objc(win, "setValue:forKey:", winFrame, cfstr("frame"));
+    log("statbar: post setValue frame");
+    log("statbar: pre setValue windowLevel");
     objc(win, "setValue:forKey:", nsNumberLL(100001), cfstr("windowLevel"));
+    log("statbar: post setValue windowLevel");
 
+    log("statbar: pre UIColor");
     const UIColor = Native.callSymbol("objc_getClass", "UIColor");
     const clearC = objc(UIColor, "clearColor");
     const whiteC = objc(UIColor, "whiteColor");
     const blackC = objc(UIColor, "blackColor");
+    log("statbar: colors clear=0x" + u64(clearC).toString(16) + " white=0x" + u64(whiteC).toString(16) + " black=0x" + u64(blackC).toString(16));
+    log("statbar: pre win setBackgroundColor");
     objc(win, "setBackgroundColor:", clearC);
+    log("statbar: pre win setUserInteractionEnabled");
     objc(win, "setUserInteractionEnabled:", 0n);
+    log("statbar: pre win setOpaque");
     objc(win, "setOpaque:", 0n);
+    log("statbar: win props done");
 
+    log("statbar: pre UIViewController");
     const UIViewController = Native.callSymbol("objc_getClass", "UIViewController");
     const vc = objc(objc(UIViewController, "alloc"), "init");
+    log("statbar: vc=0x" + u64(vc).toString(16));
     if (!isNonZero(vc)) { log("statbar: vc init failed"); return false; }
+    log("statbar: pre vc view");
     const vcView = objc(vc, "view");
+    log("statbar: vcView=0x" + u64(vcView).toString(16));
     objc(vcView, "setBackgroundColor:", clearC);
     objc(vcView, "setUserInteractionEnabled:", 0n);
+    log("statbar: pre setRootViewController");
     objc(win, "setRootViewController:", vc);
+    log("statbar: post setRootViewController");
 
+    log("statbar: pre UILabel");
     const UILabel = Native.callSymbol("objc_getClass", "UILabel");
     const label = objc(objc(UILabel, "alloc"), "init");
+    log("statbar: label=0x" + u64(label).toString(16));
     if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
+    log("statbar: pre label frame KVC");
     const labelFrame = nsValueFromCGRect(pillX, labelY, pillW, labelH);
     objc(label, "setValue:forKey:", labelFrame, cfstr("frame"));
+    log("statbar: pre setText");
     objc(label, "setText:", cfstr(text));
+    log("statbar: pre setTextColor");
     objc(label, "setTextColor:", whiteC);
+    log("statbar: pre setTextAlignment");
     objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter
+    log("statbar: pre label setBackgroundColor");
     objc(label, "setBackgroundColor:", blackC);
     // Rounded corners: setCornerRadius: takes CGFloat (FP reg), so route
     // through the label.layer via KVC with an NSNumber. KVC unboxes to
     // CGFloat internally. Same trick for masksToBounds.
+    log("statbar: pre label layer");
     const layer = objc(label, "layer");
+    log("statbar: layer=0x" + u64(layer).toString(16));
     if (isNonZero(layer)) {
       objc(layer, "setValue:forKey:", nsNumberLL(10), cfstr("cornerRadius"));
       objc(layer, "setMasksToBounds:", 1n);
     }
 
+    log("statbar: pre addSubview");
     objc(vcView, "addSubview:", label);
+    log("statbar: pre win setHidden");
     objc(win, "setHidden:", 0n);
+    log("statbar: post win setHidden");
 
     // Retain via associated object on UIApplication so ARC doesn't drop it.
     // Key just needs to be a stable unique pointer; reuse UIApplication class.

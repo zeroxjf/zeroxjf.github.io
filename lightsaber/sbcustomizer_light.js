@@ -45,6 +45,18 @@
   // can't synthesize from JS, and -performSelector:...afterDelay: takes
   // a double which our int-only bridge can't pass.
   const ENABLE_STATBAR = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true);
+  // Hide icon labels - calls -[SBIconListGridLayoutConfiguration setShowsLabels:NO]
+  // on the same cfg object we already get in patchHomescreenGrid. BOOL arg,
+  // no FP regs, no new class lookups. Verified against 18.6.2 SpringBoardHome
+  // dump (line 27063: -[SBIconListGridLayoutConfiguration setShowsLabels:]).
+  const ENABLE_HIDE_LABELS = (globalThis.__sbc_hide_labels === 1 || globalThis.__sbc_hide_labels === true);
+  // Enable nested folders (folders inside folders) - flips the
+  // _allowNestedFolders BOOL ivar on SBHFolderSettings, reached via the chain
+  // iconMgr.homeScreenSettings.folderSettings. All nullary getters + one
+  // BOOL setter. Verified against 18.6.2 SpringBoardHome dump (line 11562:
+  // @property (TB,N,V_allowNestedFolders) allowNestedFolders, line 14211:
+  // -[SBHIconManager homeScreenSettings]).
+  const ENABLE_NESTED_FOLDERS = (globalThis.__sbc_nested_folders === 1 || globalThis.__sbc_nested_folders === true);
 
   class Native {
     static #baseAddr;
@@ -518,6 +530,18 @@
       objc(cfg, "setNumberOfLandscapeRows:", BigInt(targetCols));
     }
 
+    // Hide icon labels if requested. setShowsLabels: is a BOOL setter on
+    // the same cfg object we just modified, so we get it for free on this
+    // code path. Verified via SpringBoardHome dump line 27063. The
+    // subsequent stabilizeRootListViews / forceRelayout pass picks this up
+    // along with the column count change.
+    if (ENABLE_HIDE_LABELS && canRespond(cfg, "setShowsLabels:")) {
+      const beforeLabels = canRespond(cfg, "showsLabels") ? u64(objc(cfg, "showsLabels")) : 0n;
+      objc(cfg, "setShowsLabels:", 0n);
+      const afterLabels = canRespond(cfg, "showsLabels") ? u64(objc(cfg, "showsLabels")) : 0n;
+      log("patchHomescreenGrid: showsLabels " + beforeLabels.toString() + " -> " + afterLabels.toString());
+    }
+
     const afterCols = canRespond(cfg, "numberOfPortraitColumns") ? u64(objc(cfg, "numberOfPortraitColumns")) : 0n;
     const afterRows = canRespond(cfg, "numberOfPortraitRows") ? u64(objc(cfg, "numberOfPortraitRows")) : 0n;
     log("patchHomescreenGrid: after cols=" + afterCols.toString() + " rows=" + afterRows.toString() + " (target=" + targetCols + "x" + targetRows + ")");
@@ -607,6 +631,45 @@
       if (canRespond(superview, "setNeedsLayout")) objc(superview, "setNeedsLayout");
       if (canRespond(superview, "layoutIfNeeded")) objc(superview, "layoutIfNeeded");
     }
+  }
+
+  // Enable nested folders: iconMgr.homeScreenSettings.folderSettings
+  // .setAllowNestedFolders:YES. Every step is a nullary getter except the
+  // final BOOL setter, so the x-only bridge handles it fine. SBHFolderSettings
+  // is a PTSettings subclass and the setter goes through the standard KVO
+  // plumbing, so the change takes effect immediately without a relayout.
+  // Verified against 18.6.2 SpringBoardHome dump:
+  //   line 14211: -[SBHIconManager homeScreenSettings]
+  //   line 11853: -[SBHHomeScreenSettings rootFolderSettings] (sibling proof
+  //               that homeScreenSettings is a real nullary getter)
+  //   line 11562: @property (TB,N,V_allowNestedFolders) allowNestedFolders
+  function patchNestedFolders(iconMgr) {
+    if (!isNonZero(iconMgr)) { log("nestedFolders: nil iconMgr"); return 0; }
+    if (!canRespond(iconMgr, "homeScreenSettings")) {
+      log("nestedFolders: iconMgr has no homeScreenSettings");
+      return 0;
+    }
+    const hsSettings = objc(iconMgr, "homeScreenSettings");
+    log("nestedFolders: hsSettings=0x" + u64(hsSettings).toString(16));
+    if (!isNonZero(hsSettings)) { log("nestedFolders: nil hsSettings"); return 0; }
+
+    if (!canRespond(hsSettings, "folderSettings")) {
+      log("nestedFolders: hsSettings has no folderSettings");
+      return 0;
+    }
+    const folderSettings = objc(hsSettings, "folderSettings");
+    log("nestedFolders: folderSettings=0x" + u64(folderSettings).toString(16));
+    if (!isNonZero(folderSettings)) { log("nestedFolders: nil folderSettings"); return 0; }
+
+    if (!canRespond(folderSettings, "setAllowNestedFolders:")) {
+      log("nestedFolders: folderSettings has no setAllowNestedFolders:");
+      return 0;
+    }
+    const before = canRespond(folderSettings, "allowNestedFolders") ? u64(objc(folderSettings, "allowNestedFolders")) : 0n;
+    objc(folderSettings, "setAllowNestedFolders:", 1n);
+    const after = canRespond(folderSettings, "allowNestedFolders") ? u64(objc(folderSettings, "allowNestedFolders")) : 0n;
+    log("nestedFolders: allowNestedFolders " + before.toString() + " -> " + after.toString());
+    return after === 1n ? 1 : 0;
   }
 
   // ---- StatBar port ----------------------------------------------------
@@ -1090,6 +1153,14 @@
         stabilizeRootListViews(iconCtrl);
       } catch (stabErr) {
         log("stabilizeRootListViews threw: " + String(stabErr));
+      }
+    }
+
+    if (ENABLE_NESTED_FOLDERS) {
+      try {
+        if (patchNestedFolders(iconMgr)) touched++;
+      } catch (nfErr) {
+        log("patchNestedFolders threw: " + String(nfErr));
       }
     }
 

@@ -6789,6 +6789,8 @@
       let sbcHsCols = sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 4);
       let sbcHsRows = sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
       let sbcStatbar = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true) ? 1 : 0;
+      let sbcHideLabels = (globalThis.__sbc_hide_labels === 1 || globalThis.__sbc_hide_labels === true) ? 1 : 0;
+      let sbcNestedFolders = (globalThis.__sbc_nested_folders === 1 || globalThis.__sbc_nested_folders === true) ? 1 : 0;
       let lsTweaksOut = [];
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
@@ -6801,6 +6803,8 @@
       prelude += 'globalThis.__sbc_hs_cols = ' + sbcHsCols + ';\n';
       prelude += 'globalThis.__sbc_hs_rows = ' + sbcHsRows + ';\n';
       prelude += 'globalThis.__sbc_statbar = ' + sbcStatbar + ';\n';
+      prelude += 'globalThis.__sbc_hide_labels = ' + sbcHideLabels + ';\n';
+      prelude += 'globalThis.__sbc_nested_folders = ' + sbcNestedFolders + ';\n';
       let tweakPrefetchPrelude = '';
       let tweakPrefetchBytes = 0;
       function addTweakPrefetch(enabled, scriptPath, globalName, label) {

@@ -927,7 +927,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.55</p>
+    <p class="version">v0.0.56</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1264,8 +1264,24 @@
           var el = document.getElementById(id);
           if (!el || typeof val !== 'number') return;
           el.value = String(val);
+          // Do not call sbcWireStepper again - it re-attaches click
+          // listeners and causes double-increments. Just refresh the
+          // visible value + disabled states inline.
           var stepper = document.querySelector('.sbc-stepper[data-target="' + id + '"]');
-          if (stepper) sbcWireStepper(stepper);
+          if (!stepper) return;
+          var min = parseInt(stepper.getAttribute('data-min'), 10);
+          var max = parseInt(stepper.getAttribute('data-max'), 10);
+          var n = parseInt(el.value, 10);
+          if (!isFinite(n)) n = min;
+          if (n < min) n = min;
+          if (n > max) n = max;
+          el.value = String(n);
+          var valueEl = document.getElementById(id + 'Val');
+          if (valueEl) valueEl.textContent = String(n);
+          var minusBtn = stepper.querySelector('.sbc-stepper-minus');
+          var plusBtn = stepper.querySelector('.sbc-stepper-plus');
+          if (minusBtn) minusBtn.disabled = (n <= min);
+          if (plusBtn) plusBtn.disabled = (n >= max);
         }
         applyStepper('sbcDockIcons', s.dockIcons);
         applyStepper('sbcHsCols', s.hsCols);

@@ -630,29 +630,39 @@
   // libffi-style ABI dispatch under the hood so FP regs get populated
   // correctly - our own #nativeCallAddr only sets x0..x7.
   function invokeStructSetter(obj, selectorName, bytesBuf) {
+    log("iss[" + selectorName + "]: entry obj=0x" + u64(obj).toString(16));
     if (!isNonZero(obj)) return false;
+    log("iss: pre sel");
     const s = sel(selectorName);
+    log("iss: sel=0x" + u64(s).toString(16));
     if (!isNonZero(s)) return false;
+    log("iss: pre methodSignatureForSelector");
     const sig = Native.callSymbol("objc_msgSend", obj,
       sel("methodSignatureForSelector:"), s);
-    if (!isNonZero(sig)) { log("isset: nil sig for " + selectorName); return false; }
+    log("iss: sig=0x" + u64(sig).toString(16));
+    if (!isNonZero(sig)) { log("iss: nil sig for " + selectorName); return false; }
+    log("iss: pre objc_getClass NSInvocation");
     const NSInvocation = Native.callSymbol("objc_getClass", "NSInvocation");
-    // Verified via DSC class dump: initWithMethodSignature: does not
-    // exist on 18.6.2; only +invocationWithMethodSignature: (CF line
-    // 1330) is present. Use the class factory.
+    log("iss: NSInvocation=0x" + u64(NSInvocation).toString(16));
+    log("iss: pre invocationWithMethodSignature:");
     const inv = objc(NSInvocation, "invocationWithMethodSignature:", sig);
-    if (!isNonZero(inv)) { log("isset: nil inv for " + selectorName); return false; }
+    log("iss: inv=0x" + u64(inv).toString(16));
+    if (!isNonZero(inv)) { log("iss: nil inv for " + selectorName); return false; }
+    log("iss: pre setTarget:");
     objc(inv, "setTarget:", obj);
+    log("iss: pre setSelector:");
     objc(inv, "setSelector:", s);
-    // Copy caller bytes into a fresh native buffer (setArgument: reads
-    // the memory at the time of -invoke, so the pointer must be stable
-    // and native).
+    log("iss: pre malloc/write " + bytesBuf.byteLength);
     const mem = Native.callSymbol("malloc", BigInt(bytesBuf.byteLength));
     Native.write(mem, bytesBuf);
-    // Index 2 = first real argument (0 is self, 1 is _cmd).
+    log("iss: mem=0x" + u64(mem).toString(16));
+    log("iss: pre setArgument:atIndex:2");
     objc(inv, "setArgument:atIndex:", mem, 2n);
+    log("iss: pre invoke");
     objc(inv, "invoke");
+    log("iss: post invoke");
     Native.callSymbol("free", mem);
+    log("iss: done " + selectorName);
     return true;
   }
 
@@ -865,31 +875,54 @@
     log("statbar: label=0x" + u64(label).toString(16));
     if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
 
-    // Every NSValue-based KVC path we've tried (UIView frame,
-    // CALayer bounds/position via setValue:forKey:) PAC-faults because
-    // the internal unpacking calls -[NSValue getValue:size:], which
-    // itself faults in this realm. Instead, use NSInvocation to call
-    // -[CALayer setBounds:] / setPosition: / setCornerRadius: directly
-    // with raw struct bytes packed via setArgument:atIndex:. NSInvocation
-    // uses proper ABI dispatch so CGRect/CGPoint/CGFloat land in FP regs.
-    log("statbar: pre label layer");
-    const layer = objc(label, "layer");
-    log("statbar: layer=0x" + u64(layer).toString(16));
-    if (!isNonZero(layer)) { log("statbar: nil layer"); return false; }
+    // Geometry via Auto Layout Visual Format Language. Our bridge
+    // can't load FP registers, so any direct call that takes a
+    // CGRect/CGPoint/CGFloat (-setFrame:, -setBounds:, -setPosition:,
+    // -setCornerRadius:, NSLayoutConstraint constraintWithItem:... with
+    // a multiplier/constant) is blocked. Every NSValue-based KVC path
+    // we tried PAC-faults inside -[NSValue getValue:size:] while
+    // UIKit/QuartzCore tries to unbox the struct. NSInvocation also
+    // faulted inside its trampoline. VFL is the last dodge: the
+    // numeric sizes live inside the format string, CoreAutoLayout
+    // parses them internally as CGFloats, and the call site only
+    // passes NSString/NSUInteger/NSDictionary - all pointer or
+    // integer args our x-only bridge handles fine.
+    log("statbar: pre setTranslatesAutoresizingMaskIntoConstraints");
+    objc(label, "setTranslatesAutoresizingMaskIntoConstraints:", 0n);
 
-    log("statbar: pre setLayerBounds");
-    const boundsOk = setLayerBounds(layer, 0, 0, pillW, labelH);
-    log("statbar: setLayerBounds=" + boundsOk);
-    const centerX = pillX + pillW / 2;
-    const centerY = labelY + labelH / 2;
-    log("statbar: pre setLayerPosition center=" + centerX + "," + centerY);
-    const posOk = setLayerPosition(layer, centerX, centerY);
-    log("statbar: setLayerPosition=" + posOk);
-    log("statbar: pre setLayerCornerRadius");
-    setLayerCornerRadius(layer, 10);
-    log("statbar: pre setMasksToBounds");
-    objc(layer, "setMasksToBounds:", 1n);
-    log("statbar: post setMasksToBounds");
+    log("statbar: pre addSubview");
+    objc(hostView, "addSubview:", label);
+    log("statbar: post addSubview");
+
+    const NSDictionary = Native.callSymbol("objc_getClass", "NSDictionary");
+    const NSLayoutConstraint = Native.callSymbol("objc_getClass", "NSLayoutConstraint");
+    const viewsDict = objc(NSDictionary, "dictionaryWithObject:forKey:", label, nsStr("pill"));
+    log("statbar: viewsDict=0x" + u64(viewsDict).toString(16));
+
+    const hVFL = "H:|-" + pillX + "-[pill(" + pillW + ")]";
+    const vVFL = "V:|-" + labelY + "-[pill(" + labelH + ")]";
+    log("statbar: hVFL=" + hVFL);
+    log("statbar: vVFL=" + vVFL);
+
+    log("statbar: pre hConstraints");
+    const hConstraints = objc(NSLayoutConstraint,
+      "constraintsWithVisualFormat:options:metrics:views:",
+      nsStr(hVFL), 0n, 0n, viewsDict);
+    log("statbar: hConstraints=0x" + u64(hConstraints).toString(16));
+    log("statbar: pre vConstraints");
+    const vConstraints = objc(NSLayoutConstraint,
+      "constraintsWithVisualFormat:options:metrics:views:",
+      nsStr(vVFL), 0n, 0n, viewsDict);
+    log("statbar: vConstraints=0x" + u64(vConstraints).toString(16));
+
+    if (isNonZero(hConstraints)) {
+      log("statbar: activate hConstraints");
+      objc(NSLayoutConstraint, "activateConstraints:", hConstraints);
+    }
+    if (isNonZero(vConstraints)) {
+      log("statbar: activate vConstraints");
+      objc(NSLayoutConstraint, "activateConstraints:", vConstraints);
+    }
 
     log("statbar: pre setText");
     objc(label, "setText:", nsStr(text));
@@ -899,10 +932,6 @@
     objc(label, "setTextAlignment:", 1n);
     log("statbar: pre setBackgroundColor");
     objc(label, "setBackgroundColor:", blackC);
-
-    log("statbar: pre addSubview on hostView");
-    objc(hostView, "addSubview:", label);
-    log("statbar: post addSubview");
 
     // Retain via associated object on UIApplication so ARC doesn't drop it.
     Native.callSymbol("objc_setAssociatedObject", app, UIApplication, label, 1n /* RETAIN_NONATOMIC */);

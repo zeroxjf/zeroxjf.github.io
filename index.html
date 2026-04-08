@@ -188,12 +188,18 @@
       border-radius: 10px;
       font-weight: 600;
       white-space: nowrap;
-      background: var(--accent-soft);
-      color: var(--accent-hover);
-      border: 1px solid var(--accent-border);
       text-transform: lowercase;
       letter-spacing: 0.02em;
     }
+
+    .line-tag.kernel,
+    .line-tag.sep    { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .line-tag.uaf,
+    .line-tag.dos,
+    .line-tag.race   { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .line-tag.cve    { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .line-tag.webkit,
+    .line-tag.sop    { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
 
     .line-stars {
       font-size: 0.76rem;
@@ -487,7 +493,7 @@
 
     <!-- Vulnerability Research -->
     <div class="section" id="research">
-      <div class="section-title">Vulnerability Research <span class="section-count">6</span></div>
+      <div class="section-title">Vulnerability Research <span class="section-count">5</span></div>
       <div class="entry-list">
 
       <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
@@ -541,17 +547,6 @@
           <span class="line-tag dos">DoS</span>
         </span>
         <span class="line-stars">&#9734; 23</span>
-      </a>
-
-      <a class="post-line" href="https://github.com/zeroxjf/WebKit-UAF-ANGLE-OOB-Analysis" target="_blank">
-        <span class="line-date">2025</span>
-        <span class="line-title">WebKit UAF + ANGLE OOB Exploit Chain Analysis</span>
-        <span class="line-tags">
-          <span class="line-tag webkit">webkit</span>
-          <span class="line-tag uaf">uaf</span>
-          <span class="line-tag cve">CVE</span>
-        </span>
-        <span class="line-stars">&#9734; 93</span>
       </a>
 
       </div><!-- /.entry-list -->

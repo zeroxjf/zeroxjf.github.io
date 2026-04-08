@@ -6,6 +6,11 @@
   const ENABLE_LAYOUT_COLUMN_PATCH = true;
   const ENABLE_FORCE_RELAYOUT = false;
   const ENABLE_SECOND_PASS = false;
+  // Experimental: also bump the home screen grid to 5 columns to match the
+  // 5-icon dock. Uses the same layout-config setter pattern the dock patch
+  // already relies on, walked over SBIconController's root list views.
+  const ENABLE_HOMESCREEN_COL_PATCH = true;
+  const HOMESCREEN_TARGET_COLS = 5;
 
   class Native {
     static #baseAddr;
@@ -417,6 +422,46 @@
     return true;
   }
 
+  function patchRootListViewCols(listView, targetCols) {
+    if (!isNonZero(listView)) return false;
+    const layout = tryObjSelector(listView, ["layout"]);
+    if (!isNonZero(layout)) return false;
+    const cfg = tryObjSelector(layout, ["layoutConfiguration"]);
+    if (!isNonZero(cfg)) return false;
+    if (!canRespond(cfg, "setNumberOfPortraitColumns:")) return false;
+    if (!canRespond(cfg, "numberOfPortraitColumns")) return false;
+    const beforeCols = u64(objc(cfg, "numberOfPortraitColumns"));
+    const beforeRows = canRespond(cfg, "numberOfPortraitRows") ? u64(objc(cfg, "numberOfPortraitRows")) : 0n;
+    // Skip if this looks like a dock config (rows==1) - the dock path owns it.
+    if (beforeRows === 1n) return false;
+    objc(cfg, "setNumberOfPortraitColumns:", BigInt(targetCols));
+    const afterCols = u64(objc(cfg, "numberOfPortraitColumns"));
+    if (canRespond(cfg, "setNumberOfLandscapeRows:")) {
+      objc(cfg, "setNumberOfLandscapeRows:", BigInt(targetCols));
+    }
+    log("root cfg portraitRows=" + beforeRows.toString() + " portraitColumns " + beforeCols.toString() + " -> " + afterCols.toString());
+    return afterCols === BigInt(targetCols);
+  }
+
+  function patchHomescreenCols(iconCtrl, targetCols) {
+    if (!isNonZero(iconCtrl)) return 0;
+    const rootFolder = tryObjSelector(iconCtrl, ["rootFolderController", "_rootFolderController"]);
+    const container = isNonZero(rootFolder) ? rootFolder : iconCtrl;
+    const arr = tryObjSelector(container, ["iconListViews", "rootIconListViews", "visibleIconLists"]);
+    if (!isNonZero(arr)) { log("patchHomescreenCols: no root list view array"); return 0; }
+    if (!canRespond(arr, "count")) { log("patchHomescreenCols: list view array missing count"); return 0; }
+    const count = Number(u64(objc(arr, "count")));
+    log("patchHomescreenCols: walking " + count + " root list views (target=" + targetCols + ")");
+    let touched = 0;
+    for (let i = 0; i < count; i++) {
+      const lv = objc(arr, "objectAtIndex:", BigInt(i));
+      if (!isNonZero(lv)) continue;
+      if (patchRootListViewCols(lv, targetCols)) touched++;
+    }
+    log("patchHomescreenCols: touched=" + touched + "/" + count);
+    return touched;
+  }
+
   function forceRelayout(dockListView) {
     const selectors = ["layoutIconsNow", "setNeedsLayout", "layoutIfNeeded"];
     for (const selectorName of selectors) {
@@ -484,6 +529,16 @@
       const canAdd = u64(objc(model, "allowsAddingIconCount:", 1n));
       log("model.allowsAddingIconCount(1)=" + canAdd.toString());
     }
+
+    if (ENABLE_HOMESCREEN_COL_PATCH) {
+      try {
+        const rootTouched = patchHomescreenCols(iconCtrl, HOMESCREEN_TARGET_COLS);
+        if (rootTouched > 0) touched++;
+      } catch (hsErr) {
+        log("patchHomescreenCols threw: " + String(hsErr));
+      }
+    }
+
     log("pass=" + passTag + " touched=" + touched + " dock=0x" + u64(dockListView).toString(16) + " model=0x" + u64(model).toString(16));
     return touched > 0;
   }

@@ -812,39 +812,41 @@
     return text;
   }
 
-  // Recognise any class the system might use for the status bar clock/text
-  // label across iOS 16 / 17 / 18. Verified names:
-  //   iOS 16        -> _UIStatusBarStringView
-  //   iOS 17+       -> STUIStatusBarStringView  (per 34306/excalibur)
-  // Plus a couple of defensive fallbacks in case 18.6.2 shipped yet another
-  // rename - walkFindStatusBarLabels() will match whichever one exists.
-  function isStatusBarStringViewClassName(name) {
-    if (!name) return false;
-    return name === "_UIStatusBarStringView" ||
-           name === "STUIStatusBarStringView" ||
-           name === "_UIStatusBarForegroundStyleLabel" ||
-           name === "UIStatusBarStringView" ||
-           name === "_UIStatusBarItemStringView";
+  // Resolve the status bar string view classes Huy's tweak targets, the
+  // same way his constructor does it (objc_getClass by name). On 18.6.2
+  // we expect STUIStatusBarStringView to exist in the loaded runtime.
+  // Returns {cls17, cls16} - either or both can be 0n.
+  function resolveStatusBarClasses() {
+    const cls17 = Native.callSymbol("objc_getClass", "STUIStatusBarStringView");
+    const cls16 = Native.callSymbol("objc_getClass", "_UIStatusBarStringView");
+    log("statbar: cls17 (STUIStatusBarStringView)=0x" + u64(cls17).toString(16));
+    log("statbar: cls16 (_UIStatusBarStringView)=0x"  + u64(cls16).toString(16));
+    return { cls17: cls17, cls16: cls16 };
   }
 
   // Recursively walk a view tree, collecting any descendant whose class
-  // name matches one of the status bar string view classes. Uses only
-  // pointer-arg ObjC calls (subviews / count / objectAtIndex: /
-  // object_getClass / class_getName) so the x-only bridge handles it fine.
-  // Bounded depth + per-level child cap keep a pathological tree from
-  // blowing the JS stack inside the injected worker.
-  function walkFindStatusBarLabels(view, out, depth) {
-    if (depth > 16) return;
+  // is cls1 OR cls2 (either can be 0n) using -isKindOfClass: against the
+  // resolved Class pointer. isKindOfClass: handles private subclasses,
+  // NSKVONotifying_ isa-swizzled variants, and rename chains that a
+  // string compare on class_getName would miss. Uses only pointer-arg
+  // ObjC calls (subviews / count / objectAtIndex: / isKindOfClass:) so
+  // the x-only bridge handles it fine. Bounded depth + per-level cap
+  // keep a pathological tree from blowing the JS stack.
+  //
+  // visited[] is a mutable counter (one-element array) that tracks total
+  // views visited so the caller can distinguish 'walked nothing' from
+  // 'walked a lot and found nothing'.
+  function walkFindStatusBarLabels(view, cls1, cls2, out, depth, visited) {
+    if (depth > 20) return;
     if (!isNonZero(view)) return;
-    const cls = Native.callSymbol("object_getClass", view);
-    if (isNonZero(cls)) {
-      const namePtr = Native.callSymbol("class_getName", cls);
-      if (isNonZero(namePtr)) {
-        const name = Native.readString(namePtr, 128);
-        if (isStatusBarStringViewClassName(name)) {
-          out.push(view);
-        }
-      }
+    visited[0] = visited[0] + 1;
+    if (isNonZero(cls1)) {
+      const m1 = objc(view, "isKindOfClass:", cls1);
+      if (isNonZero(m1)) { out.push(view); return; }
+    }
+    if (isNonZero(cls2)) {
+      const m2 = objc(view, "isKindOfClass:", cls2);
+      if (isNonZero(m2)) { out.push(view); return; }
     }
     const subs = objc(view, "subviews");
     if (!isNonZero(subs)) return;
@@ -855,34 +857,32 @@
     for (let i = 0; i < lim; i++) {
       const sub = objc(subs, "objectAtIndex:", BigInt(i));
       if (!isNonZero(sub)) continue;
-      walkFindStatusBarLabels(sub, out, depth + 1);
+      walkFindStatusBarLabels(sub, cls1, cls2, out, depth + 1, visited);
     }
   }
 
-  // Walk every UIWindow looking for a status bar string view. Prefer any
-  // candidate whose current text contains ':' (the clock line) so we hit
-  // the time label and not the cellular / SSID string. Falls back to the
-  // first match if nothing has a colon.
-  function findStatusBarClockLabel(app) {
+  // Walk the keyWindow's view tree looking for any status bar string view
+  // instance. Prefer any candidate whose current text contains ':' (the
+  // clock line) so we hit the time label and not the cellular / SSID
+  // label. Falls back to the first match if nothing has a colon.
+  //
+  // We deliberately DO NOT walk -[UIApplication windows] as a fallback:
+  // that path PAC-faulted on 18.6.2 in an earlier run of this payload,
+  // and Huy's tweak doesn't need it either - his swizzle catches setText:
+  // on every instance system-wide, so if the class exists and there's any
+  // instance anywhere in SpringBoard's UI, it'll be reachable from the
+  // root window tree.
+  function findStatusBarClockLabel(app, classes) {
     const candidates = [];
+    const visited = [0];
     const keyWin = objc(app, "keyWindow");
-    if (isNonZero(keyWin)) {
-      walkFindStatusBarLabels(keyWin, candidates, 0);
-      log("statbar: keyWindow walk produced " + candidates.length + " candidates");
+    log("statbar: keyWin=0x" + u64(keyWin).toString(16));
+    if (!isNonZero(keyWin)) {
+      log("statbar: no keyWindow - bailing");
+      return 0n;
     }
-    const wins = objc(app, "windows");
-    if (isNonZero(wins)) {
-      const wCntRaw = objc(wins, "count");
-      const wCnt = Number(u64(wCntRaw));
-      const wLim = wCnt < 32 ? wCnt : 32;
-      for (let i = 0; i < wLim; i++) {
-        const w = objc(wins, "objectAtIndex:", BigInt(i));
-        if (!isNonZero(w)) continue;
-        if (u64(w) === u64(keyWin)) continue;
-        walkFindStatusBarLabels(w, candidates, 0);
-      }
-      log("statbar: total candidates after all windows: " + candidates.length);
-    }
+    walkFindStatusBarLabels(keyWin, classes.cls17, classes.cls16, candidates, 0, visited);
+    log("statbar: walk visited " + visited[0] + " views, produced " + candidates.length + " candidates");
     if (candidates.length === 0) return 0n;
     const colon = nsStr(":");
     for (let i = 0; i < candidates.length; i++) {
@@ -890,30 +890,48 @@
       if (!isNonZero(txt)) continue;
       const hit = objc(txt, "containsString:", colon);
       if (isNonZero(hit)) {
-        log("statbar: picked candidate " + i + " (clock line)");
+        log("statbar: picked candidate " + i + " (has ':' in current text)");
         return candidates[i];
       }
     }
-    log("statbar: no ':' candidate, falling back to first");
+    log("statbar: no ':' candidate, falling back to candidate 0");
     return candidates[0];
   }
 
-  // New approach (credit: 34306/excalibur/StatusBarTweak.m): instead of
-  // creating a fresh UILabel, positioning it via VFL / layout anchors /
-  // CALayer bounds and fighting the x-only bridge's FP-register hole for
-  // every single geometry setter, find the system status bar string view
-  // that already exists in SpringBoard's window hierarchy and overwrite
-  // its -text directly. Every selector in this path takes only pointer
-  // or integer args (objc_getClass / sharedApplication / keyWindow /
-  // subviews / count / objectAtIndex: / object_getClass / class_getName
-  // / text / containsString: / setText:), so nothing touches d0..d7 and
-  // nothing depends on CGRect/CGPoint/CGFloat argument marshalling.
+  // Emulation of 34306/excalibur/darksword-kexploit-fun/StatusBarTweak.m
+  // in JS against the lightsaber Native bridge.
   //
-  // The system will re-set the clock text on its next minute tick, so
-  // this is effectively a one-shot overlay (matches the old behaviour).
-  // Re-inject fiveicondock with __sbc_statbar=1 to refresh the values.
+  // Huy's tweak is a dylib that dlopens into SpringBoard and, in its
+  // constructor, does exactly this:
+  //
+  //   Class cls17 = objc_getClass("STUIStatusBarStringView");  // iOS 17+
+  //   Class cls16 = objc_getClass("_UIStatusBarStringView");   // iOS 16
+  //   if (cls17) hookClass(cls17);  // method_setImplementation(-setText:)
+  //   if (cls16) hookClass(cls16);
+  //
+  // His hook body then checks whether the incoming text contains ':' and,
+  // if so, replaces it with a custom date/time attributed string. The
+  // hook catches EVERY -setText: call on those classes system-wide -
+  // there's no view hierarchy walking at all.
+  //
+  // Our JS bridge doesn't have block or imp_implementationWithBlock
+  // infrastructure, so we can't install a method swizzle from here. But
+  // we can port the underlying insight: resolve the exact same Class
+  // pointers via objc_getClass by name, and then find a live instance
+  // to poke. Finding an instance means walking the UI tree once, which
+  // Huy's tweak avoids via the swizzle but which we have to do manually.
+  //
+  // Every ObjC call on this path is pointer-or-integer only: objc_getClass
+  // / sharedApplication / keyWindow / subviews / count / objectAtIndex: /
+  // isKindOfClass: / text / containsString: / setText:. Nothing touches
+  // d0..d7 and nothing depends on CGRect/CGPoint/CGFloat marshalling, so
+  // the whole SIGBUS surface from the prior VFL and CALayer paths is
+  // gone.
+  //
+  // This is still one-shot: iOS will re-set the clock text on the next
+  // minute tick. Re-inject fiveicondock with __sbc_statbar=1 to refresh.
   function createStatBarOverlay() {
-    log("statbar: entry (replace mode)");
+    log("statbar: entry (replace mode v2)");
     log("statbar: pre objc_getClass UIApplication");
     const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
     log("statbar: UIApplication=0x" + u64(UIApplication).toString(16));
@@ -926,9 +944,17 @@
     log("statbar: app=0x" + u64(app).toString(16));
     if (!isNonZero(app)) { log("statbar: no sharedApplication"); return false; }
 
+    log("statbar: pre resolveStatusBarClasses");
+    const classes = resolveStatusBarClasses();
+    if (!isNonZero(classes.cls17) && !isNonZero(classes.cls16)) {
+      log("statbar: NEITHER STUIStatusBarStringView nor _UIStatusBarStringView");
+      log("statbar: runtime - need a class-dump of UIKitCore on this build");
+      return false;
+    }
+
     log("statbar: pre findStatusBarClockLabel");
-    const label = findStatusBarClockLabel(app);
-    if (!isNonZero(label)) { log("statbar: no status bar label found"); return false; }
+    const label = findStatusBarClockLabel(app, classes);
+    if (!isNonZero(label)) { log("statbar: no status bar label instance found"); return false; }
     log("statbar: label=0x" + u64(label).toString(16));
 
     const text = buildStatBarText();

@@ -421,11 +421,30 @@
     .post-line:hover .line-stars { opacity: 0; }
 
     /* ---- Package manager buttons ---- */
+    .manager-wrap {
+      margin-top: 1.25rem;
+      padding: 1.1rem 1rem 1.25rem;
+      background: var(--card-alt);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .manager-prompt {
+      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-size: 0.66rem;
+      font-weight: 500;
+      color: var(--subtle);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
     .manager-row {
       display: flex;
       gap: 0.55rem;
       flex-wrap: wrap;
-      margin-top: 0.85rem;
+      justify-content: center;
     }
 
     .manager-btn {
@@ -873,16 +892,19 @@
       <div class="entry-list" id="tweak-list"></div>
 
       <!-- Add Repo -->
-      <div class="manager-row">
-        <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io">
-          <img src="icons/sileo.png" alt="">Sileo
-        </a>
-        <a class="manager-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io">
-          <img src="icons/cydia.png" alt="">Cydia
-        </a>
-        <a class="manager-btn" href="zbra://sources/add/https://zeroxjf.github.io">
-          <img src="icons/zebra.png" alt="">Zebra
-        </a>
+      <div class="manager-wrap">
+        <div class="manager-prompt">Tap to add my repo to your package manager</div>
+        <div class="manager-row">
+          <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io">
+            <img src="icons/sileo.png" alt="">Sileo
+          </a>
+          <a class="manager-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io">
+            <img src="icons/cydia.png" alt="">Cydia
+          </a>
+          <a class="manager-btn" href="zbra://sources/add/https://zeroxjf.github.io">
+            <img src="icons/zebra.png" alt="">Zebra
+          </a>
+        </div>
       </div>
     </div>
 

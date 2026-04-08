@@ -667,11 +667,11 @@
           </div>
         </div>
 
-        <div class="tweak-row" id="tweakRowAtria">
+        <div class="tweak-row experimental" id="tweakRowAtria">
           <div class="tweak-row-head">
             <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailAtria">
               <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
-              <span class="tweak-row-name">Atria (Light) &mdash; grid resize</span>
+              <span class="tweak-row-name">Atria (Light) &mdash; grid resize <span class="tweak-row-badge">WIP &mdash; avoid</span></span>
             </button>
             <label class="tweak-toggle" aria-label="Enable Atria">
               <input type="checkbox" id="tweakAtria">
@@ -681,6 +681,7 @@
           <div class="tweak-row-detail" id="tweakDetailAtria" hidden>
             <div class="tweak-row-desc">Resizes the homescreen and dock grid. Minimal one-shot port of <a href="https://github.com/ren7995/Atria">ren7995's Atria</a> &mdash; grid resize only, no insets / scale / per-page settings.</div>
             <div class="tweak-row-notes">
+              <strong>In progress &mdash; unstable, avoid unless you're testing.</strong> Layout provider walk may miss the right selector on 18.4/18.6.x and silently no-op, or partially apply and look correct until you flip pages. Can SpringBoard-crash on some device models.<br>
               <strong>Mutually exclusive with FiveIconDock.</strong> Both own the dock grid; picking Atria will uncheck FiveIconDock automatically.<br>
               <strong>Persistence:</strong> in-memory only, clears on respring/reboot.
             </div>

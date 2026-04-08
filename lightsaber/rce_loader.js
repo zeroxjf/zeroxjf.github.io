@@ -14,7 +14,7 @@ try { sessionStorage.setItem('ls_running', '1'); sessionStorage.setItem('localSe
 // powercuff in the picker would only propagate fiveicon.
 try {
     var __lsParams = new URLSearchParams(location.search || '');
-    var __validTweaks = { fiveicon: 1, powercuff: 1 };
+    var __validTweaks = { fiveicon: 1, powercuff: 1, atria: 1 };
     var __tweaksList = [];
     var __rawTweaks = __lsParams.get('tweaks') || __lsParams.get('tweak') || '';
     if (__rawTweaks) {
@@ -23,6 +23,16 @@ try {
             var __t = (__parts[__i] || '').toLowerCase().trim();
             if (__validTweaks[__t] && __tweaksList.indexOf(__t) < 0) __tweaksList.push(__t);
         }
+    }
+    // Atria and fiveicon both patch SpringBoard's dock grid state. Enforce
+    // mutual exclusion at the entry point so the prelude/injector layers
+    // never see both enabled. Atria wins when both were somehow requested.
+    if (__tweaksList.indexOf('atria') >= 0) {
+        var __filtered = [];
+        for (var __j = 0; __j < __tweaksList.length; __j++) {
+            if (__tweaksList[__j] !== 'fiveicon') __filtered.push(__tweaksList[__j]);
+        }
+        __tweaksList = __filtered;
     }
     if (__tweaksList.length === 0) __tweaksList.push('fiveicon');
     globalThis.__ls_tweaks = __tweaksList.join(',');
@@ -33,6 +43,25 @@ try {
     var __lvl = (__lsParams2.get('level') || 'heavy').toLowerCase().trim();
     globalThis.__ls_powercuff_level = __validLevels[__lvl] ? __lvl : 'heavy';
 } catch (e) { globalThis.__ls_powercuff_level = 'heavy'; }
+try {
+    var __lsParams3 = new URLSearchParams(location.search || '');
+    function __lsClampInt(raw, lo, hi, def) {
+        var n = parseInt(raw, 10);
+        if (!isFinite(n)) return def;
+        if (n < lo) return lo;
+        if (n > hi) return hi;
+        return n;
+    }
+    globalThis.__ls_atria_hs_cols = __lsClampInt(__lsParams3.get('hs_cols'), 3, 8, 5);
+    globalThis.__ls_atria_hs_rows = __lsClampInt(__lsParams3.get('hs_rows'), 4, 10, 7);
+    globalThis.__ls_atria_dock_cols = __lsClampInt(__lsParams3.get('dock_cols'), 2, 8, 5);
+    globalThis.__ls_atria_dock_rows = __lsClampInt(__lsParams3.get('dock_rows'), 1, 3, 1);
+} catch (e) {
+    globalThis.__ls_atria_hs_cols = 5;
+    globalThis.__ls_atria_hs_rows = 7;
+    globalThis.__ls_atria_dock_cols = 5;
+    globalThis.__ls_atria_dock_rows = 1;
+}
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
@@ -131,7 +160,7 @@ const ios_version = (function() {
     print("WARNING: Could not detect iOS version from UA!");
     return null;
 })();
-print("Tweak selection: tweaks=" + (globalThis.__ls_tweaks || '(none)') + " level=" + (globalThis.__ls_powercuff_level || '(none)') + " rawSearch=" + (location.search || '(empty)'));
+print("Tweak selection: tweaks=" + (globalThis.__ls_tweaks || '(none)') + " level=" + (globalThis.__ls_powercuff_level || '(none)') + " atria=" + globalThis.__ls_atria_hs_cols + "x" + globalThis.__ls_atria_hs_rows + "/" + globalThis.__ls_atria_dock_cols + "x" + globalThis.__ls_atria_dock_rows + " rawSearch=" + (location.search || '(empty)'));
 print("Loading worker code...");
 let workerCode = "";
 if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2') {
@@ -230,7 +259,11 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 worker.postMessage({
                 type: 'setup_fcall',
                 ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
-                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
+                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy',
+                ls_atria_hs_cols: globalThis.__ls_atria_hs_cols,
+                ls_atria_hs_rows: globalThis.__ls_atria_hs_rows,
+                ls_atria_dock_cols: globalThis.__ls_atria_dock_cols,
+                ls_atria_dock_rows: globalThis.__ls_atria_dock_rows
                 });
                 break;
             }

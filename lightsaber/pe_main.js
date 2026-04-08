@@ -8410,9 +8410,19 @@ const ENABLE_CORUNA_TWEAKLOADER = false;
 // in a single chain run. index.html can select any subset; each flag drives an
 // independent payload injection. Defaults to fiveicon if no tweak flags are
 // specified (e.g. when pe_main.js is run standalone without the sbx1 prelude).
-const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined' && typeof globalThis.__ls_enable_powercuff === 'undefined') ? true : !!globalThis.__ls_enable_fiveicon;
+// Atria and fiveicon both inject into SpringBoard and both claim ownership
+// of the dock grid state. They're mutually exclusive upstream (iframe URL
+// parser + sbx1 prelude both enforce it) but we pick atria over fiveicon
+// here as a final safety net if both flags somehow made it through.
+const ENABLE_ATRIA_TWEAK = !!globalThis.__ls_enable_atria;
+const ENABLE_FIVEICON_TWEAK = !ENABLE_ATRIA_TWEAK && !!globalThis.__ls_enable_fiveicon;
+const ENABLE_SPRINGBOARD_JS_TWEAK = (typeof globalThis.__ls_enable_fiveicon === 'undefined'
+	&& typeof globalThis.__ls_enable_powercuff === 'undefined'
+	&& typeof globalThis.__ls_enable_atria === 'undefined') ? true : (ENABLE_ATRIA_TWEAK || ENABLE_FIVEICON_TWEAK);
 const SPRINGBOARD_JS_TWEAK_PATH = "/fiveicondock_light.js";
 const SPRINGBOARD_JS_TWEAK_LABEL = "FiveIconDock JS";
+const ATRIA_TWEAK_PATH = "/atria_light.js";
+const ATRIA_TWEAK_LABEL = "Atria JS";
 const ENABLE_POWERCUFF_TWEAK = !!globalThis.__ls_enable_powercuff;
 const POWERCUFF_TWEAK_PATH = "/powercuff_light.js";
 const POWERCUFF_TWEAK_LABEL = "Powercuff";
@@ -8579,6 +8589,52 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 	}
 }
 
+function injectAtriaSpringBoardPayload(existingTask, migFilterBypass, agentPid) {
+	// Atria reads its 4 grid values from globalThis.__atria_* inside the
+	// SpringBoard JSContext. Bake them into a prelude here so the payload
+	// sees the user's picker choices after it crosses the InjectJS boundary.
+	// Clamps mirror the ones in atria_light.js as defense in depth.
+	function atriaSafeInt(v, lo, hi, def) {
+		let n = Number(v);
+		if (!isFinite(n)) return def;
+		n = Math.floor(n);
+		if (n < lo) return lo;
+		if (n > hi) return hi;
+		return n;
+	}
+	const hsCols = atriaSafeInt(globalThis.__atria_hs_cols, 3, 8, 5);
+	const hsRows = atriaSafeInt(globalThis.__atria_hs_rows, 4, 10, 7);
+	const dockCols = atriaSafeInt(globalThis.__atria_dock_cols, 2, 8, 5);
+	const dockRows = atriaSafeInt(globalThis.__atria_dock_rows, 1, 3, 1);
+	LOG("[PE] Injecting " + ATRIA_TWEAK_LABEL + " (hs=" + hsCols + "x" + hsRows + " dock=" + dockCols + "x" + dockRows + ") into SpringBoard...");
+	LOG("[PE] agentPid=" + agentPid + " existingTask.pid=" + (existingTask && existingTask.pid ? existingTask.pid() : "N/A"));
+	LOG("[PE] code source: " + (typeof globalThis.__atria_code === 'string' && globalThis.__atria_code.length > 0 ? "prefetched (" + globalThis.__atria_code.length + " bytes)" : "fetchRemoteScript(" + ATRIA_TWEAK_PATH + ")"));
+	let code = (typeof globalThis.__atria_code === 'string' && globalThis.__atria_code.length > 0) ? globalThis.__atria_code : fetchRemoteScript(ATRIA_TWEAK_PATH);
+	if (!code) {
+		LOG("[PE] " + ATRIA_TWEAK_LABEL + " fetch failed");
+		return false;
+	}
+	const configPrelude =
+		'globalThis.__atria_hs_cols = ' + hsCols + ';\n' +
+		'globalThis.__atria_hs_rows = ' + hsRows + ';\n' +
+		'globalThis.__atria_dock_cols = ' + dockCols + ';\n' +
+		'globalThis.__atria_dock_rows = ' + dockRows + ';\n';
+	code = configPrelude + code;
+	LOG("[PE] " + ATRIA_TWEAK_LABEL + " code loaded: " + code.length + " bytes (with config prelude)");
+	try {
+		LOG("[PE] Creating InjectJS loader for " + ATRIA_TWEAK_LABEL + "...");
+		let loader = new _InjectJS__WEBPACK_IMPORTED_MODULE_6__["default"](existingTask, code, migFilterBypass);
+		LOG("[PE] InjectJS loader created, calling inject(agentPid=" + agentPid + ")...");
+		let ok = loader.inject(agentPid);
+		LOG("[PE] " + ATRIA_TWEAK_LABEL + " inject result: " + ok);
+		return ok;
+	} catch (e) {
+		LOG("[PE] " + ATRIA_TWEAK_LABEL + " inject exception: " + String(e));
+		LOG("[PE] " + ATRIA_TWEAK_LABEL + " stack: " + (e.stack || "no stack"));
+		return false;
+	}
+}
+
 function injectThermalmonitordPayload(migFilterBypass, path, label) {
 	// Validate the requested level here (in mediaplaybackd's pe_main.js context)
 	// and bake it into a prelude that runs inside thermalmonitord's JSC realm,
@@ -8688,10 +8744,15 @@ function start() { LOG("[+] PE start() called");
 			else
 				LOG("[PE] Coruna tweakloader disabled");
 			let springboardTweakInjected = false;
-			if (ENABLE_SPRINGBOARD_JS_TWEAK)
-				springboardTweakInjected = injectLightweightSpringBoardPayload(agentLoader.task, migFilterBypass, agentPid, SPRINGBOARD_JS_TWEAK_PATH, SPRINGBOARD_JS_TWEAK_LABEL);
-			else
+			if (ENABLE_SPRINGBOARD_JS_TWEAK) {
+				if (ENABLE_ATRIA_TWEAK) {
+					springboardTweakInjected = injectAtriaSpringBoardPayload(agentLoader.task, migFilterBypass, agentPid);
+				} else {
+					springboardTweakInjected = injectLightweightSpringBoardPayload(agentLoader.task, migFilterBypass, agentPid, SPRINGBOARD_JS_TWEAK_PATH, SPRINGBOARD_JS_TWEAK_LABEL);
+				}
+			} else {
 				LOG("[PE] SpringBoard JS tweak disabled");
+			}
 			if (springboardTweakInjected && !ENABLE_POWERCUFF_TWEAK && FIVEICON_ONLY_SETTLE_DELAY_USEC > 0n) {
 				LOG("[PE] SpringBoard-only mode: waiting " + FIVEICON_ONLY_SETTLE_DELAY_USEC.toString() + " usec for async main-thread dispatch to settle");
 				libs_Chain_Native__WEBPACK_IMPORTED_MODULE_0__["default"].callSymbol("usleep", FIVEICON_ONLY_SETTLE_DELAY_USEC);

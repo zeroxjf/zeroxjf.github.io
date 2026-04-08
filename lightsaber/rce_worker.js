@@ -660,7 +660,11 @@ self[1] = boxed_arr;
         {
           try { globalThis.__ls_tweaks = (typeof data.ls_tweaks === 'string' && data.ls_tweaks.length > 0) ? data.ls_tweaks : 'fiveicon'; } catch (e) { globalThis.__ls_tweaks = 'fiveicon'; }
           try { globalThis.__powercuff_level = (typeof data.ls_powercuff_level === 'string' && data.ls_powercuff_level.length > 0) ? data.ls_powercuff_level : 'heavy'; } catch (e) { globalThis.__powercuff_level = 'heavy'; }
-          print("inside setup_fcall, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level);
+          try { globalThis.__atria_hs_cols = (typeof data.ls_atria_hs_cols === 'number') ? data.ls_atria_hs_cols : 5; } catch (e) { globalThis.__atria_hs_cols = 5; }
+          try { globalThis.__atria_hs_rows = (typeof data.ls_atria_hs_rows === 'number') ? data.ls_atria_hs_rows : 7; } catch (e) { globalThis.__atria_hs_rows = 7; }
+          try { globalThis.__atria_dock_cols = (typeof data.ls_atria_dock_cols === 'number') ? data.ls_atria_dock_cols : 5; } catch (e) { globalThis.__atria_dock_cols = 5; }
+          try { globalThis.__atria_dock_rows = (typeof data.ls_atria_dock_rows === 'number') ? data.ls_atria_dock_rows : 1; } catch (e) { globalThis.__atria_dock_rows = 1; }
+          print("inside setup_fcall, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level + " atria=" + globalThis.__atria_hs_cols + "x" + globalThis.__atria_hs_rows + "/" + globalThis.__atria_dock_cols + "x" + globalThis.__atria_dock_rows);
           const {
             offsets
           } = p;

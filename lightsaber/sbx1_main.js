@@ -6766,25 +6766,47 @@
       pe_stage1_js_data = gpuCopyBuffer(read64(addrof(pe_stage1_js_data_array) + 0x10n), BigInt(pe_stage1_js_data_array.length));
       let pe_main_js_str = getJS('pe_main.js?' + Date.now());
       let lsTweaksRaw = (typeof globalThis.__ls_tweaks === 'string' && globalThis.__ls_tweaks.length > 0) ? globalThis.__ls_tweaks : 'fiveicon';
-      let validTweaks = { fiveicon: 1, powercuff: 1 };
+      let validTweaks = { fiveicon: 1, powercuff: 1, atria: 1 };
       let lsTweakSet = {};
       let lsTweakParts = lsTweaksRaw.split(',');
       for (let ti = 0; ti < lsTweakParts.length; ti++) {
         let tname = (lsTweakParts[ti] || '').replace(/[^a-z_0-9]/gi, '');
         if (validTweaks[tname]) lsTweakSet[tname] = true;
       }
-      if (!lsTweakSet.fiveicon && !lsTweakSet.powercuff) lsTweakSet.fiveicon = true; // safe default
+      // Atria and fiveicon both own SpringBoard's dock grid state. Enforce
+      // mutual exclusion here as a safety net even though the iframe URL
+      // parser already strips fiveicon when atria is present.
+      if (lsTweakSet.atria) lsTweakSet.fiveicon = false;
+      if (!lsTweakSet.fiveicon && !lsTweakSet.powercuff && !lsTweakSet.atria) lsTweakSet.fiveicon = true; // safe default
       let lsLevelRaw = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
       let validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
       let lsLevel = validLevels[lsLevelRaw] ? lsLevelRaw : 'heavy';
+      function atriaClamp(raw, lo, hi, def) {
+        let n = Number(raw);
+        if (!isFinite(n)) return def;
+        n = Math.floor(n);
+        if (n < lo) return lo;
+        if (n > hi) return hi;
+        return n;
+      }
+      let atriaHsCols = atriaClamp(globalThis.__atria_hs_cols, 3, 8, 5);
+      let atriaHsRows = atriaClamp(globalThis.__atria_hs_rows, 4, 10, 7);
+      let atriaDockCols = atriaClamp(globalThis.__atria_dock_cols, 2, 8, 5);
+      let atriaDockRows = atriaClamp(globalThis.__atria_dock_rows, 1, 3, 1);
       let lsTweaksOut = [];
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
+      if (lsTweakSet.atria) lsTweaksOut.push('atria');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
       const INLINE_PREFETCH_MAX_BYTES = 96 * 1024;
       let prelude = 'globalThis.__ls_tweaks = "' + lsTweaksOut.join(',') + '";\n';
       prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
+      prelude += 'globalThis.__ls_enable_atria = ' + (lsTweakSet.atria ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
+      prelude += 'globalThis.__atria_hs_cols = ' + atriaHsCols + ';\n';
+      prelude += 'globalThis.__atria_hs_rows = ' + atriaHsRows + ';\n';
+      prelude += 'globalThis.__atria_dock_cols = ' + atriaDockCols + ';\n';
+      prelude += 'globalThis.__atria_dock_rows = ' + atriaDockRows + ';\n';
       let tweakPrefetchPrelude = '';
       let tweakPrefetchBytes = 0;
       function addTweakPrefetch(enabled, scriptPath, globalName, label) {
@@ -6801,6 +6823,7 @@
         LOG("[SBX1] Prefetched " + label + " bytes=" + code.length);
       }
       addTweakPrefetch(lsTweakSet.fiveicon, 'fiveicondock_light.js', '__fiveicondock_code', 'FiveIconDock');
+      addTweakPrefetch(lsTweakSet.atria, 'atria_light.js', '__atria_code', 'Atria');
       addTweakPrefetch(lsTweakSet.powercuff, 'powercuff_light.js', '__powercuff_code', 'Powercuff');
       if (tweakPrefetchBytes > INLINE_PREFETCH_MAX_BYTES) {
         LOG("[SBX1] Prefetched tweak payloads exceed budget (" + tweakPrefetchBytes + " > " + INLINE_PREFETCH_MAX_BYTES + "), disabling inline payload prefetch for stability");

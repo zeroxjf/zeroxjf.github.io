@@ -632,18 +632,30 @@
     // Can't call -[UIScreen bounds] directly (returns CGRect in FP regs).
     // Use KVC: valueForKey:@"bounds" returns NSValue<CGRect>, then
     // getValue:size: copies 32 bytes into our scratch.
+    log("rsb: pre UIScreen class");
     const UIScreen = Native.callSymbol("objc_getClass", "UIScreen");
+    log("rsb: UIScreen=0x" + u64(UIScreen).toString(16));
+    if (!isNonZero(UIScreen)) return { w: 390, h: 844 };
+    log("rsb: pre mainScreen");
     const screen = objc(UIScreen, "mainScreen");
+    log("rsb: screen=0x" + u64(screen).toString(16));
     if (!isNonZero(screen)) return { w: 390, h: 844 };
+    log("rsb: pre valueForKey bounds");
     const key = cfstr("bounds");
     const v = objc(screen, "valueForKey:", key);
+    log("rsb: v=0x" + u64(v).toString(16));
     if (!isNonZero(v)) return { w: 390, h: 844 };
+    log("rsb: pre getValue:size:");
     const scratch = Native.callSymbol("malloc", 32n);
     objc(v, "getValue:size:", scratch, 32n);
+    log("rsb: post getValue:size:");
     const bytes = Native.read(scratch, 32);
     Native.callSymbol("free", scratch);
     const dv = new DataView(bytes);
-    return { w: dv.getFloat64(16, true), h: dv.getFloat64(24, true) };
+    const w = dv.getFloat64(16, true);
+    const h = dv.getFloat64(24, true);
+    log("rsb: w=" + w + " h=" + h);
+    return { w: w, h: h };
   }
 
   function getBatteryTempC() {

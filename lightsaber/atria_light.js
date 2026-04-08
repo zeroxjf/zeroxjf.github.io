@@ -4,6 +4,7 @@
     static #dlsymAddr;
     static #memcpyAddr;
     static #mallocAddr;
+    static #argMemSize = 0x1000n;
     static #argMem = 0n;
     static #argPtr = 0n;
     static #dlsymCache = {};
@@ -14,7 +15,7 @@
       this.#dlsymAddr = buff[21];
       this.#memcpyAddr = buff[22];
       this.#mallocAddr = buff[23];
-      this.#argMem = this.#nativeCallAddr(this.#mallocAddr, 0x1000n);
+      this.#argMem = this.#nativeCallAddr(this.#mallocAddr, this.#argMemSize);
       this.#argPtr = this.#argMem;
     }
 
@@ -49,9 +50,13 @@
     static #toNative(value) {
       if (!value) return 0n;
       if (typeof value === "string") {
+        const need = BigInt(value.length + 1);
+        if (need <= 0n || need > this.#argMemSize) return 0n;
+        const used = this.#argPtr - this.#argMem;
+        if (used < 0n || used + need > this.#argMemSize) return 0n;
         const ptr = this.#argPtr;
         this.writeString(ptr, value);
-        this.#argPtr += BigInt(value.length + 1);
+        this.#argPtr += need;
         return ptr;
       }
       if (typeof value === "bigint") return value;
@@ -97,6 +102,10 @@
       x6 = this.#toNative(x6);
       x7 = this.#toNative(x7);
       const funcAddr = this.#dlsym(name);
+      if (!funcAddr) {
+        this.#argPtr = this.#argMem;
+        return 0n;
+      }
       const ret64 = this.#nativeCallAddr(funcAddr, x0, x1, x2, x3, x4, x5, x6, x7);
       this.#argPtr = this.#argMem;
       if (ret64 < 0xffffffffn && ret64 > -0xffffffffn) return Number(ret64);
@@ -114,18 +123,14 @@
 
   function log(msg) {
     try {
-      const tagged = "[ATRIA] " + msg;
-      const ptr = Native.callSymbol("malloc", BigInt(tagged.length + 1));
-      if (!ptr) return;
-      Native.writeString(ptr, tagged);
-      Native.callSymbol("syslog", 5, ptr);
-      Native.callSymbol("free", ptr);
+      Native.callSymbol("syslog", 5, "[ATRIA] " + msg);
     } catch (_) {}
   }
 
   function sel(name) { return Native.callSymbol("sel_registerName", name); }
   function objc(obj, selectorName, ...args) { return Native.callSymbol("objc_msgSend", obj, sel(selectorName), ...args); }
   function cfstr(str) { return Native.callSymbol("CFStringCreateWithCString", 0n, str, 0x08000100); }
+  function cfrelease(obj) { if (isNonZero(obj)) Native.callSymbol("CFRelease", obj); }
 
   function canRespond(obj, selectorName) {
     if (!isNonZero(obj)) return false;
@@ -164,13 +169,17 @@
     if (!canRespond(provider, "layoutForIconLocation:")) return false;
     const loc = cfstr(locationStr);
     if (!isNonZero(loc)) return false;
-    const layout = objc(provider, "layoutForIconLocation:", loc);
-    if (!isNonZero(layout)) { log(locationStr + ": no layout"); return false; }
-    const cfg = tryObjSelector(layout, ["layoutConfiguration"]);
-    if (!isNonZero(cfg)) { log(locationStr + ": no cfg"); return false; }
-    const ok = stampGrid(cfg, cols, rows);
-    log(locationStr + " " + cols + "x" + rows + (ok ? " ok" : " fail"));
-    return ok;
+    try {
+      const layout = objc(provider, "layoutForIconLocation:", loc);
+      if (!isNonZero(layout)) { log(locationStr + ": no layout"); return false; }
+      const cfg = tryObjSelector(layout, ["layoutConfiguration"]);
+      if (!isNonZero(cfg)) { log(locationStr + ": no cfg"); return false; }
+      const ok = stampGrid(cfg, cols, rows);
+      log(locationStr + " " + cols + "x" + rows + (ok ? " ok" : " fail"));
+      return ok;
+    } finally {
+      cfrelease(loc);
+    }
   }
 
   function patchListViewGrid(listView, cols, rows) {
@@ -216,7 +225,10 @@
     const arr = tryObjSelector(container, ["rootIconLists", "iconListViews", "visibleIconLists"]);
     if (!isNonZero(arr)) return 0;
     if (!canRespond(arr, "count")) return 0;
-    const count = Number(u64(objc(arr, "count")));
+    if (!canRespond(arr, "objectAtIndex:")) return 0;
+    const countRaw = Number(u64(objc(arr, "count")));
+    if (!Number.isFinite(countRaw) || countRaw <= 0) return 0;
+    const count = Math.min(countRaw, 128);
     let n = 0;
     for (let i = 0; i < count; i++) {
       const v = objc(arr, "objectAtIndex:", BigInt(i));
@@ -281,8 +293,12 @@
     if (!isNonZero(jsctxObj)) return false;
     const s = cfstr(script);
     if (!isNonZero(s)) return false;
-    objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), s, 0);
-    return true;
+    try {
+      objc(jsctxObj, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("evaluateScript:"), s, 0);
+      return true;
+    } finally {
+      cfrelease(s);
+    }
   }
 
   try {

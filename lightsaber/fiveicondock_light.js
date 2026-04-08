@@ -7,8 +7,14 @@
   const ENABLE_FORCE_RELAYOUT = false;
   const ENABLE_SECOND_PASS = false;
   // Experimental: also bump the home screen grid to 5 columns to match the
-  // 5-icon dock. Uses the same layout-config setter pattern the dock patch
-  // already relies on, walked over SBIconController's root list views.
+  // 5-icon dock. Uses the SBHIconManager -> listLayoutProvider path verified
+  // against the 18.6.2 SpringBoardHome class dump (-[SBHIconManager
+  // listLayoutProvider], -[SBHDefaultIconListLayoutProvider
+  // layoutForIconLocation:], -[SBIconListGridLayoutConfiguration
+  // setNumberOfPortraitColumns:]). The first attempt walked
+  // SBRootFolderController for a list view array that does not exist on
+  // 18.x and PAC-faulted; this rewrite targets the cached provider layout
+  // instead, which is what Atria hooks upstream.
   const ENABLE_HOMESCREEN_COL_PATCH = true;
   const HOMESCREEN_TARGET_COLS = 5;
 
@@ -422,44 +428,64 @@
     return true;
   }
 
-  function patchRootListViewCols(listView, targetCols) {
-    if (!isNonZero(listView)) return false;
-    const layout = tryObjSelector(listView, ["layout"]);
-    if (!isNonZero(layout)) return false;
-    const cfg = tryObjSelector(layout, ["layoutConfiguration"]);
-    if (!isNonZero(cfg)) return false;
-    if (!canRespond(cfg, "setNumberOfPortraitColumns:")) return false;
-    if (!canRespond(cfg, "numberOfPortraitColumns")) return false;
-    const beforeCols = u64(objc(cfg, "numberOfPortraitColumns"));
+  function patchHomescreenCols(iconCtrl, targetCols) {
+    if (!isNonZero(iconCtrl)) { log("patchHomescreenCols: nil iconCtrl"); return 0; }
+    log("patchHomescreenCols: entry, target=" + targetCols);
+
+    if (!canRespond(iconCtrl, "iconManager")) {
+      log("patchHomescreenCols: iconCtrl has no iconManager");
+      return 0;
+    }
+    const iconMgr = objc(iconCtrl, "iconManager");
+    log("patchHomescreenCols: iconMgr=0x" + u64(iconMgr).toString(16));
+    if (!isNonZero(iconMgr)) { log("patchHomescreenCols: nil iconMgr"); return 0; }
+
+    if (!canRespond(iconMgr, "listLayoutProvider")) {
+      log("patchHomescreenCols: iconMgr has no listLayoutProvider");
+      return 0;
+    }
+    const provider = objc(iconMgr, "listLayoutProvider");
+    log("patchHomescreenCols: provider=0x" + u64(provider).toString(16));
+    if (!isNonZero(provider)) { log("patchHomescreenCols: nil provider"); return 0; }
+
+    if (!canRespond(provider, "layoutForIconLocation:")) {
+      log("patchHomescreenCols: provider has no layoutForIconLocation:");
+      return 0;
+    }
+
+    const loc = cfstr("SBIconLocationRoot");
+    log("patchHomescreenCols: loc=0x" + u64(loc).toString(16));
+    if (!isNonZero(loc)) { log("patchHomescreenCols: cfstr failed"); return 0; }
+
+    const layout = objc(provider, "layoutForIconLocation:", loc);
+    log("patchHomescreenCols: layout=0x" + u64(layout).toString(16));
+    if (!isNonZero(layout)) { log("patchHomescreenCols: nil layout for root"); return 0; }
+
+    if (!canRespond(layout, "layoutConfiguration")) {
+      log("patchHomescreenCols: layout has no layoutConfiguration");
+      return 0;
+    }
+    const cfg = objc(layout, "layoutConfiguration");
+    log("patchHomescreenCols: cfg=0x" + u64(cfg).toString(16));
+    if (!isNonZero(cfg)) { log("patchHomescreenCols: nil cfg"); return 0; }
+
+    if (!canRespond(cfg, "setNumberOfPortraitColumns:")) {
+      log("patchHomescreenCols: cfg has no setNumberOfPortraitColumns:");
+      return 0;
+    }
+
+    const beforeCols = canRespond(cfg, "numberOfPortraitColumns") ? u64(objc(cfg, "numberOfPortraitColumns")) : 0n;
     const beforeRows = canRespond(cfg, "numberOfPortraitRows") ? u64(objc(cfg, "numberOfPortraitRows")) : 0n;
-    // Skip if this looks like a dock config (rows==1) - the dock path owns it.
-    if (beforeRows === 1n) return false;
+    log("patchHomescreenCols: before cols=" + beforeCols.toString() + " rows=" + beforeRows.toString());
+
     objc(cfg, "setNumberOfPortraitColumns:", BigInt(targetCols));
-    const afterCols = u64(objc(cfg, "numberOfPortraitColumns"));
     if (canRespond(cfg, "setNumberOfLandscapeRows:")) {
       objc(cfg, "setNumberOfLandscapeRows:", BigInt(targetCols));
     }
-    log("root cfg portraitRows=" + beforeRows.toString() + " portraitColumns " + beforeCols.toString() + " -> " + afterCols.toString());
-    return afterCols === BigInt(targetCols);
-  }
 
-  function patchHomescreenCols(iconCtrl, targetCols) {
-    if (!isNonZero(iconCtrl)) return 0;
-    const rootFolder = tryObjSelector(iconCtrl, ["rootFolderController", "_rootFolderController"]);
-    const container = isNonZero(rootFolder) ? rootFolder : iconCtrl;
-    const arr = tryObjSelector(container, ["iconListViews", "rootIconListViews", "visibleIconLists"]);
-    if (!isNonZero(arr)) { log("patchHomescreenCols: no root list view array"); return 0; }
-    if (!canRespond(arr, "count")) { log("patchHomescreenCols: list view array missing count"); return 0; }
-    const count = Number(u64(objc(arr, "count")));
-    log("patchHomescreenCols: walking " + count + " root list views (target=" + targetCols + ")");
-    let touched = 0;
-    for (let i = 0; i < count; i++) {
-      const lv = objc(arr, "objectAtIndex:", BigInt(i));
-      if (!isNonZero(lv)) continue;
-      if (patchRootListViewCols(lv, targetCols)) touched++;
-    }
-    log("patchHomescreenCols: touched=" + touched + "/" + count);
-    return touched;
+    const afterCols = canRespond(cfg, "numberOfPortraitColumns") ? u64(objc(cfg, "numberOfPortraitColumns")) : 0n;
+    log("patchHomescreenCols: after cols=" + afterCols.toString() + " (target=" + targetCols + ")");
+    return afterCols === BigInt(targetCols) ? 1 : 0;
   }
 
   function forceRelayout(dockListView) {

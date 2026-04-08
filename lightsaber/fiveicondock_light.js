@@ -698,11 +698,19 @@
 
   function createStatBarOverlay() {
     log("statbar: entry");
+    log("statbar: pre objc_getClass UIApplication");
     const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
+    log("statbar: UIApplication=0x" + u64(UIApplication).toString(16));
     if (!isNonZero(UIApplication)) { log("statbar: no UIApplication class"); return false; }
-    const app = objc(UIApplication, "sharedApplication");
+    log("statbar: pre sel sharedApplication");
+    const sharedSel = sel("sharedApplication");
+    log("statbar: sharedSel=0x" + u64(sharedSel).toString(16));
+    log("statbar: pre objc_msgSend sharedApplication");
+    const app = Native.callSymbol("objc_msgSend", UIApplication, sharedSel);
+    log("statbar: app=0x" + u64(app).toString(16));
     if (!isNonZero(app)) { log("statbar: no sharedApplication"); return false; }
 
+    log("statbar: pre findWindowScene");
     const scene = findWindowScene(app);
     if (!isNonZero(scene)) { log("statbar: no UIWindowScene"); return false; }
     log("statbar: scene=0x" + u64(scene).toString(16));
@@ -882,7 +890,12 @@
     log("test SBIconController=0x" + u64(testSB).toString(16) + (testSB ? " (found)" : " (NOT FOUND - wrong process?)"));
 
     log("about to runOnMainEvaluate (performSelectorOnMainThread) - PAC violation happens here if PAC context is stale");
-    runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}try{__fiveicon_statbar();}catch(e){__fiveicon_log('statbar dispatch err: '+e);}");
+    runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}");
+    // Bounce statbar through a separate performSelectorOnMainThread so it
+    // lands on a fresh runloop tick rather than piggybacking on the dock
+    // pass, which kicks off async UIKit layout work that can leave the
+    // main thread in a funky state for an immediate follow-up message.
+    runOnMainEvaluate("try{__fiveicon_statbar();}catch(e){__fiveicon_log('statbar dispatch err: '+e);}");
     log("runOnMainEvaluate returned (async dispatch, no crash on injected thread)");
 
     if (ENABLE_SECOND_PASS) {

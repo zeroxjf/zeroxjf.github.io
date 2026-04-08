@@ -424,32 +424,117 @@
     }
     .tweak-row-head {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      cursor: pointer;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 34px;
     }
-    .tweak-row-head input[type="checkbox"] {
-      margin-top: 3px;
-      accent-color: #1d1d1f;
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-    .tweak-row-meta {
+    .tweak-row-title {
       flex: 1;
       min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      margin: 0;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
+    .tweak-row-title:focus-visible {
+      outline: 2px solid #1d1d1f;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+    .tweak-row-caret {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      font-size: 18px;
+      line-height: 1;
+      color: #86868b;
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+      font-weight: 400;
+    }
+    .tweak-row.expanded .tweak-row-caret { transform: rotate(90deg); }
     .tweak-row-name {
+      flex: 1;
+      min-width: 0;
       font-size: 15px;
       font-weight: 600;
       color: #1d1d1f;
       line-height: 1.3;
     }
+    .tweak-row-detail {
+      margin-top: 10px;
+      padding-top: 10px;
+      padding-left: 24px;
+      border-top: 1px solid #e5e5e7;
+    }
+    .tweak-row-detail[hidden] { display: none; }
     .tweak-row-desc {
       font-size: 12px;
       color: #86868b;
-      margin-top: 2px;
       line-height: 1.5;
+    }
+    /* iOS-style toggle switch */
+    .tweak-toggle {
+      position: relative;
+      display: inline-block;
+      width: 51px;
+      height: 31px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tweak-toggle input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .tweak-toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #e9e9ea;
+      border-radius: 31px;
+      transition: background 0.22s ease;
+    }
+    .tweak-toggle-track::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 27px;
+      height: 27px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16);
+      transition: transform 0.22s ease;
+    }
+    .tweak-toggle input:checked ~ .tweak-toggle-track { background: #34c759; }
+    .tweak-toggle input:checked ~ .tweak-toggle-track::before { transform: translateX(20px); }
+    .tweak-toggle input:focus-visible ~ .tweak-toggle-track {
+      box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.35);
+    }
+    .tweak-row.experimental .tweak-toggle-track {
+      background: #f0f0f2;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tweak-row-caret,
+      .tweak-toggle-track,
+      .tweak-toggle-track::before { transition: none; }
     }
     .tweak-row-options {
       display: none;
@@ -520,26 +605,38 @@
 
       <div class="tweak-list">
         <div class="tweak-row" id="tweakRowFiveicon">
-          <label class="tweak-row-head">
-            <input type="checkbox" id="tweakFiveicon">
-            <div class="tweak-row-meta">
-              <div class="tweak-row-name">FiveIconDock</div>
-              <div class="tweak-row-desc">Adds a 5th dock slot by patching SpringBoard at runtime.</div>
+          <div class="tweak-row-head">
+            <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailFiveicon">
+              <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
+              <span class="tweak-row-name">FiveIconDock</span>
+            </button>
+            <label class="tweak-toggle" aria-label="Enable FiveIconDock">
+              <input type="checkbox" id="tweakFiveicon">
+              <span class="tweak-toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="tweak-row-detail" id="tweakDetailFiveicon" hidden>
+            <div class="tweak-row-desc">Adds a 5th dock slot by patching SpringBoard at runtime.</div>
+            <div class="tweak-row-notes">
+              <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot. After install, try dragging a 5th icon into your dock.
             </div>
-          </label>
-          <div class="tweak-row-notes">
-            <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot. After install, try dragging a 5th icon into your dock.
           </div>
         </div>
 
         <div class="tweak-row" id="tweakRowPowercuff">
-          <label class="tweak-row-head">
-            <input type="checkbox" id="tweakPowercuff">
-            <div class="tweak-row-meta">
-              <div class="tweak-row-name">Powercuff &mdash; battery saver</div>
-              <div class="tweak-row-desc">Underclocks the CPU/GPU for longer battery, at the cost of speed. Port of <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a>. Lasts until reboot.</div>
-            </div>
-          </label>
+          <div class="tweak-row-head">
+            <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailPowercuff">
+              <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
+              <span class="tweak-row-name">Powercuff &mdash; battery saver</span>
+            </button>
+            <label class="tweak-toggle" aria-label="Enable Powercuff">
+              <input type="checkbox" id="tweakPowercuff">
+              <span class="tweak-toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="tweak-row-detail" id="tweakDetailPowercuff" hidden>
+            <div class="tweak-row-desc">Underclocks the CPU/GPU for longer battery, at the cost of speed. Port of <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a>. Lasts until reboot.</div>
+          </div>
           <div class="tweak-row-options">
             <span class="tweak-row-options-label">Level</span>
             <select id="powercuffLevel">
@@ -592,7 +689,7 @@
 
     <div class="info" style="margin-top:4px">
       <strong>Thanks to</strong><br>
-      <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, and anonymous contributors for help stabilizing the exploit chain.
+      <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
     <p class="version">v0.0.25</p>
@@ -801,9 +898,12 @@
       runBtn.onclick = null;
     }
 
-    // Wire tweak rows: clicking anywhere on the row head toggles the checkbox
-    // and adds/removes the .checked class so the row lights up and any inline
-    // options (e.g. Powercuff level) slide into view.
+    // Wire tweak rows. Each row has two independent interactive areas in its
+    // head: the title button (tap = expand/collapse the description detail
+    // below) and the iOS-style toggle switch (tap = enable/disable the tweak).
+    // The .checked class is still driven by the hidden checkbox so the
+    // selected row highlights and any inline options (e.g. Powercuff Level)
+    // slide into view when the toggle is on.
     var tweakRows = [
       { rowId: 'tweakRowFiveicon', cbId: 'tweakFiveicon', name: 'fiveicon' },
       { rowId: 'tweakRowPowercuff', cbId: 'tweakPowercuff', name: 'powercuff' }
@@ -815,12 +915,33 @@
       if (cb.checked) el.classList.add('checked');
       else el.classList.remove('checked');
     }
+    function toggleTweakDetail(rowId) {
+      var el = document.getElementById(rowId);
+      if (!el) return;
+      var expanded = el.classList.toggle('expanded');
+      var detail = el.querySelector('.tweak-row-detail');
+      if (detail) {
+        if (expanded) detail.removeAttribute('hidden');
+        else detail.setAttribute('hidden', '');
+      }
+      var title = el.querySelector('.tweak-row-title');
+      if (title) title.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
     for (var ti = 0; ti < tweakRows.length; ti++) {
       (function(row) {
         var cb = document.getElementById(row.cbId);
-        if (!cb) return;
-        cb.addEventListener('change', function() { syncTweakRow(row); });
-        syncTweakRow(row);
+        if (cb) {
+          cb.addEventListener('change', function() { syncTweakRow(row); });
+          syncTweakRow(row);
+        }
+        var el = document.getElementById(row.rowId);
+        var title = el && el.querySelector('.tweak-row-title');
+        if (title) {
+          title.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleTweakDetail(row.rowId);
+          });
+        }
       })(tweakRows[ti]);
     }
 

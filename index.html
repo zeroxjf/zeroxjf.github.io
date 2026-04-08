@@ -226,8 +226,14 @@
     .meta-cell {
       padding: 1rem 1.25rem;
       border-right: 1px solid var(--border-soft);
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+      transition: background 0.15s var(--ease);
     }
     .meta-cell:last-child { border-right: none; }
+    a.meta-cell:hover { background: var(--card); }
+    a.meta-cell:hover .meta-value { color: var(--accent-hover); }
 
     .meta-label {
       font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
@@ -741,17 +747,17 @@
     <!-- Meta stats -->
     <div class="meta-row">
       <div class="meta-cell">
-        <div class="meta-label">Research</div>
-        <div class="meta-value">5 <small>writeups</small></div>
+        <div class="meta-label">Vulnerabilities</div>
+        <div class="meta-value">5 <small>disclosed</small></div>
       </div>
       <div class="meta-cell">
-        <div class="meta-label">Tweaks</div>
-        <div class="meta-value">3 <small>iOS 16 / 17</small></div>
+        <div class="meta-label">Blog Posts</div>
+        <div class="meta-value">1 <small>published</small></div>
       </div>
-      <div class="meta-cell">
-        <div class="meta-label">Focus</div>
-        <div class="meta-value">iOS <small>kernel · sep</small></div>
-      </div>
+      <a class="meta-cell" href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/" target="_blank" rel="noopener">
+        <div class="meta-label">Media Mention</div>
+        <div class="meta-value">1 <small>WIRED ↗</small></div>
+      </a>
     </div>
 
     <!-- Add Repo -->
@@ -769,10 +775,29 @@
 
     <div id="main-view">
 
+    <!-- Projects -->
+    <div class="section" id="projects">
+      <div class="section-header">
+        <span class="section-num">01 —</span>
+        <div class="section-title">Projects</div>
+        <span class="section-desc">Open-source tooling</span>
+      </div>
+      <div class="entry-list">
+        <a class="tweak-line" href="lightsaber/" style="text-decoration:none">
+          <div class="tweak-info">
+            <div class="tweak-name">LightSaber</div>
+            <div class="tweak-desc">Open-source iOS 18.4–18.6.2 userland exploit chain with JS injection into SpringBoard. Derived from DarkSword.</div>
+          </div>
+          <span class="tweak-ver">iOS 18.4–18.6</span>
+          <span class="tweak-arrow">&rsaquo;</span>
+        </a>
+      </div>
+    </div>
+
     <!-- Vulnerability Research -->
     <div class="section" id="research">
       <div class="section-header">
-        <span class="section-num">01 —</span>
+        <span class="section-num">02 —</span>
         <div class="section-title">Vulnerability Research</div>
         <span class="section-desc">Apple kernel / SEP</span>
       </div>
@@ -837,8 +862,8 @@
     <!-- Blog -->
     <div class="section" id="blog">
       <div class="section-header">
-        <span class="section-num">02 —</span>
-        <div class="section-title">Writeups</div>
+        <span class="section-num">03 —</span>
+        <div class="section-title">Blog</div>
         <span class="section-desc">Long-form notes</span>
       </div>
       <div class="entry-list">
@@ -854,7 +879,7 @@
     <!-- iOS Tweaks -->
     <div class="section" id="tweaks">
       <div class="section-header">
-        <span class="section-num">03 —</span>
+        <span class="section-num">04 —</span>
         <div class="section-title">iOS Tweaks</div>
         <span class="section-desc">iOS 16 / 17 · rootless</span>
       </div>

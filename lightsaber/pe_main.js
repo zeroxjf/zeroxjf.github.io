@@ -8564,7 +8564,30 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 		LOG("[PE] " + label + " fetch failed");
 		return false;
 	}
-	LOG("[PE] " + label + " code loaded: " + code.length + " bytes");
+	// Build the SBCustomizer config prelude that runs inside SpringBoard's
+	// JSContext before fiveicondock_light.js. Values come from pe_main.js's
+	// own globalThis which was seeded by the sbx1 prelude, and are re-
+	// clamped here as defense in depth. Matches the clamp ranges in the
+	// payload so the payload's own defaults never silently override user
+	// picks.
+	function sbcSafeInt(v, lo, hi, def) {
+		let n = Number(v);
+		if (!isFinite(n)) return def;
+		n = Math.floor(n);
+		if (n < lo) return lo;
+		if (n > hi) return hi;
+		return n;
+	}
+	const sbcDockIcons = sbcSafeInt(globalThis.__sbc_dock_icons, 4, 7, 5);
+	const sbcHsCols = sbcSafeInt(globalThis.__sbc_hs_cols, 3, 7, 5);
+	const sbcHsRows = sbcSafeInt(globalThis.__sbc_hs_rows, 4, 8, 6);
+	const sbcPrelude =
+		'globalThis.__sbc_dock_icons = ' + sbcDockIcons + ';\n' +
+		'globalThis.__sbc_hs_cols = ' + sbcHsCols + ';\n' +
+		'globalThis.__sbc_hs_rows = ' + sbcHsRows + ';\n';
+	code = sbcPrelude + code;
+	LOG("[PE] " + label + " SBCustomizer cfg dock=" + sbcDockIcons + " hs=" + sbcHsCols + "x" + sbcHsRows);
+	LOG("[PE] " + label + " code loaded: " + code.length + " bytes (with SBC prelude)");
 	try {
 		LOG("[PE] Creating InjectJS loader for " + label + "...");
 		let loader = new _InjectJS__WEBPACK_IMPORTED_MODULE_6__["default"](existingTask, code, migFilterBypass);

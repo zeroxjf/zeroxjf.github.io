@@ -6777,6 +6777,17 @@
       let lsLevelRaw = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
       let validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
       let lsLevel = validLevels[lsLevelRaw] ? lsLevelRaw : 'heavy';
+      function sbcClamp(raw, lo, hi, def) {
+        let n = Number(raw);
+        if (!isFinite(n)) return def;
+        n = Math.floor(n);
+        if (n < lo) return lo;
+        if (n > hi) return hi;
+        return n;
+      }
+      let sbcDockIcons = sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 5);
+      let sbcHsCols = sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 5);
+      let sbcHsRows = sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
       let lsTweaksOut = [];
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
@@ -6785,6 +6796,9 @@
       prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
+      prelude += 'globalThis.__sbc_dock_icons = ' + sbcDockIcons + ';\n';
+      prelude += 'globalThis.__sbc_hs_cols = ' + sbcHsCols + ';\n';
+      prelude += 'globalThis.__sbc_hs_rows = ' + sbcHsRows + ';\n';
       let tweakPrefetchPrelude = '';
       let tweakPrefetchBytes = 0;
       function addTweakPrefetch(enabled, scriptPath, globalName, label) {

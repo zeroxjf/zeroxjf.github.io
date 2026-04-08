@@ -572,6 +572,39 @@
       margin-top: 6px;
       line-height: 1.5;
     }
+    .sbc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 12px;
+      margin-top: 4px;
+    }
+    .sbc-field { display: flex; flex-direction: column; gap: 4px; }
+    .sbc-field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6e6e73;
+      letter-spacing: 0.02em;
+    }
+    .sbc-field input[type="number"] {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      background: #fff;
+      color: #1d1d1f;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .sbc-field input[type="number"]::-webkit-inner-spin-button,
+    .sbc-field input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    @media (max-width: 420px) {
+      .sbc-grid { grid-template-columns: 1fr 1fr; }
+    }
     .tweak-row-notes {
       font-size: 11px;
       color: #86868b;
@@ -608,19 +641,36 @@
           <div class="tweak-row-head">
             <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailFiveicon">
               <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
-              <span class="tweak-row-name">FiveIconDock</span>
+              <span class="tweak-row-name">SBCustomizer</span>
             </button>
-            <label class="tweak-toggle" aria-label="Enable FiveIconDock">
+            <label class="tweak-toggle" aria-label="Enable SBCustomizer">
               <input type="checkbox" id="tweakFiveicon">
               <span class="tweak-toggle-track" aria-hidden="true"></span>
             </label>
           </div>
           <div class="tweak-row-detail" id="tweakDetailFiveicon" hidden>
-            <div class="tweak-row-desc">Adds a 5th dock slot and (experimentally) bumps the home screen grid to 5 columns to match, by patching SpringBoard at runtime.</div>
+            <div class="tweak-row-desc">Fine-tune the SpringBoard dock and home screen grid at runtime: number of icons in the dock, home columns, and home rows. Runtime patch only &mdash; no on-disk changes.</div>
             <div class="tweak-row-notes">
-              <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot. After install, try dragging a 5th icon into your dock and watch for the wider home screen grid.<br>
-              <strong>Experimental:</strong> the home screen column bump is new. If icons clip or a page flip looks wrong, respring and report it.
+              <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot.<br>
+              <strong>Going wide:</strong> pushing home columns or rows well above stock can cause icons to clip. If something looks wrong after install, respring.
             </div>
+          </div>
+          <div class="tweak-row-options">
+            <div class="sbc-grid">
+              <div class="sbc-field">
+                <label for="sbcDockIcons">Dock icons (4-7)</label>
+                <input type="number" id="sbcDockIcons" min="4" max="7" step="1" value="5" inputmode="numeric">
+              </div>
+              <div class="sbc-field">
+                <label for="sbcHsCols">Home columns (3-7)</label>
+                <input type="number" id="sbcHsCols" min="3" max="7" step="1" value="5" inputmode="numeric">
+              </div>
+              <div class="sbc-field">
+                <label for="sbcHsRows">Home rows (4-8)</label>
+                <input type="number" id="sbcHsRows" min="4" max="8" step="1" value="6" inputmode="numeric">
+              </div>
+            </div>
+            <div class="tweak-row-opt-help">Defaults 5 / 5 / 6 match the original FiveIconDock plus one extra column. Stock iPhone is 4 / 4 / 6.</div>
           </div>
         </div>
 
@@ -694,7 +744,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.32</p>
+    <p class="version">v0.0.33</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -954,6 +1004,22 @@
       pcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
       pcOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
     }
+    var sbcOptionsWrap = document.querySelector('#tweakRowFiveicon .tweak-row-options');
+    if (sbcOptionsWrap) {
+      sbcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
+      sbcOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
+      sbcOptionsWrap.addEventListener('input', function(e) { e.stopPropagation(); });
+    }
+    function sbcClampInput(id, lo, hi, def) {
+      var el = document.getElementById(id);
+      if (!el) return def;
+      var n = parseInt(el.value, 10);
+      if (!isFinite(n)) n = def;
+      if (n < lo) n = lo;
+      if (n > hi) n = hi;
+      el.value = String(n);
+      return n;
+    }
 
     window.scrollTo(0, 0);
 
@@ -965,7 +1031,12 @@
       }
       var levelSel = document.getElementById('powercuffLevel');
       var level = levelSel ? levelSel.value : 'heavy';
-      return { tweaks: tweaks, level: level };
+      var sbc = {
+        dock_icons: sbcClampInput('sbcDockIcons', 4, 7, 5),
+        hs_cols: sbcClampInput('sbcHsCols', 3, 7, 5),
+        hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6)
+      };
+      return { tweaks: tweaks, level: level, sbc: sbc };
     }
 
     function markDone() {
@@ -1020,7 +1091,7 @@
     function proceedInstall() {
       document.getElementById('confirmOverlay').className = 'overlay';
       var sel = gatherSelection();
-      runExploit(sel.tweaks, sel.level);
+      runExploit(sel.tweaks, sel.level, sel.sbc);
     }
 
     function showKillSafari() {
@@ -1036,10 +1107,11 @@
       document.getElementById('killSafariOverlay').className = 'overlay';
     }
 
-    function runExploit(tweaks, level) {
+    function runExploit(tweaks, level, sbc) {
       if (!canRun) return;
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
+      sbc = sbc || { dock_icons: 5, hs_cols: 5, hs_rows: 6 };
       var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {
@@ -1077,8 +1149,11 @@
       // URLSearchParams parser handles either form, but a literal comma is
       // also more readable in logs and proxies.
       var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
+      var sbcParams = '&dock_icons=' + encodeURIComponent(sbc.dock_icons)
+        + '&hs_cols=' + encodeURIComponent(sbc.hs_cols)
+        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows);
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
+      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + sbcParams + '&_=' + Math.random();
       frame.style.width = '1px';
       frame.style.height = '1px';
       frame.style.opacity = '0.01';

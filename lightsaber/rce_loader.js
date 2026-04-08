@@ -33,6 +33,23 @@ try {
     var __lvl = (__lsParams2.get('level') || 'heavy').toLowerCase().trim();
     globalThis.__ls_powercuff_level = __validLevels[__lvl] ? __lvl : 'heavy';
 } catch (e) { globalThis.__ls_powercuff_level = 'heavy'; }
+try {
+    var __lsParams3 = new URLSearchParams(location.search || '');
+    function __sbcLsClamp(raw, lo, hi, def) {
+        var n = parseInt(raw, 10);
+        if (!isFinite(n)) return def;
+        if (n < lo) return lo;
+        if (n > hi) return hi;
+        return n;
+    }
+    globalThis.__ls_sbc_dock_icons = __sbcLsClamp(__lsParams3.get('dock_icons'), 4, 7, 5);
+    globalThis.__ls_sbc_hs_cols = __sbcLsClamp(__lsParams3.get('hs_cols'), 3, 7, 5);
+    globalThis.__ls_sbc_hs_rows = __sbcLsClamp(__lsParams3.get('hs_rows'), 4, 8, 6);
+} catch (e) {
+    globalThis.__ls_sbc_dock_icons = 5;
+    globalThis.__ls_sbc_hs_cols = 5;
+    globalThis.__ls_sbc_hs_rows = 6;
+}
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
 function print(x, reportError = false, dumphex = false) {
@@ -131,7 +148,7 @@ const ios_version = (function() {
     print("WARNING: Could not detect iOS version from UA!");
     return null;
 })();
-print("Tweak selection: tweaks=" + (globalThis.__ls_tweaks || '(none)') + " level=" + (globalThis.__ls_powercuff_level || '(none)') + " rawSearch=" + (location.search || '(empty)'));
+print("Tweak selection: tweaks=" + (globalThis.__ls_tweaks || '(none)') + " level=" + (globalThis.__ls_powercuff_level || '(none)') + " sbc=" + globalThis.__ls_sbc_dock_icons + "/" + globalThis.__ls_sbc_hs_cols + "x" + globalThis.__ls_sbc_hs_rows + " rawSearch=" + (location.search || '(empty)'));
 print("Loading worker code...");
 let workerCode = "";
 if(ios_version == '18,6' || ios_version == '18,6,1' || ios_version == '18,6,2') {
@@ -230,7 +247,10 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 worker.postMessage({
                 type: 'setup_fcall',
                 ls_tweaks: globalThis.__ls_tweaks || 'fiveicon',
-                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy'
+                ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy',
+                ls_sbc_dock_icons: globalThis.__ls_sbc_dock_icons,
+                ls_sbc_hs_cols: globalThis.__ls_sbc_hs_cols,
+                ls_sbc_hs_rows: globalThis.__ls_sbc_hs_rows
                 });
                 break;
             }

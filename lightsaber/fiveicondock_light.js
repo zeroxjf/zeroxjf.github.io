@@ -1,22 +1,31 @@
 (() => {
-  const DOCK_ICONS = 5;
+  function _sbcClamp(v, lo, hi, def) {
+    var n = Number(v);
+    if (!isFinite(n)) return def;
+    n = Math.floor(n);
+    if (n < lo) return lo;
+    if (n > hi) return hi;
+    return n;
+  }
+  // SBCustomizer config - read from the prelude baked in by pe_main.js at
+  // inject time. Defaults match the historical fiveicondock behavior so a
+  // standalone payload run with no config prelude still does the right
+  // thing (5 dock icons, 5 home cols, stock 6 rows).
+  const DOCK_ICONS = _sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 5);
+  const HOMESCREEN_TARGET_COLS = _sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 5);
+  const HOMESCREEN_TARGET_ROWS = _sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
   const ENABLE_UNSAFE_IVAR_WRITES = false;
   const ENABLE_METHOD_ENUMERATION = false;
   const ENABLE_MODEL_GRID_SIZE_CHANGE = true;
   const ENABLE_LAYOUT_COLUMN_PATCH = true;
   const ENABLE_FORCE_RELAYOUT = false;
   const ENABLE_SECOND_PASS = false;
-  // Experimental: also bump the home screen grid to 5 columns to match the
-  // 5-icon dock. Uses the SBHIconManager -> listLayoutProvider path verified
-  // against the 18.6.2 SpringBoardHome class dump (-[SBHIconManager
-  // listLayoutProvider], -[SBHDefaultIconListLayoutProvider
+  // Home screen grid patch uses the SBHIconManager -> listLayoutProvider
+  // path verified against the 18.6.2 SpringBoardHome class dump
+  // (-[SBHIconManager listLayoutProvider], -[SBHDefaultIconListLayoutProvider
   // layoutForIconLocation:], -[SBIconListGridLayoutConfiguration
-  // setNumberOfPortraitColumns:]). The first attempt walked
-  // SBRootFolderController for a list view array that does not exist on
-  // 18.x and PAC-faulted; this rewrite targets the cached provider layout
-  // instead, which is what Atria hooks upstream.
+  // setNumberOfPortraitColumns:] / setNumberOfPortraitRows:).
   const ENABLE_HOMESCREEN_COL_PATCH = true;
-  const HOMESCREEN_TARGET_COLS = 5;
 
   class Native {
     static #baseAddr;
@@ -428,64 +437,72 @@
     return true;
   }
 
-  function patchHomescreenCols(iconCtrl, targetCols) {
-    if (!isNonZero(iconCtrl)) { log("patchHomescreenCols: nil iconCtrl"); return 0; }
-    log("patchHomescreenCols: entry, target=" + targetCols);
+  function patchHomescreenGrid(iconCtrl, targetCols, targetRows) {
+    if (!isNonZero(iconCtrl)) { log("patchHomescreenGrid: nil iconCtrl"); return 0; }
+    log("patchHomescreenGrid: entry, target=" + targetCols + "x" + targetRows);
 
     if (!canRespond(iconCtrl, "iconManager")) {
-      log("patchHomescreenCols: iconCtrl has no iconManager");
+      log("patchHomescreenGrid: iconCtrl has no iconManager");
       return 0;
     }
     const iconMgr = objc(iconCtrl, "iconManager");
-    log("patchHomescreenCols: iconMgr=0x" + u64(iconMgr).toString(16));
-    if (!isNonZero(iconMgr)) { log("patchHomescreenCols: nil iconMgr"); return 0; }
+    log("patchHomescreenGrid: iconMgr=0x" + u64(iconMgr).toString(16));
+    if (!isNonZero(iconMgr)) { log("patchHomescreenGrid: nil iconMgr"); return 0; }
 
     if (!canRespond(iconMgr, "listLayoutProvider")) {
-      log("patchHomescreenCols: iconMgr has no listLayoutProvider");
+      log("patchHomescreenGrid: iconMgr has no listLayoutProvider");
       return 0;
     }
     const provider = objc(iconMgr, "listLayoutProvider");
-    log("patchHomescreenCols: provider=0x" + u64(provider).toString(16));
-    if (!isNonZero(provider)) { log("patchHomescreenCols: nil provider"); return 0; }
+    log("patchHomescreenGrid: provider=0x" + u64(provider).toString(16));
+    if (!isNonZero(provider)) { log("patchHomescreenGrid: nil provider"); return 0; }
 
     if (!canRespond(provider, "layoutForIconLocation:")) {
-      log("patchHomescreenCols: provider has no layoutForIconLocation:");
+      log("patchHomescreenGrid: provider has no layoutForIconLocation:");
       return 0;
     }
 
     const loc = cfstr("SBIconLocationRoot");
-    log("patchHomescreenCols: loc=0x" + u64(loc).toString(16));
-    if (!isNonZero(loc)) { log("patchHomescreenCols: cfstr failed"); return 0; }
+    log("patchHomescreenGrid: loc=0x" + u64(loc).toString(16));
+    if (!isNonZero(loc)) { log("patchHomescreenGrid: cfstr failed"); return 0; }
 
     const layout = objc(provider, "layoutForIconLocation:", loc);
-    log("patchHomescreenCols: layout=0x" + u64(layout).toString(16));
-    if (!isNonZero(layout)) { log("patchHomescreenCols: nil layout for root"); return 0; }
+    log("patchHomescreenGrid: layout=0x" + u64(layout).toString(16));
+    if (!isNonZero(layout)) { log("patchHomescreenGrid: nil layout for root"); return 0; }
 
     if (!canRespond(layout, "layoutConfiguration")) {
-      log("patchHomescreenCols: layout has no layoutConfiguration");
+      log("patchHomescreenGrid: layout has no layoutConfiguration");
       return 0;
     }
     const cfg = objc(layout, "layoutConfiguration");
-    log("patchHomescreenCols: cfg=0x" + u64(cfg).toString(16));
-    if (!isNonZero(cfg)) { log("patchHomescreenCols: nil cfg"); return 0; }
+    log("patchHomescreenGrid: cfg=0x" + u64(cfg).toString(16));
+    if (!isNonZero(cfg)) { log("patchHomescreenGrid: nil cfg"); return 0; }
 
     if (!canRespond(cfg, "setNumberOfPortraitColumns:")) {
-      log("patchHomescreenCols: cfg has no setNumberOfPortraitColumns:");
+      log("patchHomescreenGrid: cfg has no setNumberOfPortraitColumns:");
       return 0;
     }
 
     const beforeCols = canRespond(cfg, "numberOfPortraitColumns") ? u64(objc(cfg, "numberOfPortraitColumns")) : 0n;
     const beforeRows = canRespond(cfg, "numberOfPortraitRows") ? u64(objc(cfg, "numberOfPortraitRows")) : 0n;
-    log("patchHomescreenCols: before cols=" + beforeCols.toString() + " rows=" + beforeRows.toString());
+    log("patchHomescreenGrid: before cols=" + beforeCols.toString() + " rows=" + beforeRows.toString());
 
     objc(cfg, "setNumberOfPortraitColumns:", BigInt(targetCols));
+    if (canRespond(cfg, "setNumberOfPortraitRows:")) {
+      objc(cfg, "setNumberOfPortraitRows:", BigInt(targetRows));
+    }
+    // Rotate: landscape columns = portrait rows, landscape rows = portrait columns.
+    if (canRespond(cfg, "setNumberOfLandscapeColumns:")) {
+      objc(cfg, "setNumberOfLandscapeColumns:", BigInt(targetRows));
+    }
     if (canRespond(cfg, "setNumberOfLandscapeRows:")) {
       objc(cfg, "setNumberOfLandscapeRows:", BigInt(targetCols));
     }
 
     const afterCols = canRespond(cfg, "numberOfPortraitColumns") ? u64(objc(cfg, "numberOfPortraitColumns")) : 0n;
-    log("patchHomescreenCols: after cols=" + afterCols.toString() + " (target=" + targetCols + ")");
-    return afterCols === BigInt(targetCols) ? 1 : 0;
+    const afterRows = canRespond(cfg, "numberOfPortraitRows") ? u64(objc(cfg, "numberOfPortraitRows")) : 0n;
+    log("patchHomescreenGrid: after cols=" + afterCols.toString() + " rows=" + afterRows.toString() + " (target=" + targetCols + "x" + targetRows + ")");
+    return (afterCols === BigInt(targetCols) && afterRows === BigInt(targetRows)) ? 1 : 0;
   }
 
   function forceRelayout(dockListView) {
@@ -558,10 +575,10 @@
 
     if (ENABLE_HOMESCREEN_COL_PATCH) {
       try {
-        const rootTouched = patchHomescreenCols(iconCtrl, HOMESCREEN_TARGET_COLS);
+        const rootTouched = patchHomescreenGrid(iconCtrl, HOMESCREEN_TARGET_COLS, HOMESCREEN_TARGET_ROWS);
         if (rootTouched > 0) touched++;
       } catch (hsErr) {
-        log("patchHomescreenCols threw: " + String(hsErr));
+        log("patchHomescreenGrid threw: " + String(hsErr));
       }
     }
 

@@ -24,8 +24,8 @@
     button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
     body {
-      font-family: 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
-      background: #0c0e14;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #0f1115;
       color: #d0d6e0;
       min-height: 100vh;
       line-height: 1.6;
@@ -51,42 +51,17 @@
     }
 
     .header-title {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       font-weight: 700;
       color: #e2e8f0;
       letter-spacing: -0.01em;
-      margin-bottom: 0.15rem;
-      display: flex;
-      align-items: baseline;
-      gap: 0;
-    }
-
-    .header-prefix {
-      color: #4c6ef5;
-      font-weight: 400;
-      opacity: 0.7;
-    }
-
-    .header-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 1.3em;
-      background: #4c6ef5;
-      margin-left: 3px;
-      vertical-align: text-bottom;
-      animation: blink 1s step-end infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
+      margin-bottom: 0.2rem;
     }
 
     .header-sub {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #7a8194;
       margin-bottom: 1.4rem;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      letter-spacing: 0.03em;
     }
 
     .nav {
@@ -97,10 +72,10 @@
     }
 
     .nav a {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       color: #7a8194;
       font-weight: 500;
-      padding: 0.25rem 0.6rem;
+      padding: 0.3rem 0.7rem;
       border-radius: 4px;
       transition: color 0.15s, background 0.15s;
     }
@@ -122,27 +97,14 @@
 
     .social-row a:hover { color: #e2e8f0; }
 
-    /* ---- Intro ---- */
-    .intro {
-      font-size: 0.85rem;
-      color: #7a8194;
-      margin-bottom: 2.5rem;
-      line-height: 1.7;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-
     /* ---- Sections ---- */
     .section { margin-bottom: 2.5rem; }
 
     .section-title {
-      font-size: 0.72rem;
+      font-size: 1.05rem;
       font-weight: 600;
-      color: #7a8194;
+      color: #e2e8f0;
       margin-bottom: 1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding-left: 0.75rem;
-      border-left: 2px solid #4c6ef5;
     }
 
     /* ---- Post lines (research & blog) ---- */
@@ -159,7 +121,7 @@
     .post-line:hover { background: #12151e; }
 
     .line-date {
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       color: #5c6370;
       flex-shrink: 0;
       width: 5.5rem;
@@ -167,9 +129,8 @@
     }
 
     .line-title {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #d0d6e0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       transition: color 0.15s;
     }
 
@@ -182,10 +143,9 @@
     }
 
     .line-tag {
-      font-size: 0.62rem;
-      padding: 0.05rem 0.4rem;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.45rem;
       border-radius: 3px;
-      font-family: 'SF Mono', 'Menlo', monospace;
       font-weight: 500;
       letter-spacing: 0.02em;
     }
@@ -456,7 +416,7 @@
   <div class="content">
 
     <div class="header">
-      <div class="header-title"><span class="header-prefix">0x</span>jf<span class="header-cursor"></span></div>
+      <div class="header-title">zeroxjf</div>
       <div class="header-sub">iOS Security Researcher</div>
 
       <nav class="nav">
@@ -477,11 +437,6 @@
           <svg height="15" width="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>
         </a>
       </div>
-    </div>
-
-    <div class="intro">
-      iOS security researcher focused on kernel vulnerability research, exploit development, and jailbreak tweak development.
-      This site serves as a personal archive of my research, writeups, and iOS tweaks.
     </div>
 
     <!-- Add Repo -->

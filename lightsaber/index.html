@@ -216,6 +216,23 @@
       margin-top: 10px;
       line-height: 1.6;
     }
+    .install-zone {
+      display: flex;
+      justify-content: center;
+      margin: 18px 0;
+    }
+    .install-status {
+      font-size: 13px;
+      color: var(--subtle);
+      text-align: center;
+      line-height: 1.4;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .install-status:not(:empty) {
+      margin: -6px auto 12px;
+    }
+    .install-status.error { color: #dc2626; }
     .tip {
       display: flex;
       align-items: flex-start;
@@ -224,7 +241,7 @@
       border: 1px solid var(--accent-border);
       border-radius: 10px;
       padding: 11px 13px;
-      margin-top: 12px;
+      margin-top: 0;
       font-size: 0.74rem;
       line-height: 1.55;
       color: var(--accent-dark);
@@ -1010,11 +1027,10 @@
 
       </div>
 
-      <div id="status" style="font-size:14px;color:#86868b;min-height:18px"></div>
-      <div style="text-align:center;margin-top:12px">
+      <div class="install-zone">
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install Selected</button>
       </div>
-      <div id="installStatus" style="font-size:13px;color:#86868b;min-height:16px;margin-top:10px;text-align:center;line-height:1.4"></div>
+      <div id="installStatus" class="install-status"></div>
       <div class="tip">
         <div class="tip-icon">i</div>
         <div class="tip-body">
@@ -1050,7 +1066,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.80</p>
+    <p class="version">v0.0.81</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1456,10 +1472,12 @@
       doneSignal = true;
       // stopSyslogPolling();
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
-      var statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = '';
       var installStatusEl = document.getElementById('installStatus');
-      if (installStatusEl) installStatusEl.textContent = '';
+      if (installStatusEl) {
+        installStatusEl.textContent = '';
+        installStatusEl.classList.remove('error');
+        installStatusEl.dataset.sbxDone = '';
+      }
       var btn = document.getElementById('runBtn');
       if (btn) {
         btn.textContent = 'Installed';
@@ -1493,15 +1511,18 @@
     function confirmInstall() {
       if (!canRun) return;
       var sel = gatherSelection();
-      var statusEl = document.getElementById('status');
+      var statusEl = document.getElementById('installStatus');
       if (sel.tweaks.length === 0) {
         if (statusEl) {
-          statusEl.style.color = '#dc2626';
+          statusEl.classList.add('error');
           statusEl.textContent = 'Select at least one tweak to install.';
         }
         return;
       }
-      if (statusEl) { statusEl.style.color = ''; statusEl.textContent = ''; }
+      if (statusEl) {
+        statusEl.classList.remove('error');
+        statusEl.textContent = '';
+      }
       // If a previous chain run left ls_running set, Safari is in a dirty
       // state and the user has to force-quit it before anything else will
       // work. Skip the "Are you sure?" confirm in that case and go straight
@@ -1543,10 +1564,13 @@
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
       sbc = sbc || { dock_icons: 4, hs_cols: 4, hs_rows: 6, hide_labels: 0 };
-      var statusEl = document.getElementById('status');
+      var installStatusEl = document.getElementById('installStatus');
       try {
         if (sessionStorage.getItem('ls_running')) {
-          if (statusEl) { statusEl.style.color = ''; statusEl.textContent = ''; }
+          if (installStatusEl) {
+            installStatusEl.classList.remove('error');
+            installStatusEl.textContent = '';
+          }
           showKillSafari();
           return;
         }
@@ -1557,9 +1581,8 @@
         btn.className = 'btn btn-disabled';
         btn.textContent = 'Installing (' + tweaks.join(' + ') + ')...';
       }
-      if (statusEl) statusEl.textContent = '';
-      var installStatusEl = document.getElementById('installStatus');
       if (installStatusEl) {
+        installStatusEl.classList.remove('error');
         installStatusEl.dataset.sbxDone = '';
         installStatusEl.textContent = '';
       }

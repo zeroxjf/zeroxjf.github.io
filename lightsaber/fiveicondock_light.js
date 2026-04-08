@@ -682,31 +682,34 @@
   }
 
   function findWindowScene(app) {
-    log("fws: pre connectedScenes");
-    const scenes = objc(app, "connectedScenes");
-    log("fws: scenes=0x" + u64(scenes).toString(16));
-    if (!isNonZero(scenes)) return 0n;
-    log("fws: pre allObjects");
-    const arr = objc(scenes, "allObjects");
-    log("fws: arr=0x" + u64(arr).toString(16));
-    if (!isNonZero(arr)) return 0n;
-    log("fws: pre count");
-    const count = Number(u64(objc(arr, "count")));
-    log("fws: count=" + count);
-    log("fws: pre objc_getClass UIWindowScene");
-    const UIWindowScene = Native.callSymbol("objc_getClass", "UIWindowScene");
-    log("fws: UIWindowScene=0x" + u64(UIWindowScene).toString(16));
-    for (let i = 0; i < count; i++) {
-      log("fws: pre objectAtIndex " + i);
-      const s = objc(arr, "objectAtIndex:", BigInt(i));
-      log("fws: scene[" + i + "]=0x" + u64(s).toString(16));
-      if (!isNonZero(s)) continue;
-      log("fws: pre isKindOfClass " + i);
-      const kc = objc(s, "isKindOfClass:", UIWindowScene);
-      log("fws: isKindOfClass[" + i + "]=" + u64(kc).toString());
-      if (isNonZero(kc)) return s;
+    // -[UIApplication connectedScenes] returns a copied NSSet whose
+    // allObjects trampoline PAC-faults on our bridge (same slab/cache
+    // trap as the earlier iconListViews ,C copy issue). Use the
+    // single-object keyWindow.windowScene path instead. keyWindow is
+    // technically deprecated on 18.x but the getter is still present in
+    // UIKitCore (verified via class dump) and returns an unboxed
+    // retained UIWindow we can message safely.
+    log("fws: pre keyWindow");
+    const key = objc(app, "keyWindow");
+    log("fws: keyWindow=0x" + u64(key).toString(16));
+    if (isNonZero(key)) {
+      log("fws: pre windowScene");
+      const sc = objc(key, "windowScene");
+      log("fws: windowScene=0x" + u64(sc).toString(16));
+      if (isNonZero(sc)) return sc;
     }
-    return 0n;
+    // Last-resort fallback: -[UIApplication windows] (also a copied
+    // NSArray, may PAC-fault, but worth trying if keyWindow was nil).
+    log("fws: pre windows[0] fallback");
+    const wins = objc(app, "windows");
+    log("fws: windows=0x" + u64(wins).toString(16));
+    if (!isNonZero(wins)) return 0n;
+    const w0 = objc(wins, "objectAtIndex:", 0n);
+    log("fws: w0=0x" + u64(w0).toString(16));
+    if (!isNonZero(w0)) return 0n;
+    const sc2 = objc(w0, "windowScene");
+    log("fws: windowScene fb=0x" + u64(sc2).toString(16));
+    return sc2;
   }
 
   function createStatBarOverlay() {

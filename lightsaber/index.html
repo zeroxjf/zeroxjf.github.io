@@ -572,50 +572,6 @@
       margin-top: 6px;
       line-height: 1.5;
     }
-    .atria-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 12px;
-      margin-top: 4px;
-    }
-    .atria-grid-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .atria-grid-field label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #6e6e73;
-      letter-spacing: 0.02em;
-    }
-    .atria-grid-field input[type="number"] {
-      width: 100%;
-      padding: 9px 10px;
-      border: 1px solid #d2d2d7;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 14px;
-      background: #fff;
-      color: #1d1d1f;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .atria-grid-field input[type="number"]::-webkit-inner-spin-button,
-    .atria-grid-field input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .atria-grid-group {
-      grid-column: 1 / -1;
-      font-size: 11px;
-      font-weight: 600;
-      color: #6e6e73;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-    .atria-grid-group:first-child { margin-top: 0; }
     .tweak-row-notes {
       font-size: 11px;
       color: #86868b;
@@ -664,50 +620,6 @@
             <div class="tweak-row-notes">
               <strong>Persistence:</strong> lives only inside SpringBoard, so it clears on respring/reboot. After install, try dragging a 5th icon into your dock.
             </div>
-          </div>
-        </div>
-
-        <div class="tweak-row experimental" id="tweakRowAtria">
-          <div class="tweak-row-head">
-            <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailAtria">
-              <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
-              <span class="tweak-row-name">Atria (Light) &mdash; grid resize <span class="tweak-row-badge">WIP &mdash; avoid</span></span>
-            </button>
-            <label class="tweak-toggle" aria-label="Enable Atria">
-              <input type="checkbox" id="tweakAtria">
-              <span class="tweak-toggle-track" aria-hidden="true"></span>
-            </label>
-          </div>
-          <div class="tweak-row-detail" id="tweakDetailAtria" hidden>
-            <div class="tweak-row-desc">Resizes the homescreen and dock grid. Minimal one-shot port of <a href="https://github.com/ren7995/Atria">ren7995's Atria</a> &mdash; grid resize only, no insets / scale / per-page settings.</div>
-            <div class="tweak-row-notes">
-              <strong>In progress &mdash; unstable, avoid unless you're testing.</strong> Layout provider walk may miss the right selector on 18.4/18.6.x and silently no-op, or partially apply and look correct until you flip pages. Can SpringBoard-crash on some device models.<br>
-              <strong>Mutually exclusive with FiveIconDock.</strong> Both own the dock grid; picking Atria will uncheck FiveIconDock automatically.<br>
-              <strong>Persistence:</strong> in-memory only, clears on respring/reboot.
-            </div>
-          </div>
-          <div class="tweak-row-options">
-            <div class="atria-grid">
-              <div class="atria-grid-group">Home screen</div>
-              <div class="atria-grid-field">
-                <label for="atriaHsCols">Columns (3-8)</label>
-                <input type="number" id="atriaHsCols" min="3" max="8" step="1" value="5" inputmode="numeric">
-              </div>
-              <div class="atria-grid-field">
-                <label for="atriaHsRows">Rows (4-10)</label>
-                <input type="number" id="atriaHsRows" min="4" max="10" step="1" value="7" inputmode="numeric">
-              </div>
-              <div class="atria-grid-group">Dock</div>
-              <div class="atria-grid-field">
-                <label for="atriaDockCols">Columns (2-8)</label>
-                <input type="number" id="atriaDockCols" min="2" max="8" step="1" value="5" inputmode="numeric">
-              </div>
-              <div class="atria-grid-field">
-                <label for="atriaDockRows">Rows (1-3)</label>
-                <input type="number" id="atriaDockRows" min="1" max="3" step="1" value="1" inputmode="numeric">
-              </div>
-            </div>
-            <div class="tweak-row-opt-help">Going above the supported Apple range may cause icons to visually clip or disappear until respring.</div>
           </div>
         </div>
 
@@ -781,7 +693,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.29</p>
+    <p class="version">v0.0.30</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -995,16 +907,8 @@
     // slide into view when the toggle is on.
     var tweakRows = [
       { rowId: 'tweakRowFiveicon', cbId: 'tweakFiveicon', name: 'fiveicon' },
-      { rowId: 'tweakRowAtria', cbId: 'tweakAtria', name: 'atria' },
       { rowId: 'tweakRowPowercuff', cbId: 'tweakPowercuff', name: 'powercuff' }
     ];
-    // Atria and FiveIconDock both mutate SpringBoard's dock grid state;
-    // enabling one forcibly disables the other so the prelude / injector
-    // layers downstream never see a conflicting combo.
-    var tweakMutualExclusions = {
-      atria: ['fiveicon'],
-      fiveicon: ['atria']
-    };
     function syncTweakRow(row) {
       var el = document.getElementById(row.rowId);
       var cb = document.getElementById(row.cbId);
@@ -1024,36 +928,11 @@
       var title = el.querySelector('.tweak-row-title');
       if (title) title.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     }
-    function enforceTweakExclusions(changedName) {
-      var conflicts = tweakMutualExclusions[changedName];
-      if (!conflicts) return;
-      var changedRow = null;
-      for (var k = 0; k < tweakRows.length; k++) {
-        if (tweakRows[k].name === changedName) { changedRow = tweakRows[k]; break; }
-      }
-      if (!changedRow) return;
-      var changedCb = document.getElementById(changedRow.cbId);
-      if (!changedCb || !changedCb.checked) return;
-      for (var c = 0; c < conflicts.length; c++) {
-        var otherName = conflicts[c];
-        for (var j = 0; j < tweakRows.length; j++) {
-          if (tweakRows[j].name !== otherName) continue;
-          var otherCb = document.getElementById(tweakRows[j].cbId);
-          if (otherCb && otherCb.checked) {
-            otherCb.checked = false;
-            syncTweakRow(tweakRows[j]);
-          }
-        }
-      }
-    }
     for (var ti = 0; ti < tweakRows.length; ti++) {
       (function(row) {
         var cb = document.getElementById(row.cbId);
         if (cb) {
-          cb.addEventListener('change', function() {
-            enforceTweakExclusions(row.name);
-            syncTweakRow(row);
-          });
+          cb.addEventListener('change', function() { syncTweakRow(row); });
           syncTweakRow(row);
         }
         var el = document.getElementById(row.rowId);
@@ -1074,22 +953,6 @@
       pcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
       pcOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
     }
-    var atriaOptionsWrap = document.querySelector('#tweakRowAtria .tweak-row-options');
-    if (atriaOptionsWrap) {
-      atriaOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
-      atriaOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
-      atriaOptionsWrap.addEventListener('input', function(e) { e.stopPropagation(); });
-    }
-    function atriaClampInput(id, lo, hi, def) {
-      var el = document.getElementById(id);
-      if (!el) return def;
-      var n = parseInt(el.value, 10);
-      if (!isFinite(n)) n = def;
-      if (n < lo) n = lo;
-      if (n > hi) n = hi;
-      el.value = String(n);
-      return n;
-    }
 
     window.scrollTo(0, 0);
 
@@ -1101,13 +964,7 @@
       }
       var levelSel = document.getElementById('powercuffLevel');
       var level = levelSel ? levelSel.value : 'heavy';
-      var atria = {
-        hs_cols: atriaClampInput('atriaHsCols', 3, 8, 5),
-        hs_rows: atriaClampInput('atriaHsRows', 4, 10, 7),
-        dock_cols: atriaClampInput('atriaDockCols', 2, 8, 5),
-        dock_rows: atriaClampInput('atriaDockRows', 1, 3, 1)
-      };
-      return { tweaks: tweaks, level: level, atria: atria };
+      return { tweaks: tweaks, level: level };
     }
 
     function markDone() {
@@ -1162,7 +1019,7 @@
     function proceedInstall() {
       document.getElementById('confirmOverlay').className = 'overlay';
       var sel = gatherSelection();
-      runExploit(sel.tweaks, sel.level, sel.atria);
+      runExploit(sel.tweaks, sel.level);
     }
 
     function showKillSafari() {
@@ -1178,11 +1035,10 @@
       document.getElementById('killSafariOverlay').className = 'overlay';
     }
 
-    function runExploit(tweaks, level, atria) {
+    function runExploit(tweaks, level) {
       if (!canRun) return;
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
-      atria = atria || { hs_cols: 5, hs_rows: 7, dock_cols: 5, dock_rows: 1 };
       var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {
@@ -1220,12 +1076,8 @@
       // URLSearchParams parser handles either form, but a literal comma is
       // also more readable in logs and proxies.
       var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
-      var atriaParams = '&hs_cols=' + encodeURIComponent(atria.hs_cols)
-        + '&hs_rows=' + encodeURIComponent(atria.hs_rows)
-        + '&dock_cols=' + encodeURIComponent(atria.dock_cols)
-        + '&dock_rows=' + encodeURIComponent(atria.dock_rows);
       var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + atriaParams + '&_=' + Math.random();
+      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + '&_=' + Math.random();
       frame.style.width = '1px';
       frame.style.height = '1px';
       frame.style.opacity = '0.01';

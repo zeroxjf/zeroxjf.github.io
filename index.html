@@ -25,16 +25,14 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-      background: #0f1115;
-      color: #d0d6e0;
+      background: #ffffff;
+      color: #1f2328;
       min-height: 100vh;
       line-height: 1.6;
     }
 
-    a { color: #6b8aed; text-decoration: none; transition: color 0.15s; }
-    a:hover { color: #93aaf5; }
-
-    ::selection { background: #4c6ef533; }
+    a { color: #0969da; text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
     /* ---- Layout ---- */
     .content {
@@ -45,43 +43,23 @@
 
     /* ---- Header ---- */
     .header {
-      padding: 3.5rem 0 1.5rem;
-      border-bottom: 1px solid #1a1f2b;
+      padding: 3rem 0 1.25rem;
+      border-bottom: 1px solid #d0d7de;
       margin-bottom: 2rem;
     }
 
     .header-title {
-      font-size: 1.7rem;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: #e2e8f0;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.2rem;
+      color: #1f2328;
+      margin-bottom: 0.25rem;
     }
 
     .header-sub {
-      font-size: 0.85rem;
-      color: #7a8194;
-      margin-bottom: 1.4rem;
+      font-size: 0.9rem;
+      color: #656d76;
+      margin-bottom: 1.25rem;
     }
-
-    .nav {
-      display: flex;
-      gap: 0.3rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.2rem;
-    }
-
-    .nav a {
-      font-size: 0.85rem;
-      color: #7a8194;
-      font-weight: 500;
-      padding: 0.3rem 0.7rem;
-      border-radius: 4px;
-      transition: color 0.15s, background 0.15s;
-    }
-
-    .nav a:hover { color: #f0f3f7; background: #1a1f2b; }
-    .nav a.active { color: #f0f3f7; background: #1a1f2b; }
 
     .social-row {
       display: flex;
@@ -90,21 +68,22 @@
     }
 
     .social-row a {
-      color: #5c6370;
+      color: #656d76;
       display: inline-flex;
-      transition: color 0.15s;
     }
 
-    .social-row a:hover { color: #e2e8f0; }
+    .social-row a:hover { color: #1f2328; }
 
     /* ---- Sections ---- */
     .section { margin-bottom: 2.5rem; }
 
     .section-title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 600;
-      color: #e2e8f0;
-      margin-bottom: 1rem;
+      color: #1f2328;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #eaeef2;
     }
 
     /* ---- Post lines (research & blog) ---- */
@@ -112,60 +91,52 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.45rem 0.5rem;
+      padding: 0.5rem 0.5rem;
       margin: 0 -0.5rem;
       border-radius: 4px;
-      transition: background 0.15s;
+      color: #1f2328;
     }
 
-    .post-line:hover { background: #12151e; }
+    .post-line:hover { background: #f6f8fa; text-decoration: none; }
 
     .line-date {
-      font-size: 0.78rem;
-      color: #5c6370;
+      font-size: 0.8rem;
+      color: #656d76;
       flex-shrink: 0;
       width: 5.5rem;
       font-variant-numeric: tabular-nums;
     }
 
     .line-title {
-      font-size: 0.9rem;
-      color: #d0d6e0;
+      font-size: 0.92rem;
+      color: #1f2328;
       flex: 1;
       min-width: 0;
-      transition: color 0.15s;
     }
 
-    .post-line:hover .line-title { color: #e2e8f0; }
+    .post-line:hover .line-title { color: #0969da; }
 
     .line-tags {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
       flex-shrink: 0;
       justify-content: flex-end;
     }
 
     .line-tag {
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       padding: 0.1rem 0.45rem;
-      border-radius: 3px;
+      border-radius: 10px;
       font-weight: 500;
-      letter-spacing: 0.02em;
       white-space: nowrap;
+      background: #f6f8fa;
+      color: #656d76;
+      border: 1px solid #d0d7de;
     }
 
-    .line-tag.kernel { background: #da363433; color: #f85149; border: 1px solid #da364322; }
-    .line-tag.sep { background: #da363433; color: #f85149; border: 1px solid #da364322; }
-    .line-tag.uaf { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
-    .line-tag.dos { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
-    .line-tag.race { background: #d2992233; color: #e3b341; border: 1px solid #d2992222; }
-    .line-tag.cve { background: #23882433; color: #3fb950; border: 1px solid #23882422; }
-    .line-tag.webkit { background: #8957e533; color: #a371f7; border: 1px solid #8957e522; }
-    .line-tag.sop { background: #8957e533; color: #a371f7; border: 1px solid #8957e522; }
-
     .line-stars {
-      font-size: 0.72rem;
-      color: #5c6370;
+      font-size: 0.78rem;
+      color: #656d76;
       flex-shrink: 0;
       width: 2.75rem;
       text-align: right;
@@ -184,72 +155,58 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.35rem 0.7rem;
-      background: #111420;
-      border: 1px solid #1a1f2b;
-      border-radius: 4px;
-      color: #7a8194;
+      padding: 0.4rem 0.8rem;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      color: #1f2328;
       text-decoration: none;
-      font-size: 0.75rem;
-      transition: border-color 0.15s, color 0.15s;
+      font-size: 0.82rem;
+      font-weight: 500;
     }
 
-    .manager-btn:hover { border-color: #2a3040; color: #b0b8c8; }
-    .manager-btn img { height: 14px; width: 14px; opacity: 0.7; }
+    .manager-btn:hover { background: #eaeef2; text-decoration: none; }
+    .manager-btn img { height: 14px; width: 14px; }
 
     /* ---- Tweak list ---- */
     .tweak-line {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.5rem 0.5rem;
+      padding: 0.55rem 0.5rem;
       margin: 0 -0.5rem;
       border-radius: 4px;
       cursor: pointer;
-      transition: background 0.15s;
     }
 
-    .tweak-line:hover { background: #12151e; }
-
-    .tweak-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .tweak-line:hover { background: #f6f8fa; }
 
     .tweak-info { flex: 1; min-width: 0; }
 
     .tweak-name {
-      font-size: 0.85rem;
-      color: #d0d6e0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.92rem;
+      color: #1f2328;
       font-weight: 600;
-      transition: color 0.15s;
     }
 
-    .tweak-line:hover .tweak-name { color: #e2e8f0; }
+    .tweak-line:hover .tweak-name { color: #0969da; }
 
     .tweak-desc {
-      font-size: 0.75rem;
-      color: #5c6370;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.8rem;
+      color: #656d76;
     }
 
     .tweak-ver {
-      font-size: 0.68rem;
-      color: #5c6370;
+      font-size: 0.75rem;
+      color: #656d76;
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
 
     .tweak-arrow {
-      font-size: 0.85rem;
-      color: #2a3040;
-      transition: color 0.15s;
+      font-size: 0.9rem;
+      color: #afb8c1;
     }
-
-    .tweak-line:hover .tweak-arrow { color: #6b8aed; }
 
     /* ---- Detail view ---- */
     .detail-view { display: none; }
@@ -259,8 +216,8 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      color: #6b8aed;
-      font-size: 0.8rem;
+      color: #0969da;
+      font-size: 0.85rem;
       cursor: pointer;
       background: none;
       border: none;
@@ -269,7 +226,7 @@
       font-family: inherit;
     }
 
-    .detail-back:hover { color: #93aaf5; }
+    .detail-back:hover { text-decoration: underline; }
 
     .detail-header {
       display: flex;
@@ -278,22 +235,22 @@
       margin-bottom: 0.5rem;
     }
 
-    .detail-title { font-size: 1.2rem; font-weight: 700; color: #e2e8f0; }
+    .detail-title { font-size: 1.3rem; font-weight: 700; color: #1f2328; }
 
     .detail-version {
-      font-size: 0.7rem;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      background: #111420;
-      color: #7a8194;
-      border: 1px solid #1a1f2b;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      background: #f6f8fa;
+      color: #656d76;
+      border: 1px solid #d0d7de;
     }
 
-    .detail-desc { font-size: 0.82rem; color: #3d4350; margin-bottom: 1.5rem; }
+    .detail-desc { font-size: 0.88rem; color: #656d76; margin-bottom: 1.5rem; }
 
     .detail-depiction {
-      background: #111420;
-      border: 1px solid #1a1f2b;
+      background: #ffffff;
+      border: 1px solid #d0d7de;
       border-radius: 6px;
       padding: 1.25rem;
     }
@@ -302,115 +259,112 @@
     .dep-tabs {
       display: flex;
       margin-bottom: 1rem;
-      border-bottom: 1px solid #1a1f2b;
+      border-bottom: 1px solid #d0d7de;
     }
 
     .dep-tab {
       padding: 0.5rem 1rem;
-      font-size: 0.78rem;
+      font-size: 0.85rem;
       font-weight: 500;
-      color: #5c6370;
+      color: #656d76;
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
       background: none;
       border-top: none;
       border-left: none;
       border-right: none;
       font-family: inherit;
+      margin-bottom: -1px;
     }
 
-    .dep-tab:hover { color: #b0b8c8; }
-    .dep-tab.active { color: #6b8aed; border-bottom-color: #4c6ef5; }
+    .dep-tab:hover { color: #1f2328; }
+    .dep-tab.active { color: #1f2328; border-bottom-color: #0969da; }
 
     .dep-tab-content { display: none; }
     .dep-tab-content.active { display: block; }
 
     .dep-header {
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #7a8194;
+      letter-spacing: 0.04em;
+      color: #656d76;
       margin: 1.25rem 0 0.5rem;
     }
 
     .dep-header:first-child { margin-top: 0; }
 
     .dep-markdown {
-      font-size: 0.84rem;
+      font-size: 0.9rem;
       line-height: 1.7;
-      color: #d0d6e0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #1f2328;
     }
     .dep-markdown p { margin-bottom: 0.5rem; }
     .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { color: #e2e8f0; font-weight: 600; }
+    .dep-markdown strong { font-weight: 600; }
     .dep-markdown em { font-style: italic; }
     .dep-markdown ul, .dep-markdown ol { margin: 0.3rem 0 0.5rem 1.25rem; }
     .dep-markdown li { margin-bottom: 0.25rem; }
 
     .dep-markdown code {
       font-family: 'SF Mono', 'Menlo', monospace;
-      font-size: 0.78rem;
-      background: #0c0e14;
+      font-size: 0.82rem;
+      background: #f6f8fa;
       padding: 0.12rem 0.32rem;
       border-radius: 4px;
-      color: #d0d6e0;
-      border: 1px solid #1a1f2b;
+      color: #1f2328;
     }
 
     .dep-markdown pre {
-      background: #0c0e14;
-      border: 1px solid #1a1f2b;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
       border-radius: 6px;
       padding: 0.75rem 1rem;
       overflow-x: auto;
       margin: 0.5rem 0;
     }
 
-    .dep-markdown pre code { background: none; padding: 0; font-size: 0.76rem; color: #525866; border: none; }
-    .dep-markdown a { color: #6b8aed; }
+    .dep-markdown pre code { background: none; padding: 0; font-size: 0.8rem; }
+    .dep-markdown a { color: #0969da; }
     .dep-markdown a:hover { text-decoration: underline; }
 
-    .dep-separator { border: none; border-top: 1px solid #1a1f2b; margin: 0.75rem 0; }
+    .dep-separator { border: none; border-top: 1px solid #eaeef2; margin: 0.75rem 0; }
 
     .dep-table-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.5rem 0;
-      font-size: 0.82rem;
-      border-bottom: 1px solid #111420;
+      padding: 0.55rem 0;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #eaeef2;
     }
 
-    .dep-table-title { color: #3d4350; }
-    .dep-table-value { color: #b0b8c8; font-weight: 500; }
+    .dep-table-title { color: #656d76; }
+    .dep-table-value { color: #1f2328; font-weight: 500; }
 
     .dep-button {
       display: inline-block;
       padding: 0.45rem 1rem;
       margin: 0.5rem 0;
-      border-radius: 4px;
-      font-size: 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
       font-weight: 500;
       text-decoration: none;
-      background: #1a1f2b;
-      color: #6b8aed;
-      border: 1px solid #2a3040;
-      transition: background 0.15s;
+      background: #f6f8fa;
+      color: #0969da;
+      border: 1px solid #d0d7de;
     }
 
-    .dep-button:hover { background: #2a3040; }
+    .dep-button:hover { background: #eaeef2; text-decoration: none; }
 
-    .dep-loading { text-align: center; padding: 2rem; color: #3d4350; font-size: 0.78rem; }
+    .dep-loading { text-align: center; padding: 2rem; color: #656d76; font-size: 0.85rem; }
 
     /* ---- Responsive ---- */
     @media (max-width: 500px) {
       .content { padding: 0 1rem 3rem; }
       .header { padding: 2rem 0 1.2rem; }
-      .header-title { font-size: 1.3rem; }
-      .line-date { width: 4.5rem; font-size: 0.65rem; }
+      .header-title { font-size: 1.4rem; }
+      .line-date { width: 4.5rem; font-size: 0.72rem; }
       .tweak-desc { display: none; }
       .line-tags { display: none; }
       .line-stars { display: none; }
@@ -423,13 +377,6 @@
     <div class="header">
       <div class="header-title">zeroxjf</div>
       <div class="header-sub">iOS Security Researcher</div>
-
-      <nav class="nav">
-        <a href="/" class="active">home</a>
-        <a href="#research">research</a>
-        <a href="#blog">blog</a>
-        <a href="#tweaks">tweaks</a>
-      </nav>
 
       <div class="social-row">
         <a href="https://github.com/zeroxjf" target="_blank" title="GitHub">
@@ -741,7 +688,6 @@
       const line = document.createElement('div');
       line.className = 'tweak-line';
       line.innerHTML = `
-        <span class="tweak-dot" style="background:${tweak.tint}"></span>
         <div class="tweak-info">
           <div class="tweak-name">${escapeHtml(tweak.name)}</div>
           <div class="tweak-desc">${escapeHtml(tweak.desc)}</div>

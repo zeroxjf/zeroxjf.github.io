@@ -45,10 +45,12 @@ try {
     globalThis.__ls_sbc_dock_icons = __sbcLsClamp(__lsParams3.get('dock_icons'), 4, 7, 5);
     globalThis.__ls_sbc_hs_cols = __sbcLsClamp(__lsParams3.get('hs_cols'), 3, 7, 5);
     globalThis.__ls_sbc_hs_rows = __sbcLsClamp(__lsParams3.get('hs_rows'), 4, 8, 6);
+    globalThis.__ls_sbc_statbar = (__lsParams3.get('statbar') === '1') ? 1 : 0;
 } catch (e) {
     globalThis.__ls_sbc_dock_icons = 5;
     globalThis.__ls_sbc_hs_cols = 5;
     globalThis.__ls_sbc_hs_rows = 6;
+    globalThis.__ls_sbc_statbar = 0;
 }
 var basePrefix = location.pathname.startsWith('/lightsaber/') ? '/lightsaber' : '';
 var localHost = location.origin + basePrefix;
@@ -250,7 +252,8 @@ let workerBlobUrl = URL.createObjectURL(workerBlob);
                 ls_powercuff_level: globalThis.__ls_powercuff_level || 'heavy',
                 ls_sbc_dock_icons: globalThis.__ls_sbc_dock_icons,
                 ls_sbc_hs_cols: globalThis.__ls_sbc_hs_cols,
-                ls_sbc_hs_rows: globalThis.__ls_sbc_hs_rows
+                ls_sbc_hs_rows: globalThis.__ls_sbc_hs_rows,
+                ls_sbc_statbar: globalThis.__ls_sbc_statbar
                 });
                 break;
             }

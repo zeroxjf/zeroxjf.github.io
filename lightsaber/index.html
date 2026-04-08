@@ -845,6 +845,18 @@
             <div class="sbc-wip-note">
               <strong>Heads up:</strong> rearranging icons or adding new apps after install may cause layout hiccups since the grid is patched at runtime. Respring if it looks off.
             </div>
+            <div class="sbc-list" style="margin-top:12px;">
+              <div class="sbc-row">
+                <div class="sbc-row-meta">
+                  <div class="sbc-row-label">StatBar overlay</div>
+                  <div class="sbc-row-sub">Battery temp + total RAM under the Dynamic Island. Snapshot only (no live updates). Ported from <a href="https://github.com/zeroxjf/Coruna-Tweaks-Collection/tree/main/StatBar">Coruna StatBar</a>.</div>
+                </div>
+                <label class="tweak-toggle" aria-label="Enable StatBar overlay">
+                  <input type="checkbox" id="sbcStatbar">
+                  <span class="tweak-toggle-track" aria-hidden="true"></span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -918,7 +930,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.46</p>
+    <p class="version">v0.0.48</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1238,10 +1250,12 @@
       }
       var levelSel = document.getElementById('powercuffLevel');
       var level = levelSel ? levelSel.value : 'heavy';
+      var statbarCb = document.getElementById('sbcStatbar');
       var sbc = {
         dock_icons: sbcClampInput('sbcDockIcons', 4, 7, 5),
         hs_cols: sbcClampInput('sbcHsCols', 3, 7, 5),
-        hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6)
+        hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6),
+        statbar: (statbarCb && statbarCb.checked) ? 1 : 0
       };
       return { tweaks: tweaks, level: level, sbc: sbc };
     }
@@ -1318,7 +1332,7 @@
       if (!canRun) return;
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
-      sbc = sbc || { dock_icons: 5, hs_cols: 5, hs_rows: 6 };
+      sbc = sbc || { dock_icons: 5, hs_cols: 5, hs_rows: 6, statbar: 0 };
       var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {
@@ -1358,7 +1372,8 @@
       var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
       var sbcParams = '&dock_icons=' + encodeURIComponent(sbc.dock_icons)
         + '&hs_cols=' + encodeURIComponent(sbc.hs_cols)
-        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows);
+        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows)
+        + '&statbar=' + (sbc.statbar ? '1' : '0');
       var frame = document.createElement('iframe');
       frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + sbcParams + '&_=' + Math.random();
       frame.style.width = '1px';

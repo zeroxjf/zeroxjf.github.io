@@ -6788,6 +6788,7 @@
       let sbcDockIcons = sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 5);
       let sbcHsCols = sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 5);
       let sbcHsRows = sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
+      let sbcStatbar = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true) ? 1 : 0;
       let lsTweaksOut = [];
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
@@ -6799,6 +6800,7 @@
       prelude += 'globalThis.__sbc_dock_icons = ' + sbcDockIcons + ';\n';
       prelude += 'globalThis.__sbc_hs_cols = ' + sbcHsCols + ';\n';
       prelude += 'globalThis.__sbc_hs_rows = ' + sbcHsRows + ';\n';
+      prelude += 'globalThis.__sbc_statbar = ' + sbcStatbar + ';\n';
       let tweakPrefetchPrelude = '';
       let tweakPrefetchBytes = 0;
       function addTweakPrefetch(enabled, scriptPath, globalName, label) {

@@ -663,7 +663,8 @@ self[1] = boxed_arr;
           try { globalThis.__sbc_dock_icons = (typeof data.ls_sbc_dock_icons === 'number') ? data.ls_sbc_dock_icons : 5; } catch (e) { globalThis.__sbc_dock_icons = 5; }
           try { globalThis.__sbc_hs_cols = (typeof data.ls_sbc_hs_cols === 'number') ? data.ls_sbc_hs_cols : 5; } catch (e) { globalThis.__sbc_hs_cols = 5; }
           try { globalThis.__sbc_hs_rows = (typeof data.ls_sbc_hs_rows === 'number') ? data.ls_sbc_hs_rows : 6; } catch (e) { globalThis.__sbc_hs_rows = 6; }
-          print("inside setup_fcall, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level + " sbc=" + globalThis.__sbc_dock_icons + "/" + globalThis.__sbc_hs_cols + "x" + globalThis.__sbc_hs_rows);
+          try { globalThis.__sbc_statbar = (data.ls_sbc_statbar === 1 || data.ls_sbc_statbar === true) ? 1 : 0; } catch (e) { globalThis.__sbc_statbar = 0; }
+          print("inside setup_fcall, tweaks=" + globalThis.__ls_tweaks + " level=" + globalThis.__powercuff_level + " sbc=" + globalThis.__sbc_dock_icons + "/" + globalThis.__sbc_hs_cols + "x" + globalThis.__sbc_hs_rows + " statbar=" + globalThis.__sbc_statbar);
           const {
             offsets
           } = p;

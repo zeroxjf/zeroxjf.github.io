@@ -26,6 +26,12 @@
   // layoutForIconLocation:], -[SBIconListGridLayoutConfiguration
   // setNumberOfPortraitColumns:] / setNumberOfPortraitRows:).
   const ENABLE_HOMESCREEN_COL_PATCH = true;
+  // StatBar: snapshot overlay window showing battery temp + total RAM.
+  // Ported from Coruna-Tweaks-Collection/StatBar/StatBar.m. Snapshot only
+  // (no NSTimer) because block-based timers need a real ObjC block we
+  // can't synthesize from JS, and -performSelector:...afterDelay: takes
+  // a double which our int-only bridge can't pass.
+  const ENABLE_STATBAR = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true);
 
   class Native {
     static #baseAddr;
@@ -590,6 +596,183 @@
     }
   }
 
+  // ---- StatBar port ----------------------------------------------------
+  //
+  // Bridge constraint: #nativeCallAddr only loads x0..x7; no FP regs. That
+  // kills any direct call taking CGRect/CGFloat (initWithFrame:, setFrame:,
+  // setWindowLevel:, systemFontOfSize:, colorWithWhite:alpha:, etc.). We
+  // route those through KVC: setValue:forKey: unboxes NSValue<CGRect> into
+  // the frame setter and NSNumber into the windowLevel setter internally,
+  // and both code paths take object pointers only.
+
+  function nsValueFromCGRect(x, y, w, h) {
+    const mem = Native.callSymbol("malloc", 32n);
+    const buf = new ArrayBuffer(32);
+    const dv = new DataView(buf);
+    dv.setFloat64(0, x, true);
+    dv.setFloat64(8, y, true);
+    dv.setFloat64(16, w, true);
+    dv.setFloat64(24, h, true);
+    Native.write(mem, buf);
+    const typeEnc = Native.callSymbol("malloc", 64n);
+    Native.writeString(typeEnc, "{CGRect={CGPoint=dd}{CGSize=dd}}");
+    const NSValue = Native.callSymbol("objc_getClass", "NSValue");
+    const v = objc(NSValue, "valueWithBytes:objCType:", mem, typeEnc);
+    Native.callSymbol("free", mem);
+    Native.callSymbol("free", typeEnc);
+    return v;
+  }
+
+  function nsNumberLL(val) {
+    const NSNumber = Native.callSymbol("objc_getClass", "NSNumber");
+    return objc(NSNumber, "numberWithLongLong:", BigInt(val));
+  }
+
+  function readScreenBounds() {
+    // Can't call -[UIScreen bounds] directly (returns CGRect in FP regs).
+    // Use KVC: valueForKey:@"bounds" returns NSValue<CGRect>, then
+    // getValue:size: copies 32 bytes into our scratch.
+    const UIScreen = Native.callSymbol("objc_getClass", "UIScreen");
+    const screen = objc(UIScreen, "mainScreen");
+    if (!isNonZero(screen)) return { w: 390, h: 844 };
+    const key = cfstr("bounds");
+    const v = objc(screen, "valueForKey:", key);
+    if (!isNonZero(v)) return { w: 390, h: 844 };
+    const scratch = Native.callSymbol("malloc", 32n);
+    objc(v, "getValue:size:", scratch, 32n);
+    const bytes = Native.read(scratch, 32);
+    Native.callSymbol("free", scratch);
+    const dv = new DataView(bytes);
+    return { w: dv.getFloat64(16, true), h: dv.getFloat64(24, true) };
+  }
+
+  function getBatteryTempC() {
+    const dict = Native.callSymbol("IOServiceMatching", "AppleSmartBattery");
+    if (!isNonZero(dict)) { log("statbar: IOServiceMatching failed"); return null; }
+    // IOServiceGetMatchingService consumes the dict ref, no CFRelease.
+    const svc = Native.callSymbol("IOServiceGetMatchingService", 0n, dict);
+    if (!isNonZero(svc)) { log("statbar: no AppleSmartBattery service"); return null; }
+    const key = cfstr("Temperature");
+    const prop = Native.callSymbol("IORegistryEntryCreateCFProperty", svc, key, 0n, 0n);
+    let result = null;
+    if (isNonZero(prop)) {
+      const scratch = Native.callSymbol("malloc", 8n);
+      writeU64(scratch, 0);
+      // kCFNumberSInt64Type = 4
+      Native.callSymbol("CFNumberGetValue", prop, 4n, scratch);
+      const raw = Native.readPtr(scratch);
+      Native.callSymbol("free", scratch);
+      Native.callSymbol("CFRelease", prop);
+      // Centidegrees Celsius -> degrees C.
+      result = Number(BigInt.asIntN(64, raw)) / 100.0;
+    } else {
+      log("statbar: no Temperature property");
+    }
+    Native.callSymbol("IOObjectRelease", svc);
+    return result;
+  }
+
+  function getPhysMemMB() {
+    const NSProcessInfo = Native.callSymbol("objc_getClass", "NSProcessInfo");
+    if (!isNonZero(NSProcessInfo)) return 0;
+    const pi = objc(NSProcessInfo, "processInfo");
+    if (!isNonZero(pi)) return 0;
+    const bytes = u64(objc(pi, "physicalMemory"));
+    return Number(bytes / (1024n * 1024n));
+  }
+
+  function findWindowScene(app) {
+    const scenes = objc(app, "connectedScenes");
+    if (!isNonZero(scenes)) return 0n;
+    const arr = objc(scenes, "allObjects");
+    if (!isNonZero(arr)) return 0n;
+    const count = Number(u64(objc(arr, "count")));
+    const UIWindowScene = Native.callSymbol("objc_getClass", "UIWindowScene");
+    for (let i = 0; i < count; i++) {
+      const s = objc(arr, "objectAtIndex:", BigInt(i));
+      if (!isNonZero(s)) continue;
+      if (isNonZero(objc(s, "isKindOfClass:", UIWindowScene))) return s;
+    }
+    return 0n;
+  }
+
+  function createStatBarOverlay() {
+    log("statbar: entry");
+    const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
+    if (!isNonZero(UIApplication)) { log("statbar: no UIApplication class"); return false; }
+    const app = objc(UIApplication, "sharedApplication");
+    if (!isNonZero(app)) { log("statbar: no sharedApplication"); return false; }
+
+    const scene = findWindowScene(app);
+    if (!isNonZero(scene)) { log("statbar: no UIWindowScene"); return false; }
+    log("statbar: scene=0x" + u64(scene).toString(16));
+
+    const bounds = readScreenBounds();
+    const screenW = bounds.w;
+    log("statbar: screenW=" + screenW);
+
+    const tempC = getBatteryTempC();
+    const ramMB = getPhysMemMB();
+    let text = "";
+    if (tempC !== null && tempC > 0) {
+      const rounded = Math.round(tempC * 10) / 10;
+      text += rounded.toFixed(1) + "C  ";
+    }
+    if (ramMB > 0) text += "RAM: " + ramMB + "MB";
+    if (!text) text = "statbar: no data";
+    log("statbar: text='" + text + "'");
+
+    // UIWindow
+    const UIWindow = Native.callSymbol("objc_getClass", "UIWindow");
+    const win = objc(objc(UIWindow, "alloc"), "initWithWindowScene:", scene);
+    if (!isNonZero(win)) { log("statbar: window init failed"); return false; }
+
+    const labelH = 16;
+    const labelY = 44; // rough safe-area inset; we can't reach safeAreaInsets (CGFloat returns).
+    const windowH = labelY + labelH + 4;
+
+    const winFrame = nsValueFromCGRect(0, 0, screenW, windowH);
+    objc(win, "setValue:forKey:", winFrame, cfstr("frame"));
+    objc(win, "setValue:forKey:", nsNumberLL(100001), cfstr("windowLevel"));
+
+    const UIColor = Native.callSymbol("objc_getClass", "UIColor");
+    const clearC = objc(UIColor, "clearColor");
+    const whiteC = objc(UIColor, "whiteColor");
+    const blackC = objc(UIColor, "blackColor");
+    objc(win, "setBackgroundColor:", clearC);
+    objc(win, "setUserInteractionEnabled:", 0n);
+    objc(win, "setOpaque:", 0n);
+
+    const UIViewController = Native.callSymbol("objc_getClass", "UIViewController");
+    const vc = objc(objc(UIViewController, "alloc"), "init");
+    if (!isNonZero(vc)) { log("statbar: vc init failed"); return false; }
+    const vcView = objc(vc, "view");
+    objc(vcView, "setBackgroundColor:", clearC);
+    objc(vcView, "setUserInteractionEnabled:", 0n);
+    objc(win, "setRootViewController:", vc);
+
+    const UILabel = Native.callSymbol("objc_getClass", "UILabel");
+    const label = objc(objc(UILabel, "alloc"), "init");
+    if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
+    const labelFrame = nsValueFromCGRect(0, labelY, screenW, labelH);
+    objc(label, "setValue:forKey:", labelFrame, cfstr("frame"));
+    objc(label, "setText:", cfstr(text));
+    objc(label, "setTextColor:", whiteC);
+    objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter
+    objc(label, "setBackgroundColor:", blackC);
+
+    objc(vcView, "addSubview:", label);
+    objc(win, "setHidden:", 0n);
+
+    // Retain via associated object on UIApplication so ARC doesn't drop it.
+    // Key just needs to be a stable unique pointer; reuse UIApplication class.
+    const keyPtr = UIApplication;
+    Native.callSymbol("objc_setAssociatedObject", app, keyPtr, win, 1n /* RETAIN_NONATOMIC */);
+
+    log("statbar: overlay visible");
+    return true;
+  }
+
   function applyDockPatch(passTag) {
     log("applyDockPatch(" + passTag + ") entered - running on main thread");
     const SBIconController = Native.callSymbol("objc_getClass", "SBIconController");
@@ -672,6 +855,11 @@
     globalThis.__fiveicon_jsctx_obj = bi.jsContextObj;
     globalThis.__fiveicon_apply_once = applyDockPatch;
     globalThis.__fiveicon_log = log;
+    globalThis.__fiveicon_statbar = function() {
+      if (!ENABLE_STATBAR) return;
+      try { createStatBarOverlay(); }
+      catch (e) { log("statbar err: " + String(e)); }
+    };
 
     log("loaded jsctx=0x" + u64(bi.jsctx).toString(16) + " jsContextObj=0x" + u64(bi.jsContextObj).toString(16));
 
@@ -694,7 +882,7 @@
     log("test SBIconController=0x" + u64(testSB).toString(16) + (testSB ? " (found)" : " (NOT FOUND - wrong process?)"));
 
     log("about to runOnMainEvaluate (performSelectorOnMainThread) - PAC violation happens here if PAC context is stale");
-    runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}");
+    runOnMainEvaluate("try{__fiveicon_log('main-thread dispatch alive');__fiveicon_apply_once('main-pass-1');}catch(e){__fiveicon_log('main-pass-1 err: '+e);}try{__fiveicon_statbar();}catch(e){__fiveicon_log('statbar dispatch err: '+e);}");
     log("runOnMainEvaluate returned (async dispatch, no crash on injected thread)");
 
     if (ENABLE_SECOND_PASS) {

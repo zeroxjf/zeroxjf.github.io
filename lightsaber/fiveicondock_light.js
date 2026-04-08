@@ -682,16 +682,29 @@
   }
 
   function findWindowScene(app) {
+    log("fws: pre connectedScenes");
     const scenes = objc(app, "connectedScenes");
+    log("fws: scenes=0x" + u64(scenes).toString(16));
     if (!isNonZero(scenes)) return 0n;
+    log("fws: pre allObjects");
     const arr = objc(scenes, "allObjects");
+    log("fws: arr=0x" + u64(arr).toString(16));
     if (!isNonZero(arr)) return 0n;
+    log("fws: pre count");
     const count = Number(u64(objc(arr, "count")));
+    log("fws: count=" + count);
+    log("fws: pre objc_getClass UIWindowScene");
     const UIWindowScene = Native.callSymbol("objc_getClass", "UIWindowScene");
+    log("fws: UIWindowScene=0x" + u64(UIWindowScene).toString(16));
     for (let i = 0; i < count; i++) {
+      log("fws: pre objectAtIndex " + i);
       const s = objc(arr, "objectAtIndex:", BigInt(i));
+      log("fws: scene[" + i + "]=0x" + u64(s).toString(16));
       if (!isNonZero(s)) continue;
-      if (isNonZero(objc(s, "isKindOfClass:", UIWindowScene))) return s;
+      log("fws: pre isKindOfClass " + i);
+      const kc = objc(s, "isKindOfClass:", UIWindowScene);
+      log("fws: isKindOfClass[" + i + "]=" + u64(kc).toString());
+      if (isNonZero(kc)) return s;
     }
     return 0n;
   }

@@ -623,6 +623,22 @@
     return v;
   }
 
+  function nsValueFromCGPoint(x, y) {
+    const mem = Native.callSymbol("malloc", 16n);
+    const buf = new ArrayBuffer(16);
+    const dv = new DataView(buf);
+    dv.setFloat64(0, x, true);
+    dv.setFloat64(8, y, true);
+    Native.write(mem, buf);
+    const typeEnc = Native.callSymbol("malloc", 32n);
+    Native.writeString(typeEnc, "{CGPoint=dd}");
+    const NSValue = Native.callSymbol("objc_getClass", "NSValue");
+    const v = objc(NSValue, "valueWithBytes:objCType:", mem, typeEnc);
+    Native.callSymbol("free", mem);
+    Native.callSymbol("free", typeEnc);
+    return v;
+  }
+
   function nsNumberLL(val) {
     const NSNumber = Native.callSymbol("objc_getClass", "NSNumber");
     return objc(NSNumber, "numberWithLongLong:", BigInt(val));
@@ -792,11 +808,35 @@
     log("statbar: label=0x" + u64(label).toString(16));
     if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
 
-    log("statbar: pre label frame KVC");
-    const labelFrame = nsValueFromCGRect(pillX, labelY, pillW, labelH);
-    log("statbar: labelFrame NSValue=0x" + u64(labelFrame).toString(16));
-    objc(label, "setValue:forKey:", labelFrame, nsStr("frame"));
-    log("statbar: post label frame KVC");
+    // UIView KVC for @"frame" PAC-faults on 18.6.2 - the generic
+    // setValue:forKey: path uses an NSInvocation-based struct setter
+    // whose signed IMP doesn't round-trip our bridge. Dodge by going
+    // through CALayer: label.layer.bounds + label.layer.position are
+    // CALayer-specific KVC keys handled by CALayer's own property
+    // resolver (not NSObject KVC), with dedicated setters that take
+    // the struct values straight from the NSValue bytes. UIView mirrors
+    // its layer geometry, so the label ends up with the same frame.
+    log("statbar: pre label layer");
+    const layer = objc(label, "layer");
+    log("statbar: layer=0x" + u64(layer).toString(16));
+    if (!isNonZero(layer)) { log("statbar: nil layer"); return false; }
+
+    log("statbar: pre layer bounds KVC");
+    const boundsVal = nsValueFromCGRect(0, 0, pillW, labelH);
+    objc(layer, "setValue:forKey:", boundsVal, nsStr("bounds"));
+    log("statbar: post layer bounds KVC");
+    log("statbar: pre layer position KVC");
+    const centerX = pillX + pillW / 2;
+    const centerY = labelY + labelH / 2;
+    const posVal = nsValueFromCGPoint(centerX, centerY);
+    objc(layer, "setValue:forKey:", posVal, nsStr("position"));
+    log("statbar: post layer position KVC");
+
+    log("statbar: pre layer cornerRadius KVC");
+    objc(layer, "setValue:forKey:", nsNumberLL(10), nsStr("cornerRadius"));
+    log("statbar: pre layer setMasksToBounds");
+    objc(layer, "setMasksToBounds:", 1n);
+
     log("statbar: pre setText");
     objc(label, "setText:", nsStr(text));
     log("statbar: pre setTextColor");
@@ -805,16 +845,6 @@
     objc(label, "setTextAlignment:", 1n);
     log("statbar: pre setBackgroundColor");
     objc(label, "setBackgroundColor:", blackC);
-
-    log("statbar: pre label layer");
-    const layer = objc(label, "layer");
-    log("statbar: layer=0x" + u64(layer).toString(16));
-    if (isNonZero(layer)) {
-      log("statbar: pre layer cornerRadius KVC");
-      objc(layer, "setValue:forKey:", nsNumberLL(10), nsStr("cornerRadius"));
-      log("statbar: pre layer setMasksToBounds");
-      objc(layer, "setMasksToBounds:", 1n);
-    }
 
     log("statbar: pre addSubview on hostView");
     objc(hostView, "addSubview:", label);

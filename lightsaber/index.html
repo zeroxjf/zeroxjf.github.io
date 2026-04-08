@@ -572,38 +572,86 @@
       margin-top: 6px;
       line-height: 1.5;
     }
-    .sbc-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px 12px;
-      margin-top: 4px;
-    }
-    .sbc-field { display: flex; flex-direction: column; gap: 4px; }
-    .sbc-field label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #6e6e73;
-      letter-spacing: 0.02em;
-    }
-    .sbc-field input[type="number"] {
-      width: 100%;
-      padding: 9px 10px;
-      border: 1px solid #d2d2d7;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 14px;
+    .sbc-list {
+      display: flex;
+      flex-direction: column;
+      margin-top: 2px;
       background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e5e5e7;
+      overflow: hidden;
+    }
+    .sbc-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-bottom: 1px solid #e5e5e7;
+      gap: 12px;
+    }
+    .sbc-row:last-child { border-bottom: none; }
+    .sbc-row-meta { min-width: 0; flex: 1; }
+    .sbc-row-label {
+      font-size: 14px;
       color: #1d1d1f;
-      -webkit-appearance: none;
-      appearance: none;
+      font-weight: 500;
+      line-height: 1.2;
     }
-    .sbc-field input[type="number"]::-webkit-inner-spin-button,
-    .sbc-field input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    .sbc-row-sub {
+      font-size: 11px;
+      color: #86868b;
+      margin-top: 2px;
+      letter-spacing: 0.01em;
     }
-    @media (max-width: 420px) {
-      .sbc-grid { grid-template-columns: 1fr 1fr; }
+    .sbc-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: #f2f2f7;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      min-height: 32px;
+    }
+    .sbc-stepper button {
+      background: none;
+      border: none;
+      width: 34px;
+      height: 32px;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1;
+      color: #007aff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+      font-family: inherit;
+      transition: background 0.12s;
+    }
+    .sbc-stepper button:hover { background: rgba(0,122,255,0.1); }
+    .sbc-stepper button:active { background: rgba(0,122,255,0.22); }
+    .sbc-stepper button:disabled {
+      color: #c7c7cc;
+      cursor: default;
+    }
+    .sbc-stepper button:disabled:hover,
+    .sbc-stepper button:disabled:active { background: none; }
+    .sbc-stepper .sbc-stepper-value {
+      min-width: 28px;
+      padding: 0 4px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1d1d1f;
+      font-variant-numeric: tabular-nums;
+      line-height: 32px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sbc-stepper .sbc-stepper-sep {
+      width: 1px;
+      height: 20px;
+      background: #d1d1d6;
+      flex-shrink: 0;
     }
     .tweak-row-notes {
       font-size: 11px;
@@ -656,21 +704,50 @@
             </div>
           </div>
           <div class="tweak-row-options">
-            <div class="sbc-grid">
-              <div class="sbc-field">
-                <label for="sbcDockIcons">Dock icons (4-7)</label>
-                <input type="number" id="sbcDockIcons" min="4" max="7" step="1" value="5" inputmode="numeric">
+            <div class="sbc-list">
+              <div class="sbc-row">
+                <div class="sbc-row-meta">
+                  <div class="sbc-row-label">Dock icons</div>
+                  <div class="sbc-row-sub">Stock 4 &middot; range 4&ndash;7</div>
+                </div>
+                <div class="sbc-stepper" data-target="sbcDockIcons" data-min="4" data-max="7">
+                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease dock icons">&#8722;</button>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <span class="sbc-stepper-value" id="sbcDockIconsVal">5</span>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <button type="button" class="sbc-stepper-plus" aria-label="Increase dock icons">+</button>
+                </div>
+                <input type="hidden" id="sbcDockIcons" value="5">
               </div>
-              <div class="sbc-field">
-                <label for="sbcHsCols">Home columns (3-7)</label>
-                <input type="number" id="sbcHsCols" min="3" max="7" step="1" value="5" inputmode="numeric">
+              <div class="sbc-row">
+                <div class="sbc-row-meta">
+                  <div class="sbc-row-label">Home columns</div>
+                  <div class="sbc-row-sub">Stock 4 &middot; range 3&ndash;7</div>
+                </div>
+                <div class="sbc-stepper" data-target="sbcHsCols" data-min="3" data-max="7">
+                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease home columns">&#8722;</button>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <span class="sbc-stepper-value" id="sbcHsColsVal">5</span>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <button type="button" class="sbc-stepper-plus" aria-label="Increase home columns">+</button>
+                </div>
+                <input type="hidden" id="sbcHsCols" value="5">
               </div>
-              <div class="sbc-field">
-                <label for="sbcHsRows">Home rows (4-8)</label>
-                <input type="number" id="sbcHsRows" min="4" max="8" step="1" value="6" inputmode="numeric">
+              <div class="sbc-row">
+                <div class="sbc-row-meta">
+                  <div class="sbc-row-label">Home rows</div>
+                  <div class="sbc-row-sub">Stock 6 &middot; range 4&ndash;8</div>
+                </div>
+                <div class="sbc-stepper" data-target="sbcHsRows" data-min="4" data-max="8">
+                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease home rows">&#8722;</button>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <span class="sbc-stepper-value" id="sbcHsRowsVal">6</span>
+                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
+                  <button type="button" class="sbc-stepper-plus" aria-label="Increase home rows">+</button>
+                </div>
+                <input type="hidden" id="sbcHsRows" value="6">
               </div>
             </div>
-            <div class="tweak-row-opt-help">Defaults 5 / 5 / 6 match the original FiveIconDock plus one extra column. Stock iPhone is 4 / 4 / 6.</div>
           </div>
         </div>
 
@@ -744,7 +821,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.33</p>
+    <p class="version">v0.0.34</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1007,9 +1084,41 @@
     var sbcOptionsWrap = document.querySelector('#tweakRowFiveicon .tweak-row-options');
     if (sbcOptionsWrap) {
       sbcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
-      sbcOptionsWrap.addEventListener('change', function(e) { e.stopPropagation(); });
-      sbcOptionsWrap.addEventListener('input', function(e) { e.stopPropagation(); });
     }
+    function sbcWireStepper(stepperEl) {
+      var targetId = stepperEl.getAttribute('data-target');
+      var min = parseInt(stepperEl.getAttribute('data-min'), 10);
+      var max = parseInt(stepperEl.getAttribute('data-max'), 10);
+      var hidden = document.getElementById(targetId);
+      var valueEl = document.getElementById(targetId + 'Val');
+      var minusBtn = stepperEl.querySelector('.sbc-stepper-minus');
+      var plusBtn = stepperEl.querySelector('.sbc-stepper-plus');
+      function refresh() {
+        var n = parseInt(hidden.value, 10);
+        if (!isFinite(n)) n = min;
+        if (n < min) n = min;
+        if (n > max) n = max;
+        hidden.value = String(n);
+        valueEl.textContent = String(n);
+        minusBtn.disabled = (n <= min);
+        plusBtn.disabled = (n >= max);
+      }
+      minusBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var n = parseInt(hidden.value, 10) || min;
+        if (n > min) { hidden.value = String(n - 1); refresh(); }
+      });
+      plusBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var n = parseInt(hidden.value, 10) || min;
+        if (n < max) { hidden.value = String(n + 1); refresh(); }
+      });
+      refresh();
+    }
+    var sbcSteppers = document.querySelectorAll('.sbc-stepper');
+    for (var si = 0; si < sbcSteppers.length; si++) sbcWireStepper(sbcSteppers[si]);
     function sbcClampInput(id, lo, hi, def) {
       var el = document.getElementById(id);
       if (!el) return def;

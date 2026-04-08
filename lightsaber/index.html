@@ -1050,7 +1050,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.78</p>
+    <p class="version">v0.0.79</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1468,16 +1468,18 @@
     }
 
     // Mirrors the sbx0 printf-via-sandbox-deny breadcrumb that fires right
-    // after SBX1 lands. rce_loader.js forwards every worker 'log' postMessage
-    // to this window as {type:'lightsaber_log', text}, so we just substring
-    // match the stage tag and update the install card.
+    // after SBX0 lands (the last log line that reliably makes it out before
+    // Safari freezes during PE / SpringBoard injection). rce_loader.js
+    // forwards every worker 'log' postMessage to this window as
+    // {type:'lightsaber_log', text}, so we just substring match the stage
+    // tag and update the install card.
     function handleProgressLog(text) {
       if (!text || typeof text !== 'string') return;
-      if (text.indexOf('sbx0: [+] SBX1 complete') === -1) return;
+      if (text.indexOf('sbx0: [+] SBX0 complete') === -1) return;
       var el = document.getElementById('installStatus');
       if (!el) return;
-      if (el.dataset.sbx1Done === '1') return;
-      el.dataset.sbx1Done = '1';
+      if (el.dataset.sbxDone === '1') return;
+      el.dataset.sbxDone = '1';
       el.style.color = '#86868b';
       el.textContent = 'sandbox escape complete, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
     }
@@ -1558,7 +1560,7 @@
       if (statusEl) statusEl.textContent = '';
       var installStatusEl = document.getElementById('installStatus');
       if (installStatusEl) {
-        installStatusEl.dataset.sbx1Done = '';
+        installStatusEl.dataset.sbxDone = '';
         installStatusEl.textContent = '';
       }
       /* log UI disabled for now

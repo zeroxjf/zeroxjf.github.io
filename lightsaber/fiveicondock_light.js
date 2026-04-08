@@ -505,16 +505,30 @@
     return (afterCols === BigInt(targetCols) && afterRows === BigInt(targetRows)) ? 1 : 0;
   }
 
-  // Walks rootFolderController.iconListViews (inherited from
-  // SBFolderController, verified on 18.6.2) and disables
-  // automaticallyAdjustsLayoutMetricsToFit on each SBIconListView, then
-  // triggers a forceRelayout via
-  // -[SBFolderController layoutIconListsWithAnimationType:forceRelayout:].
+  // Stabilize root list view metrics after patching the provider's grid.
   //
-  // Without this, each list view keeps its own cached layout metrics - pages
-  // laid out before the grid patch keep the stock icon size, pages laid out
-  // after pick up the new grid and auto-scale icons smaller, and swiping
-  // between them shows both side-by-side (the "random" size change).
+  // The first version of this walked rootFolderController.iconListViews
+  // (NSArray) and PAC-faulted on the respondsToSelector: call against the
+  // returned array on 18.6.2 - the @property is declared with `,C` copy
+  // semantics, so the getter hands back a fresh autoreleased copy each
+  // time, and calling objc_msgSend on that copy tripped the method cache
+  // PAC check. The rootFolder ivar itself is fine to message.
+  //
+  // This version skips the array walk entirely. It:
+  //   1. Touches currentIconListView (SBFolderController @property
+  //      "SBIconListView" R,N - no copy) to disable
+  //      automaticallyAdjustsLayoutMetricsToFit on at least the visible
+  //      page, verified line 28129 of the SpringBoardHome class dump.
+  //   2. Calls -[SBFolderController layoutIconListsWithAnimationType:
+  //      forceRelayout:] (line 7088) on rootFolder itself, which is what
+  //      Atria's updateLayoutForRoot:forDock:animated: ultimately calls
+  //      to push a uniform relayout across every list view in one step.
+  //
+  // Newly-created list views after install still start with auto-fit on,
+  // but all existing ones get re-laid-out from the new provider config
+  // in a single pass, which eliminates the "random mid-swipe size change"
+  // symptom (pages laid out before vs after the stamp showing different
+  // cached metrics).
   function stabilizeRootListViews(iconCtrl) {
     log("stabilizeRootListViews: entry");
     if (!canRespond(iconCtrl, "iconManager")) {
@@ -532,38 +546,28 @@
     log("stabilizeRootListViews: rootFolder=0x" + u64(rootFolder).toString(16));
     if (!isNonZero(rootFolder)) { log("stabilizeRootListViews: nil rootFolder"); return 0; }
 
-    if (!canRespond(rootFolder, "iconListViews")) {
-      log("stabilizeRootListViews: rootFolder has no iconListViews");
-      return 0;
-    }
-    const listViews = objc(rootFolder, "iconListViews");
-    log("stabilizeRootListViews: listViews=0x" + u64(listViews).toString(16));
-    if (!isNonZero(listViews) || !canRespond(listViews, "count")) {
-      log("stabilizeRootListViews: list view array missing count");
-      return 0;
-    }
-    const count = Number(u64(objc(listViews, "count")));
-    log("stabilizeRootListViews: walking " + count + " list views");
-
-    let disabled = 0;
-    let invalidated = 0;
-    for (let i = 0; i < count; i++) {
-      const lv = objc(listViews, "objectAtIndex:", BigInt(i));
-      if (!isNonZero(lv)) continue;
-      if (canRespond(lv, "setAutomaticallyAdjustsLayoutMetricsToFit:")) {
-        objc(lv, "setAutomaticallyAdjustsLayoutMetricsToFit:", 0n);
-        disabled++;
+    // Disable auto-fit on the current list view only. Single-object getter,
+    // no array, no copy semantics - safe path after the iconListViews PAC
+    // fault we hit in the previous version.
+    if (canRespond(rootFolder, "currentIconListView")) {
+      const curLv = objc(rootFolder, "currentIconListView");
+      log("stabilizeRootListViews: currentIconListView=0x" + u64(curLv).toString(16));
+      if (isNonZero(curLv)) {
+        if (canRespond(curLv, "setAutomaticallyAdjustsLayoutMetricsToFit:")) {
+          objc(curLv, "setAutomaticallyAdjustsLayoutMetricsToFit:", 0n);
+          log("stabilizeRootListViews: disabled auto-fit on currentIconListView");
+        } else {
+          log("stabilizeRootListViews: no setAutomaticallyAdjustsLayoutMetricsToFit: on curLv");
+        }
       }
-      if (canRespond(lv, "setNeedsLayout")) {
-        objc(lv, "setNeedsLayout");
-        invalidated++;
-      }
+    } else {
+      log("stabilizeRootListViews: no currentIconListView selector");
     }
-    log("stabilizeRootListViews: disabled auto-fit on " + disabled + "/" + count + ", invalidated " + invalidated);
 
-    // Force a uniform relayout pass across every root icon list so the
-    // cached per-list-view metrics get rebuilt from the new provider config
-    // in one consistent step.
+    // Force a uniform relayout pass so every existing root list view
+    // rebuilds its metrics from the new provider config in one consistent
+    // step. This is what Atria's updateLayoutForRoot:forDock:animated:
+    // ends up calling.
     if (canRespond(rootFolder, "layoutIconListsWithAnimationType:forceRelayout:")) {
       log("stabilizeRootListViews: calling layoutIconListsWithAnimationType:0 forceRelayout:YES");
       objc(rootFolder, "layoutIconListsWithAnimationType:forceRelayout:", 0n, 1n);
@@ -571,7 +575,7 @@
     } else {
       log("stabilizeRootListViews: no layoutIconListsWithAnimationType:forceRelayout: selector");
     }
-    return count;
+    return 1;
   }
 
   function forceRelayout(dockListView) {

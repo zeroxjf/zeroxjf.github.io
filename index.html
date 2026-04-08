@@ -110,7 +110,7 @@
     /* ---- Post lines (research & blog) ---- */
     .post-line {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 1rem;
       padding: 0.45rem 0.5rem;
       margin: 0 -0.5rem;
@@ -131,15 +131,18 @@
     .line-title {
       font-size: 0.9rem;
       color: #d0d6e0;
+      flex: 1;
+      min-width: 0;
       transition: color 0.15s;
     }
 
     .post-line:hover .line-title { color: #e2e8f0; }
 
     .line-tags {
-      display: inline-flex;
+      display: flex;
       gap: 0.4rem;
-      margin-left: 0.5rem;
+      flex-shrink: 0;
+      justify-content: flex-end;
     }
 
     .line-tag {
@@ -148,6 +151,7 @@
       border-radius: 3px;
       font-weight: 500;
       letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     .line-tag.kernel { background: #da363433; color: #f85149; border: 1px solid #da364322; }
@@ -160,10 +164,11 @@
     .line-tag.sop { background: #8957e533; color: #a371f7; border: 1px solid #8957e522; }
 
     .line-stars {
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       color: #5c6370;
-      margin-left: auto;
       flex-shrink: 0;
+      width: 2.75rem;
+      text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
@@ -460,76 +465,64 @@
 
       <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
         <span class="line-date">2026</span>
-        <span class="line-title">
-          CVE-2026-20637 &mdash; AppleSEPKeyStore Use-After-Free
-          <span class="line-tags">
-            <span class="line-tag kernel">kernel</span>
-            <span class="line-tag uaf">uaf</span>
-            <span class="line-tag cve">CVE</span>
-          </span>
+        <span class="line-title">CVE-2026-20637 &mdash; AppleSEPKeyStore Use-After-Free</span>
+        <span class="line-tags">
+          <span class="line-tag kernel">kernel</span>
+          <span class="line-tag uaf">uaf</span>
+          <span class="line-tag cve">CVE</span>
         </span>
         <span class="line-stars">&#9734; 50</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
         <span class="line-date">2026</span>
-        <span class="line-title">
-          IOHIDFamily FastPathUserClient UAF (AOP panic)
-          <span class="line-tags">
-            <span class="line-tag kernel">kernel</span>
-            <span class="line-tag uaf">uaf</span>
-            <span class="line-tag race">race</span>
-          </span>
+        <span class="line-title">IOHIDFamily FastPathUserClient UAF (AOP panic)</span>
+        <span class="line-tags">
+          <span class="line-tag kernel">kernel</span>
+          <span class="line-tag uaf">uaf</span>
+          <span class="line-tag race">race</span>
         </span>
         <span class="line-stars">&#9734; 6</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
         <span class="line-date">2026</span>
-        <span class="line-title">
-          CVE-2026-20687 &mdash; AppleJPEGDriver startDecoder Timeout UAF
-          <span class="line-tags">
-            <span class="line-tag kernel">kernel</span>
-            <span class="line-tag uaf">uaf</span>
-            <span class="line-tag cve">CVE</span>
-          </span>
+        <span class="line-title">CVE-2026-20687 &mdash; AppleJPEGDriver startDecoder Timeout UAF</span>
+        <span class="line-tags">
+          <span class="line-tag kernel">kernel</span>
+          <span class="line-tag uaf">uaf</span>
+          <span class="line-tag cve">CVE</span>
         </span>
         <span class="line-stars">&#9734; 15</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
         <span class="line-date">2026</span>
-        <span class="line-title">
-          AppleKeyStoreUserClient close() Use-After-Free
-          <span class="line-tags">
-            <span class="line-tag kernel">kernel</span>
-            <span class="line-tag uaf">uaf</span>
-          </span>
+        <span class="line-title">AppleKeyStoreUserClient close() Use-After-Free</span>
+        <span class="line-tags">
+          <span class="line-tag kernel">kernel</span>
+          <span class="line-tag uaf">uaf</span>
         </span>
         <span class="line-stars">&#9734; 19</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
         <span class="line-date">2026</span>
-        <span class="line-title">
-          SEP Firmware Panic via AppleKeyStore
-          <span class="line-tags">
-            <span class="line-tag sep">kernel/SEP</span>
-            <span class="line-tag dos">DoS</span>
-          </span>
+        <span class="line-title">SEP Firmware Panic via AppleKeyStore</span>
+        <span class="line-tags">
+          <span class="line-tag sep">kernel/SEP</span>
+          <span class="line-tag dos">DoS</span>
         </span>
         <span class="line-stars">&#9734; 23</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/WebKit-UAF-ANGLE-OOB-Analysis" target="_blank">
         <span class="line-date">2025</span>
-        <span class="line-title">
-          WebKit UAF + ANGLE OOB Exploit Chain Analysis
-          <span class="line-tags">
-            <span class="line-tag webkit">webkit</span>
-            <span class="line-tag uaf">uaf</span>
-            <span class="line-tag cve">CVE</span>
-          </span>
+        <span class="line-title">WebKit UAF + ANGLE OOB Exploit Chain Analysis</span>
+        <span class="line-tags">
+          <span class="line-tag webkit">webkit</span>
+          <span class="line-tag uaf">uaf</span>
+          <span class="line-tag cve">CVE</span>
         </span>
         <span class="line-stars">&#9734; 93</span>
       </a>

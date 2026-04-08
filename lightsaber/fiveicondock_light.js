@@ -505,6 +505,75 @@
     return (afterCols === BigInt(targetCols) && afterRows === BigInt(targetRows)) ? 1 : 0;
   }
 
+  // Walks rootFolderController.iconListViews (inherited from
+  // SBFolderController, verified on 18.6.2) and disables
+  // automaticallyAdjustsLayoutMetricsToFit on each SBIconListView, then
+  // triggers a forceRelayout via
+  // -[SBFolderController layoutIconListsWithAnimationType:forceRelayout:].
+  //
+  // Without this, each list view keeps its own cached layout metrics - pages
+  // laid out before the grid patch keep the stock icon size, pages laid out
+  // after pick up the new grid and auto-scale icons smaller, and swiping
+  // between them shows both side-by-side (the "random" size change).
+  function stabilizeRootListViews(iconCtrl) {
+    log("stabilizeRootListViews: entry");
+    if (!canRespond(iconCtrl, "iconManager")) {
+      log("stabilizeRootListViews: no iconManager");
+      return 0;
+    }
+    const iconMgr = objc(iconCtrl, "iconManager");
+    if (!isNonZero(iconMgr)) { log("stabilizeRootListViews: nil iconMgr"); return 0; }
+
+    if (!canRespond(iconMgr, "rootFolderController")) {
+      log("stabilizeRootListViews: no rootFolderController selector");
+      return 0;
+    }
+    const rootFolder = objc(iconMgr, "rootFolderController");
+    log("stabilizeRootListViews: rootFolder=0x" + u64(rootFolder).toString(16));
+    if (!isNonZero(rootFolder)) { log("stabilizeRootListViews: nil rootFolder"); return 0; }
+
+    if (!canRespond(rootFolder, "iconListViews")) {
+      log("stabilizeRootListViews: rootFolder has no iconListViews");
+      return 0;
+    }
+    const listViews = objc(rootFolder, "iconListViews");
+    log("stabilizeRootListViews: listViews=0x" + u64(listViews).toString(16));
+    if (!isNonZero(listViews) || !canRespond(listViews, "count")) {
+      log("stabilizeRootListViews: list view array missing count");
+      return 0;
+    }
+    const count = Number(u64(objc(listViews, "count")));
+    log("stabilizeRootListViews: walking " + count + " list views");
+
+    let disabled = 0;
+    let invalidated = 0;
+    for (let i = 0; i < count; i++) {
+      const lv = objc(listViews, "objectAtIndex:", BigInt(i));
+      if (!isNonZero(lv)) continue;
+      if (canRespond(lv, "setAutomaticallyAdjustsLayoutMetricsToFit:")) {
+        objc(lv, "setAutomaticallyAdjustsLayoutMetricsToFit:", 0n);
+        disabled++;
+      }
+      if (canRespond(lv, "setNeedsLayout")) {
+        objc(lv, "setNeedsLayout");
+        invalidated++;
+      }
+    }
+    log("stabilizeRootListViews: disabled auto-fit on " + disabled + "/" + count + ", invalidated " + invalidated);
+
+    // Force a uniform relayout pass across every root icon list so the
+    // cached per-list-view metrics get rebuilt from the new provider config
+    // in one consistent step.
+    if (canRespond(rootFolder, "layoutIconListsWithAnimationType:forceRelayout:")) {
+      log("stabilizeRootListViews: calling layoutIconListsWithAnimationType:0 forceRelayout:YES");
+      objc(rootFolder, "layoutIconListsWithAnimationType:forceRelayout:", 0n, 1n);
+      log("stabilizeRootListViews: forced relayout returned");
+    } else {
+      log("stabilizeRootListViews: no layoutIconListsWithAnimationType:forceRelayout: selector");
+    }
+    return count;
+  }
+
   function forceRelayout(dockListView) {
     const selectors = ["layoutIconsNow", "setNeedsLayout", "layoutIfNeeded"];
     for (const selectorName of selectors) {
@@ -579,6 +648,11 @@
         if (rootTouched > 0) touched++;
       } catch (hsErr) {
         log("patchHomescreenGrid threw: " + String(hsErr));
+      }
+      try {
+        stabilizeRootListViews(iconCtrl);
+      } catch (stabErr) {
+        log("stabilizeRootListViews threw: " + String(stabErr));
       }
     }
 

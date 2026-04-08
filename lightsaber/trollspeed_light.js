@@ -260,6 +260,12 @@
     if (TS_PROBE_MODE) log("[PROBE] " + msg);
   }
 
+  function isMainThread() {
+    const NSThread = Native.callSymbol("objc_getClass", "NSThread");
+    if (!isNonZero(NSThread)) return false;
+    return isNonZero(objc(NSThread, "isMainThread"));
+  }
+
   function stageEnabled(stageBit) {
     return (TS_STAGE_MASK & stageBit) !== 0;
   }
@@ -518,8 +524,12 @@
     return (bytes / GB).toFixed(2) + " GB/s";
   }
 
-  // === Tick (runs on main thread when timer fires) =====================
+  // === Tick (timer callback; may run off-main depending on dispatch mode) ===
   function tsTick() {
+    if (globalThis.__ts_tick_inflight) {
+      return;
+    }
+    globalThis.__ts_tick_inflight = true;
     try {
       const state = globalThis.__ts_state;
       if (!state || !isNonZero(state.label)) {
@@ -540,12 +550,20 @@
       const text = "\u25BC " + downStr + "   \u25B2 " + upStr;
       const cf = cfstrUtf8(text);
       if (isNonZero(cf)) {
-        objc(state.label, "setText:", cf);
-        // setText: copies the string into the label, so we can release ours.
+        // When tick runs from a background selector dispatch, bounce UI work to
+        // main thread synchronously so we can safely release `cf` right after.
+        if (!isMainThread() && canRespond(state.label, "performSelectorOnMainThread:withObject:waitUntilDone:")) {
+          objc(state.label, "performSelectorOnMainThread:withObject:waitUntilDone:", sel("setText:"), cf, 1n);
+        } else {
+          objc(state.label, "setText:", cf);
+        }
+        // setText: copies/retains as needed, so we can release our CFString.
         Native.callSymbol("CFRelease", cf);
       }
     } catch (e) {
       log("tsTick ERR: " + String(e));
+    } finally {
+      globalThis.__ts_tick_inflight = false;
     }
   }
 
@@ -734,12 +752,32 @@
       if (stageEnabled(TS_STAGE_TIMER)) {
         if (!requireSelector(jsctxObj, "evaluateScript:", "JSContext")) { log("tsSetup: evaluateScript missing"); return; }
         probe("S6 before timer");
-        const innerInv = newInvocationFromTarget(jsctxObj, "evaluateScript:");
-        if (!isNonZero(innerInv)) { log("tsSetup: evaluateScript invocation build failed"); return; }
         const tickScript = cfstrUtf8("globalThis.__ts_tick && __ts_tick()");
-        setInvPointerArg(innerInv, tickScript, 2);
-        // retainArguments tells the invocation to retain everything we passed,
-        // so the cfstring stays alive for as long as the invocation lives.
+        if (!isNonZero(tickScript)) { log("tsSetup: tick script CFString alloc failed"); return; }
+
+        // Primary path: timer fires on main runloop, but it dispatches
+        // evaluateScript to a background thread. This avoids blocking
+        // SpringBoard's main thread on JSContext lock contention.
+        let innerInv = 0n;
+        if (requireSelector(jsctxObj, "performSelectorInBackground:withObject:", "JSContext")) {
+          innerInv = newInvocationFromTarget(jsctxObj, "performSelectorInBackground:withObject:");
+          if (isNonZero(innerInv)) {
+            setInvPointerArg(innerInv, sel("evaluateScript:"), 2);
+            setInvPointerArg(innerInv, tickScript, 3);
+            probe("S6 timer mode=performSelectorInBackground");
+          }
+        }
+
+        // Fallback to direct evaluateScript invocation if background selector
+        // dispatch is unavailable.
+        if (!isNonZero(innerInv)) {
+          innerInv = newInvocationFromTarget(jsctxObj, "evaluateScript:");
+          if (!isNonZero(innerInv)) { log("tsSetup: evaluateScript invocation build failed"); return; }
+          setInvPointerArg(innerInv, tickScript, 2);
+          probe("S6 timer mode=direct evaluateScript (fallback)");
+        }
+
+        // retainArguments keeps the script CFString alive for timer lifetime.
         objc(innerInv, "retainArguments");
         objc(innerInv, "retain");
 

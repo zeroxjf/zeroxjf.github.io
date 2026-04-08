@@ -8578,8 +8578,8 @@ function injectLightweightSpringBoardPayload(existingTask, migFilterBypass, agen
 		if (n > hi) return hi;
 		return n;
 	}
-	const sbcDockIcons = sbcSafeInt(globalThis.__sbc_dock_icons, 4, 7, 5);
-	const sbcHsCols = sbcSafeInt(globalThis.__sbc_hs_cols, 3, 7, 5);
+	const sbcDockIcons = sbcSafeInt(globalThis.__sbc_dock_icons, 4, 7, 4);
+	const sbcHsCols = sbcSafeInt(globalThis.__sbc_hs_cols, 3, 7, 4);
 	const sbcHsRows = sbcSafeInt(globalThis.__sbc_hs_rows, 4, 8, 6);
 	const sbcStatbar = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true) ? 1 : 0;
 	const sbcPrelude =

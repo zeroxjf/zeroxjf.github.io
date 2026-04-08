@@ -11,8 +11,8 @@
   // inject time. Defaults match the historical fiveicondock behavior so a
   // standalone payload run with no config prelude still does the right
   // thing (5 dock icons, 5 home cols, stock 6 rows).
-  const DOCK_ICONS = _sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 5);
-  const HOMESCREEN_TARGET_COLS = _sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 5);
+  const DOCK_ICONS = _sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 4);
+  const HOMESCREEN_TARGET_COLS = _sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 4);
   const HOMESCREEN_TARGET_ROWS = _sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
   const ENABLE_UNSAFE_IVAR_WRITES = false;
   const ENABLE_METHOD_ENUMERATION = false;

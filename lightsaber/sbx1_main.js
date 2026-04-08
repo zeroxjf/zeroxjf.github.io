@@ -6785,8 +6785,8 @@
         if (n > hi) return hi;
         return n;
       }
-      let sbcDockIcons = sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 5);
-      let sbcHsCols = sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 5);
+      let sbcDockIcons = sbcClamp(globalThis.__sbc_dock_icons, 4, 7, 4);
+      let sbcHsCols = sbcClamp(globalThis.__sbc_hs_cols, 3, 7, 4);
       let sbcHsRows = sbcClamp(globalThis.__sbc_hs_rows, 4, 8, 6);
       let sbcStatbar = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true) ? 1 : 0;
       let lsTweaksOut = [];

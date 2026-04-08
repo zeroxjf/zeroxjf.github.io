@@ -802,35 +802,35 @@
               <div class="sbc-row">
                 <div class="sbc-row-meta">
                   <div class="sbc-row-label">Dock icons</div>
-                  <div class="sbc-row-sub">Stock 4 &middot; range 4&ndash;7</div>
+                  <div class="sbc-row-sub">Default 4 &middot; range 4&ndash;7</div>
                 </div>
                 <div class="sbc-stepper" data-target="sbcDockIcons" data-min="4" data-max="7">
                   <button type="button" class="sbc-stepper-minus" aria-label="Decrease dock icons">&#8722;</button>
                   <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <span class="sbc-stepper-value" id="sbcDockIconsVal">5</span>
+                  <span class="sbc-stepper-value" id="sbcDockIconsVal">4</span>
                   <span class="sbc-stepper-sep" aria-hidden="true"></span>
                   <button type="button" class="sbc-stepper-plus" aria-label="Increase dock icons">+</button>
                 </div>
-                <input type="hidden" id="sbcDockIcons" value="5">
+                <input type="hidden" id="sbcDockIcons" value="4">
               </div>
               <div class="sbc-row">
                 <div class="sbc-row-meta">
                   <div class="sbc-row-label">Home columns</div>
-                  <div class="sbc-row-sub">Stock 4 &middot; range 3&ndash;7</div>
+                  <div class="sbc-row-sub">Default 4 &middot; range 3&ndash;7</div>
                 </div>
                 <div class="sbc-stepper" data-target="sbcHsCols" data-min="3" data-max="7">
                   <button type="button" class="sbc-stepper-minus" aria-label="Decrease home columns">&#8722;</button>
                   <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <span class="sbc-stepper-value" id="sbcHsColsVal">5</span>
+                  <span class="sbc-stepper-value" id="sbcHsColsVal">4</span>
                   <span class="sbc-stepper-sep" aria-hidden="true"></span>
                   <button type="button" class="sbc-stepper-plus" aria-label="Increase home columns">+</button>
                 </div>
-                <input type="hidden" id="sbcHsCols" value="5">
+                <input type="hidden" id="sbcHsCols" value="4">
               </div>
               <div class="sbc-row">
                 <div class="sbc-row-meta">
                   <div class="sbc-row-label">Home rows</div>
-                  <div class="sbc-row-sub">Stock 6 &middot; range 4&ndash;8</div>
+                  <div class="sbc-row-sub">Default 6 &middot; range 4&ndash;8</div>
                 </div>
                 <div class="sbc-stepper" data-target="sbcHsRows" data-min="4" data-max="8">
                   <button type="button" class="sbc-stepper-minus" aria-label="Decrease home rows">&#8722;</button>
@@ -930,7 +930,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.48</p>
+    <p class="version">v0.0.49</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1229,6 +1229,56 @@
     }
     var sbcSteppers = document.querySelectorAll('.sbc-stepper');
     for (var si = 0; si < sbcSteppers.length; si++) sbcWireStepper(sbcSteppers[si]);
+
+    // Persist UI selections across Safari kills via localStorage so the
+    // user's toggles/steppers don't reset every time they relaunch.
+    var LS_STATE_KEY = 'ls_ui_state_v1';
+    function lsSaveState() {
+      try {
+        var state = {
+          fiveicon: !!document.getElementById('tweakFiveicon').checked,
+          powercuff: !!document.getElementById('tweakPowercuff').checked,
+          powercuffLevel: (document.getElementById('powercuffLevel') || {}).value || 'heavy',
+          statbar: !!document.getElementById('sbcStatbar').checked,
+          dockIcons: parseInt((document.getElementById('sbcDockIcons') || {}).value, 10) || 4,
+          hsCols: parseInt((document.getElementById('sbcHsCols') || {}).value, 10) || 4,
+          hsRows: parseInt((document.getElementById('sbcHsRows') || {}).value, 10) || 6
+        };
+        localStorage.setItem(LS_STATE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+    function lsLoadState() {
+      try {
+        var raw = localStorage.getItem(LS_STATE_KEY);
+        if (!raw) return;
+        var s = JSON.parse(raw);
+        if (!s) return;
+        if (typeof s.fiveicon === 'boolean') document.getElementById('tweakFiveicon').checked = s.fiveicon;
+        if (typeof s.powercuff === 'boolean') document.getElementById('tweakPowercuff').checked = s.powercuff;
+        if (typeof s.statbar === 'boolean') document.getElementById('sbcStatbar').checked = s.statbar;
+        var lvl = document.getElementById('powercuffLevel');
+        if (lvl && typeof s.powercuffLevel === 'string') lvl.value = s.powercuffLevel;
+        function applyStepper(id, val) {
+          var el = document.getElementById(id);
+          if (!el || typeof val !== 'number') return;
+          el.value = String(val);
+          var stepper = document.querySelector('.sbc-stepper[data-target="' + id + '"]');
+          if (stepper) sbcWireStepper(stepper);
+        }
+        applyStepper('sbcDockIcons', s.dockIcons);
+        applyStepper('sbcHsCols', s.hsCols);
+        applyStepper('sbcHsRows', s.hsRows);
+      } catch (e) {}
+    }
+    lsLoadState();
+    ['tweakFiveicon','tweakPowercuff','sbcStatbar','powercuffLevel'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('change', lsSaveState);
+    });
+    // Steppers mutate hidden inputs via JS, so hook the buttons directly.
+    document.querySelectorAll('.sbc-stepper button').forEach(function(btn) {
+      btn.addEventListener('click', function() { setTimeout(lsSaveState, 0); });
+    });
     function sbcClampInput(id, lo, hi, def) {
       var el = document.getElementById(id);
       if (!el) return def;
@@ -1252,8 +1302,8 @@
       var level = levelSel ? levelSel.value : 'heavy';
       var statbarCb = document.getElementById('sbcStatbar');
       var sbc = {
-        dock_icons: sbcClampInput('sbcDockIcons', 4, 7, 5),
-        hs_cols: sbcClampInput('sbcHsCols', 3, 7, 5),
+        dock_icons: sbcClampInput('sbcDockIcons', 4, 7, 4),
+        hs_cols: sbcClampInput('sbcHsCols', 3, 7, 4),
         hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6),
         statbar: (statbarCb && statbarCb.checked) ? 1 : 0
       };
@@ -1332,7 +1382,7 @@
       if (!canRun) return;
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
-      sbc = sbc || { dock_icons: 5, hs_cols: 5, hs_rows: 6, statbar: 0 };
+      sbc = sbc || { dock_icons: 4, hs_cols: 4, hs_rows: 6, statbar: 0 };
       var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {

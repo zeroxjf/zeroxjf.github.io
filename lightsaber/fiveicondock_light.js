@@ -623,6 +623,63 @@
     return v;
   }
 
+  // Call an ObjC method that takes a by-value struct argument (CGRect,
+  // CGPoint, CGFloat, etc.) by packing the raw bytes into an NSInvocation
+  // and invoking it. Avoids NSValue unboxing entirely (-[NSValue
+  // getValue:size:] PAC-faults on 18.6.2 in this realm) and uses
+  // libffi-style ABI dispatch under the hood so FP regs get populated
+  // correctly - our own #nativeCallAddr only sets x0..x7.
+  function invokeStructSetter(obj, selectorName, bytesBuf) {
+    if (!isNonZero(obj)) return false;
+    const s = sel(selectorName);
+    if (!isNonZero(s)) return false;
+    const sig = Native.callSymbol("objc_msgSend", obj,
+      sel("methodSignatureForSelector:"), s);
+    if (!isNonZero(sig)) { log("isset: nil sig for " + selectorName); return false; }
+    const NSInvocation = Native.callSymbol("objc_getClass", "NSInvocation");
+    // Verified via DSC class dump: initWithMethodSignature: does not
+    // exist on 18.6.2; only +invocationWithMethodSignature: (CF line
+    // 1330) is present. Use the class factory.
+    const inv = objc(NSInvocation, "invocationWithMethodSignature:", sig);
+    if (!isNonZero(inv)) { log("isset: nil inv for " + selectorName); return false; }
+    objc(inv, "setTarget:", obj);
+    objc(inv, "setSelector:", s);
+    // Copy caller bytes into a fresh native buffer (setArgument: reads
+    // the memory at the time of -invoke, so the pointer must be stable
+    // and native).
+    const mem = Native.callSymbol("malloc", BigInt(bytesBuf.byteLength));
+    Native.write(mem, bytesBuf);
+    // Index 2 = first real argument (0 is self, 1 is _cmd).
+    objc(inv, "setArgument:atIndex:", mem, 2n);
+    objc(inv, "invoke");
+    Native.callSymbol("free", mem);
+    return true;
+  }
+
+  function setLayerBounds(layer, x, y, w, h) {
+    const buf = new ArrayBuffer(32);
+    const dv = new DataView(buf);
+    dv.setFloat64(0, x, true);
+    dv.setFloat64(8, y, true);
+    dv.setFloat64(16, w, true);
+    dv.setFloat64(24, h, true);
+    return invokeStructSetter(layer, "setBounds:", buf);
+  }
+
+  function setLayerPosition(layer, x, y) {
+    const buf = new ArrayBuffer(16);
+    const dv = new DataView(buf);
+    dv.setFloat64(0, x, true);
+    dv.setFloat64(8, y, true);
+    return invokeStructSetter(layer, "setPosition:", buf);
+  }
+
+  function setLayerCornerRadius(layer, r) {
+    const buf = new ArrayBuffer(8);
+    new DataView(buf).setFloat64(0, r, true);
+    return invokeStructSetter(layer, "setCornerRadius:", buf);
+  }
+
   function nsValueFromCGPoint(x, y) {
     const mem = Native.callSymbol("malloc", 16n);
     const buf = new ArrayBuffer(16);
@@ -808,34 +865,31 @@
     log("statbar: label=0x" + u64(label).toString(16));
     if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
 
-    // UIView KVC for @"frame" PAC-faults on 18.6.2 - the generic
-    // setValue:forKey: path uses an NSInvocation-based struct setter
-    // whose signed IMP doesn't round-trip our bridge. Dodge by going
-    // through CALayer: label.layer.bounds + label.layer.position are
-    // CALayer-specific KVC keys handled by CALayer's own property
-    // resolver (not NSObject KVC), with dedicated setters that take
-    // the struct values straight from the NSValue bytes. UIView mirrors
-    // its layer geometry, so the label ends up with the same frame.
+    // Every NSValue-based KVC path we've tried (UIView frame,
+    // CALayer bounds/position via setValue:forKey:) PAC-faults because
+    // the internal unpacking calls -[NSValue getValue:size:], which
+    // itself faults in this realm. Instead, use NSInvocation to call
+    // -[CALayer setBounds:] / setPosition: / setCornerRadius: directly
+    // with raw struct bytes packed via setArgument:atIndex:. NSInvocation
+    // uses proper ABI dispatch so CGRect/CGPoint/CGFloat land in FP regs.
     log("statbar: pre label layer");
     const layer = objc(label, "layer");
     log("statbar: layer=0x" + u64(layer).toString(16));
     if (!isNonZero(layer)) { log("statbar: nil layer"); return false; }
 
-    log("statbar: pre layer bounds KVC");
-    const boundsVal = nsValueFromCGRect(0, 0, pillW, labelH);
-    objc(layer, "setValue:forKey:", boundsVal, nsStr("bounds"));
-    log("statbar: post layer bounds KVC");
-    log("statbar: pre layer position KVC");
+    log("statbar: pre setLayerBounds");
+    const boundsOk = setLayerBounds(layer, 0, 0, pillW, labelH);
+    log("statbar: setLayerBounds=" + boundsOk);
     const centerX = pillX + pillW / 2;
     const centerY = labelY + labelH / 2;
-    const posVal = nsValueFromCGPoint(centerX, centerY);
-    objc(layer, "setValue:forKey:", posVal, nsStr("position"));
-    log("statbar: post layer position KVC");
-
-    log("statbar: pre layer cornerRadius KVC");
-    objc(layer, "setValue:forKey:", nsNumberLL(10), nsStr("cornerRadius"));
-    log("statbar: pre layer setMasksToBounds");
+    log("statbar: pre setLayerPosition center=" + centerX + "," + centerY);
+    const posOk = setLayerPosition(layer, centerX, centerY);
+    log("statbar: setLayerPosition=" + posOk);
+    log("statbar: pre setLayerCornerRadius");
+    setLayerCornerRadius(layer, 10);
+    log("statbar: pre setMasksToBounds");
     objc(layer, "setMasksToBounds:", 1n);
+    log("statbar: post setMasksToBounds");
 
     log("statbar: pre setText");
     objc(label, "setText:", nsStr(text));

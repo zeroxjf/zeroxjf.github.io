@@ -552,15 +552,6 @@
           </div>
         </div>
 
-        <div class="tweak-row experimental" id="tweakRowTrollspeed">
-          <label class="tweak-row-head">
-            <input type="checkbox" id="tweakTrollspeed">
-            <div class="tweak-row-meta">
-              <div class="tweak-row-name">TrollSpeed &mdash; bandwidth HUD <span class="tweak-row-badge">Experimental</span></div>
-              <div class="tweak-row-desc">Persistent up/down speed overlay near the top of the screen. Port of <a href="https://github.com/Lessica/TrollSpeed">Lessica's TrollSpeed</a>. Lasts until respring. Still in testing &mdash; may not work or may glitch the SpringBoard UI.</div>
-            </div>
-          </label>
-        </div>
       </div>
 
       <div class="tip">
@@ -815,8 +806,7 @@
     // options (e.g. Powercuff level) slide into view.
     var tweakRows = [
       { rowId: 'tweakRowFiveicon', cbId: 'tweakFiveicon', name: 'fiveicon' },
-      { rowId: 'tweakRowPowercuff', cbId: 'tweakPowercuff', name: 'powercuff' },
-      { rowId: 'tweakRowTrollspeed', cbId: 'tweakTrollspeed', name: 'trollspeed' }
+      { rowId: 'tweakRowPowercuff', cbId: 'tweakPowercuff', name: 'powercuff' }
     ];
     function syncTweakRow(row) {
       var el = document.getElementById(row.rowId);

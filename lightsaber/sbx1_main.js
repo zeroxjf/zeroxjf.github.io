@@ -6766,26 +6766,24 @@
       pe_stage1_js_data = gpuCopyBuffer(read64(addrof(pe_stage1_js_data_array) + 0x10n), BigInt(pe_stage1_js_data_array.length));
       let pe_main_js_str = getJS('pe_main.js?' + Date.now());
       let lsTweaksRaw = (typeof globalThis.__ls_tweaks === 'string' && globalThis.__ls_tweaks.length > 0) ? globalThis.__ls_tweaks : 'fiveicon';
-      let validTweaks = { fiveicon: 1, powercuff: 1, trollspeed: 1 };
+      let validTweaks = { fiveicon: 1, powercuff: 1 };
       let lsTweakSet = {};
       let lsTweakParts = lsTweaksRaw.split(',');
       for (let ti = 0; ti < lsTweakParts.length; ti++) {
         let tname = (lsTweakParts[ti] || '').replace(/[^a-z_0-9]/gi, '');
         if (validTweaks[tname]) lsTweakSet[tname] = true;
       }
-      if (!lsTweakSet.fiveicon && !lsTweakSet.powercuff && !lsTweakSet.trollspeed) lsTweakSet.fiveicon = true; // safe default
+      if (!lsTweakSet.fiveicon && !lsTweakSet.powercuff) lsTweakSet.fiveicon = true; // safe default
       let lsLevelRaw = (typeof globalThis.__powercuff_level === 'string') ? globalThis.__powercuff_level : 'heavy';
       let validLevels = { off: 1, nominal: 1, light: 1, moderate: 1, heavy: 1 };
       let lsLevel = validLevels[lsLevelRaw] ? lsLevelRaw : 'heavy';
       let lsTweaksOut = [];
       if (lsTweakSet.fiveicon) lsTweaksOut.push('fiveicon');
       if (lsTweakSet.powercuff) lsTweaksOut.push('powercuff');
-      if (lsTweakSet.trollspeed) lsTweaksOut.push('trollspeed');
       const INLINE_PREFETCH_MAX_BYTES = 96 * 1024;
       let prelude = 'globalThis.__ls_tweaks = "' + lsTweaksOut.join(',') + '";\n';
       prelude += 'globalThis.__ls_enable_fiveicon = ' + (lsTweakSet.fiveicon ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__ls_enable_powercuff = ' + (lsTweakSet.powercuff ? 'true' : 'false') + ';\n';
-      prelude += 'globalThis.__ls_enable_trollspeed = ' + (lsTweakSet.trollspeed ? 'true' : 'false') + ';\n';
       prelude += 'globalThis.__powercuff_level = "' + lsLevel + '";\n';
       let tweakPrefetchPrelude = '';
       let tweakPrefetchBytes = 0;
@@ -6804,7 +6802,6 @@
       }
       addTweakPrefetch(lsTweakSet.fiveicon, 'fiveicondock_light.js', '__fiveicondock_code', 'FiveIconDock');
       addTweakPrefetch(lsTweakSet.powercuff, 'powercuff_light.js', '__powercuff_code', 'Powercuff');
-      addTweakPrefetch(lsTweakSet.trollspeed, 'trollspeed_light.js', '__trollspeed_code', 'TrollSpeed');
       if (tweakPrefetchBytes > INLINE_PREFETCH_MAX_BYTES) {
         LOG("[SBX1] Prefetched tweak payloads exceed budget (" + tweakPrefetchBytes + " > " + INLINE_PREFETCH_MAX_BYTES + "), disabling inline payload prefetch for stability");
       } else if (tweakPrefetchPrelude.length > 0) {

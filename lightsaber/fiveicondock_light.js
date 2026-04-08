@@ -848,9 +848,11 @@
   //
   // visited[] is a mutable counter (one-element array) that tracks total
   // views visited so the caller can distinguish 'walked nothing' from
-  // 'walked a lot and found nothing'.
+  // 'walked a lot and found nothing'. Depth cap intentionally lower than
+  // before (was 20) because we now walk the status bar window specifically
+  // instead of the deep keyWindow tree.
   function walkFindStatusBarLabels(view, cls1, cls2, out, depth, visited) {
-    if (depth > 20) return;
+    if (depth > 10) return;
     if (!isNonZero(view)) return;
     visited[0] = visited[0] + 1;
     if (isNonZero(cls1)) {
@@ -866,7 +868,7 @@
     const cntRaw = objc(subs, "count");
     const cnt = Number(u64(cntRaw));
     if (cnt <= 0) return;
-    const lim = cnt < 128 ? cnt : 128;
+    const lim = cnt < 64 ? cnt : 64;
     for (let i = 0; i < lim; i++) {
       const sub = objc(subs, "objectAtIndex:", BigInt(i));
       if (!isNonZero(sub)) continue;
@@ -874,18 +876,30 @@
     }
   }
 
-  // Walk the keyWindow's view tree looking for any status bar string view
-  // instance. Prefer any candidate whose current text contains ':' (the
-  // clock line) so we hit the time label and not the cellular / SSID
-  // label. Falls back to the first match if nothing has a colon.
+  // Find the status bar string view instance.
   //
-  // We deliberately DO NOT walk -[UIApplication windows] as a fallback:
-  // that path PAC-faulted on 18.6.2 in an earlier run of this payload,
-  // and Huy's tweak doesn't need it either - his swizzle catches setText:
-  // on every instance system-wide, so if the class exists and there's any
-  // instance anywhere in SpringBoard's UI, it'll be reachable from the
-  // root window tree.
+  // Fast path: if we found it on a previous tick, reuse the cached pointer.
+  // The system status bar label is retained by its superview (owned by
+  // SpringBoard's status bar scene) for the full lifetime of SpringBoard,
+  // so the pointer stays valid across ticks and we never need to rewalk.
+  //
+  // Slow path: walk -[UIWindowScene windows] instead of keyWindow's subtree.
+  // A previous attempt walked the keyWindow (211 views deep) and got 0
+  // candidates because on 18.6.2 SpringBoard the status bar lives in its
+  // own separate UIWindow inside the scene, NOT as a descendant of the
+  // active keyWindow. scene.windows returns every UIWindow attached to
+  // the scene including the status bar window, so walking each of those
+  // with a small depth cap lands us on the label with a fraction of the
+  // views visited and avoids racing against the home screen's layout
+  // churn that was use-after-freeing descendants between ticks.
   function findStatusBarClockLabel(app, classes) {
+    const cached = globalThis.__fiveicon_statbar_label_cached;
+    if (cached !== undefined && isNonZero(cached)) {
+      log("statbar: cache HIT label=0x" + u64(cached).toString(16));
+      return cached;
+    }
+    log("statbar: cache MISS - walking scene windows");
+
     const candidates = [];
     const visited = [0];
     const keyWin = objc(app, "keyWindow");
@@ -894,9 +908,35 @@
       log("statbar: no keyWindow - bailing");
       return 0n;
     }
-    walkFindStatusBarLabels(keyWin, classes.cls17, classes.cls16, candidates, 0, visited);
-    log("statbar: walk visited " + visited[0] + " views, produced " + candidates.length + " candidates");
+    const scene = objc(keyWin, "windowScene");
+    log("statbar: scene=0x" + u64(scene).toString(16));
+    if (!isNonZero(scene)) {
+      log("statbar: no windowScene - bailing");
+      return 0n;
+    }
+    const sceneWins = objc(scene, "windows");
+    if (!isNonZero(sceneWins)) {
+      log("statbar: no scene.windows - bailing");
+      return 0n;
+    }
+    const sceneWinCntRaw = objc(sceneWins, "count");
+    const sceneWinCnt = Number(u64(sceneWinCntRaw));
+    log("statbar: scene.windows count=" + sceneWinCnt);
+    const sceneWinLim = sceneWinCnt < 16 ? sceneWinCnt : 16;
+    for (let i = 0; i < sceneWinLim; i++) {
+      const w = objc(sceneWins, "objectAtIndex:", BigInt(i));
+      if (!isNonZero(w)) continue;
+      const preCount = candidates.length;
+      walkFindStatusBarLabels(w, classes.cls17, classes.cls16, candidates, 0, visited);
+      log("statbar: window[" + i + "]=0x" + u64(w).toString(16) + " +" + (candidates.length - preCount) + " candidates");
+    }
+    log("statbar: walk total visited=" + visited[0] + " candidates=" + candidates.length);
+
     if (candidates.length === 0) return 0n;
+
+    // Prefer a candidate whose current text has ':' (the clock line) so
+    // we don't clobber the cellular / SSID labels. Cache the winner so
+    // subsequent ticks don't need to walk.
     const colon = nsStr(":");
     for (let i = 0; i < candidates.length; i++) {
       const txt = objc(candidates[i], "text");
@@ -904,10 +944,12 @@
       const hit = objc(txt, "containsString:", colon);
       if (isNonZero(hit)) {
         log("statbar: picked candidate " + i + " (has ':' in current text)");
+        globalThis.__fiveicon_statbar_label_cached = candidates[i];
         return candidates[i];
       }
     }
-    log("statbar: no ':' candidate, falling back to candidate 0");
+    log("statbar: no ':' candidate, caching candidate 0");
+    globalThis.__fiveicon_statbar_label_cached = candidates[0];
     return candidates[0];
   }
 
@@ -1063,10 +1105,28 @@
     globalThis.__fiveicon_jsctx_obj = bi.jsContextObj;
     globalThis.__fiveicon_apply_once = applyDockPatch;
     globalThis.__fiveicon_log = log;
+    globalThis.__fiveicon_statbar_consecutive_failures = 0;
     globalThis.__fiveicon_statbar = function() {
       if (!ENABLE_STATBAR) return;
-      try { createStatBarOverlay(); }
-      catch (e) { log("statbar err: " + String(e)); }
+      try {
+        const ok = createStatBarOverlay();
+        if (ok) {
+          globalThis.__fiveicon_statbar_consecutive_failures = 0;
+        } else {
+          globalThis.__fiveicon_statbar_consecutive_failures++;
+          if (globalThis.__fiveicon_statbar_consecutive_failures >= 3) {
+            log("statbar: 3 consecutive failures, halting loop to avoid crash churn");
+            globalThis.__fiveicon_statbar_loop_active = false;
+          }
+        }
+      } catch (e) {
+        log("statbar err: " + String(e));
+        globalThis.__fiveicon_statbar_consecutive_failures++;
+        if (globalThis.__fiveicon_statbar_consecutive_failures >= 3) {
+          log("statbar: 3 consecutive failures, halting loop to avoid crash churn");
+          globalThis.__fiveicon_statbar_loop_active = false;
+        }
+      }
     };
 
     log("loaded jsctx=0x" + u64(bi.jsctx).toString(16) + " jsContextObj=0x" + u64(bi.jsContextObj).toString(16));

@@ -1066,7 +1066,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.81</p>
+    <p class="version">v0.0.82</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1148,6 +1148,7 @@
     var major = iosParts[0], minor = iosParts[1], patch = iosParts[2] || 0;
     var isIphone = /iPhone/.test(ua);
     var doneSignal = false;
+    var sbxProgressTimer = null;
     /* log UI disabled for now
     var syslogPollTimer = null;
     var lastSyslogText = '';
@@ -1471,6 +1472,7 @@
       if (doneSignal) return;
       doneSignal = true;
       // stopSyslogPolling();
+      if (sbxProgressTimer) { clearTimeout(sbxProgressTimer); sbxProgressTimer = null; }
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       var installStatusEl = document.getElementById('installStatus');
       if (installStatusEl) {
@@ -1498,8 +1500,8 @@
       if (!el) return;
       if (el.dataset.sbxDone === '1') return;
       el.dataset.sbxDone = '1';
-      el.style.color = '#86868b';
-      el.textContent = 'sandbox escape complete, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
+      el.classList.remove('error');
+      el.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
     }
 
     window.addEventListener('message', function(event) {
@@ -1586,6 +1588,25 @@
         installStatusEl.dataset.sbxDone = '';
         installStatusEl.textContent = '';
       }
+
+      // The iframe's main thread stalls during the fcall/sbx0 phase, so the
+      // log-forwarding path from the worker via rce_loader rarely makes it
+      // out to this window. Drive the status from the parent side with a
+      // timer - by ~3.5s in, the chain is past setup_fcall and into the
+      // sandbox escape gadgetry, which matches what the message says closely
+      // enough for user-visible feedback. The lightsaber_log detector in
+      // handleProgressLog() stays as a best-effort upgrade if the message
+      // does happen to make it through.
+      if (sbxProgressTimer) { clearTimeout(sbxProgressTimer); sbxProgressTimer = null; }
+      sbxProgressTimer = setTimeout(function() {
+        var el = document.getElementById('installStatus');
+        if (!el || doneSignal) return;
+        if (el.dataset.sbxDone === '1') return;
+        el.dataset.sbxDone = '1';
+        el.classList.remove('error');
+        el.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
+      }, 3500);
+
       /* log UI disabled for now
       var lb = document.getElementById('logBox');
       document.getElementById('logScroll').innerHTML = '';

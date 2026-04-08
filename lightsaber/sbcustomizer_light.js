@@ -20,13 +20,11 @@
   const ENABLE_LAYOUT_COLUMN_PATCH = true;
   const ENABLE_FORCE_RELAYOUT = false;
   const ENABLE_SECOND_PASS = false;
-  // Repeat-loop interval for the statbar overlay. We can't install a real
-  // ObjC swizzle on -[STUIStatusBarStringView setText:] from JS (no IMP
-  // fabrication in the bridge), so instead the injected worker thread
-  // sleeps for this many microseconds and re-posts __sbcust_statbar to
-  // main thread on every tick. Two seconds is slow enough not to saturate
-  // the main runloop with view walks, fast enough that the overlay reads
-  // as live.
+  // Repeat-loop interval for the statbar overlay. The injected worker
+  // thread sleeps for this many microseconds and re-posts __sbcust_statbar
+  // to main thread on every tick. Two seconds is slow enough not to
+  // saturate the main runloop, fast enough that the temp / RAM readout
+  // reads as live.
   const STATBAR_LOOP_INTERVAL_US = 2000000;
   // Hard ceiling on loop iterations so a bug can't spin the injected
   // worker forever. 12h at 2s = 21600 ticks. The loop also exits early if
@@ -39,11 +37,14 @@
   // layoutForIconLocation:], -[SBIconListGridLayoutConfiguration
   // setNumberOfPortraitColumns:] / setNumberOfPortraitRows:).
   const ENABLE_HOMESCREEN_COL_PATCH = true;
-  // StatBar: snapshot overlay window showing battery temp + total RAM.
-  // Ported from Coruna-Tweaks-Collection/StatBar/StatBar.m. Snapshot only
-  // (no NSTimer) because block-based timers need a real ObjC block we
-  // can't synthesize from JS, and -performSelector:...afterDelay: takes
-  // a double which our int-only bridge can't pass.
+  // StatBar: dedicated UIWindow overlay above the real status bar showing
+  // battery temp + total RAM. We do NOT touch -[STUIStatusBarStringView]
+  // on this path - trying to reach into the system status bar either
+  // requires IMP fabrication (no block / imp_implementationWithBlock in
+  // our bridge) or a view-tree walk that races iOS layout dealloc. The
+  // overlay approach sidesteps all of that: create our own UIWindow at
+  // windowLevel 1001 (UIWindowLevelStatusBar + 1), add a UILabel, set
+  // text on a 2s cadence from the injected worker's repeat loop.
   const ENABLE_STATBAR = (globalThis.__sbc_statbar === 1 || globalThis.__sbc_statbar === true);
 
   class Native {
@@ -609,32 +610,17 @@
     }
   }
 
-  // ---- StatBar port ----------------------------------------------------
+  // ---- StatBar overlay ------------------------------------------------
   //
   // Bridge constraint: #nativeCallAddr only loads x0..x7; no FP regs. That
   // kills any direct call taking CGRect/CGFloat (initWithFrame:, setFrame:,
-  // setWindowLevel:, systemFontOfSize:, colorWithWhite:alpha:, etc.). We
-  // route those through KVC: setValue:forKey: unboxes NSValue<CGRect> into
-  // the frame setter and NSNumber into the windowLevel setter internally,
-  // and both code paths take object pointers only.
-
-  function nsValueFromCGRect(x, y, w, h) {
-    const mem = Native.callSymbol("malloc", 32n);
-    const buf = new ArrayBuffer(32);
-    const dv = new DataView(buf);
-    dv.setFloat64(0, x, true);
-    dv.setFloat64(8, y, true);
-    dv.setFloat64(16, w, true);
-    dv.setFloat64(24, h, true);
-    Native.write(mem, buf);
-    const typeEnc = Native.callSymbol("malloc", 64n);
-    Native.writeString(typeEnc, "{CGRect={CGPoint=dd}{CGSize=dd}}");
-    const NSValue = Native.callSymbol("objc_getClass", "NSValue");
-    const v = objc(NSValue, "valueWithBytes:objCType:", mem, typeEnc);
-    Native.callSymbol("free", mem);
-    Native.callSymbol("free", typeEnc);
-    return v;
-  }
+  // setWindowLevel:, systemFontOfSize:, colorWithWhite:alpha:, etc.). The
+  // canonical workaround (CLAUDE.md) is to build an NSInvocation, push the
+  // raw struct bytes into setArgument:atIndex:, and invoke it - NSInvocation
+  // dispatches through a libffi-style thunk that populates d0..d7 properly.
+  // For scalar CGFloat properties like windowLevel we can also use KVC with
+  // numberWithLongLong: which unboxes to double without hitting the
+  // -[NSValue getValue:size:] PAC-fault path.
 
   // Call an ObjC method that takes a by-value struct argument (CGRect,
   // CGPoint, CGFloat, etc.) by packing the raw bytes into an NSInvocation
@@ -697,41 +683,9 @@
     return invokeStructSetter(layer, "setPosition:", buf);
   }
 
-  function setLayerCornerRadius(layer, r) {
-    const buf = new ArrayBuffer(8);
-    new DataView(buf).setFloat64(0, r, true);
-    return invokeStructSetter(layer, "setCornerRadius:", buf);
-  }
-
-  function nsValueFromCGPoint(x, y) {
-    const mem = Native.callSymbol("malloc", 16n);
-    const buf = new ArrayBuffer(16);
-    const dv = new DataView(buf);
-    dv.setFloat64(0, x, true);
-    dv.setFloat64(8, y, true);
-    Native.write(mem, buf);
-    const typeEnc = Native.callSymbol("malloc", 32n);
-    Native.writeString(typeEnc, "{CGPoint=dd}");
-    const NSValue = Native.callSymbol("objc_getClass", "NSValue");
-    const v = objc(NSValue, "valueWithBytes:objCType:", mem, typeEnc);
-    Native.callSymbol("free", mem);
-    Native.callSymbol("free", typeEnc);
-    return v;
-  }
-
   function nsNumberLL(val) {
     const NSNumber = Native.callSymbol("objc_getClass", "NSNumber");
     return objc(NSNumber, "numberWithLongLong:", BigInt(val));
-  }
-
-  function readScreenBounds() {
-    // Can't call -[UIScreen bounds] directly (returns CGRect in FP regs),
-    // and -[NSValue getValue:size:] PAC-faults on our bridge on 18.6.2
-    // (deprecated method cache). Hardcode a conservative default that
-    // works for every modern iPhone width (375-440pt). The overlay
-    // stretches across the full screen anyway, so being a few points
-    // off just means the black background doesn't hug the edges.
-    return { w: 402, h: 874 };
   }
 
   function getBatteryTempC() {
@@ -825,201 +779,142 @@
     return text;
   }
 
-  // Resolve the status bar string view classes Huy's tweak targets, the
-  // same way his constructor does it (objc_getClass by name). On 18.6.2
-  // we expect STUIStatusBarStringView to exist in the loaded runtime.
-  // Returns {cls17, cls16} - either or both can be 0n.
-  function resolveStatusBarClasses() {
-    const cls17 = Native.callSymbol("objc_getClass", "STUIStatusBarStringView");
-    const cls16 = Native.callSymbol("objc_getClass", "_UIStatusBarStringView");
-    log("statbar: cls17 (STUIStatusBarStringView)=0x" + u64(cls17).toString(16));
-    log("statbar: cls16 (_UIStatusBarStringView)=0x"  + u64(cls16).toString(16));
-    return { cls17: cls17, cls16: cls16 };
-  }
+  // Geometry constants. Screen width is hardcoded because -[UIScreen bounds]
+  // returns a CGRect we can't unmarshal through our bridge; 402 covers every
+  // notched iPhone from iPhone 12 through 16 Pro within a few points. The
+  // overlay hugs the center-top of the screen where the clock lives on
+  // Face-ID phones.
+  const OVERLAY_SCREEN_W = 402;
+  const OVERLAY_W = 220;
+  const OVERLAY_H = 28;
+  // Top edge of the overlay. 2pt down from the physical top edge leaves
+  // the notch area uncovered and puts the label roughly over the clock.
+  const OVERLAY_TOP = 2;
 
-  // Recursively walk a view tree, collecting any descendant whose class
-  // is cls1 OR cls2 (either can be 0n) using -isKindOfClass: against the
-  // resolved Class pointer. isKindOfClass: handles private subclasses,
-  // NSKVONotifying_ isa-swizzled variants, and rename chains that a
-  // string compare on class_getName would miss. Uses only pointer-arg
-  // ObjC calls (subviews / count / objectAtIndex: / isKindOfClass:) so
-  // the x-only bridge handles it fine. Bounded depth + per-level cap
-  // keep a pathological tree from blowing the JS stack.
+  // Create the overlay UIWindow + label once. Retains both on the way
+  // out so the main-thread autorelease pool can't tear them down between
+  // ticks - the injected loop only holds weak-ish JS property references
+  // and there's no other owner until addSubview:/makeKeyAndVisible roots
+  // the window into the scene.
   //
-  // visited[] is a mutable counter (one-element array) that tracks total
-  // views visited so the caller can distinguish 'walked nothing' from
-  // 'walked a lot and found nothing'. Depth cap intentionally lower than
-  // before (was 20) because we now walk the status bar window specifically
-  // instead of the deep keyWindow tree.
-  function walkFindStatusBarLabels(view, cls1, cls2, out, depth, visited) {
-    if (depth > 10) return;
-    if (!isNonZero(view)) return;
-    visited[0] = visited[0] + 1;
-    if (isNonZero(cls1)) {
-      const m1 = objc(view, "isKindOfClass:", cls1);
-      if (isNonZero(m1)) { out.push(view); return; }
-    }
-    if (isNonZero(cls2)) {
-      const m2 = objc(view, "isKindOfClass:", cls2);
-      if (isNonZero(m2)) { out.push(view); return; }
-    }
-    const subs = objc(view, "subviews");
-    if (!isNonZero(subs)) return;
-    const cntRaw = objc(subs, "count");
-    const cnt = Number(u64(cntRaw));
-    if (cnt <= 0) return;
-    const lim = cnt < 64 ? cnt : 64;
-    for (let i = 0; i < lim; i++) {
-      const sub = objc(subs, "objectAtIndex:", BigInt(i));
-      if (!isNonZero(sub)) continue;
-      walkFindStatusBarLabels(sub, cls1, cls2, out, depth + 1, visited);
-    }
-  }
-
-  // Find the status bar string view instance.
-  //
-  // Fast path: if we found it on a previous tick, reuse the cached pointer.
-  // The system status bar label is retained by its superview (owned by
-  // SpringBoard's status bar scene) for the full lifetime of SpringBoard,
-  // so the pointer stays valid across ticks and we never need to rewalk.
-  //
-  // Slow path: walk -[UIWindowScene windows] instead of keyWindow's subtree.
-  // A previous attempt walked the keyWindow (211 views deep) and got 0
-  // candidates because on 18.6.2 SpringBoard the status bar lives in its
-  // own separate UIWindow inside the scene, NOT as a descendant of the
-  // active keyWindow. scene.windows returns every UIWindow attached to
-  // the scene including the status bar window, so walking each of those
-  // with a small depth cap lands us on the label with a fraction of the
-  // views visited and avoids racing against the home screen's layout
-  // churn that was use-after-freeing descendants between ticks.
-  function findStatusBarClockLabel(app, classes) {
-    const cached = globalThis.__sbcust_statbar_label_cached;
-    if (cached !== undefined && isNonZero(cached)) {
-      log("statbar: cache HIT label=0x" + u64(cached).toString(16));
-      return cached;
-    }
-    log("statbar: cache MISS - walking scene windows");
-
-    const candidates = [];
-    const visited = [0];
+  // Returns { window, label } on success, null on failure.
+  function makeOverlayWindow(app) {
+    log("overlay: entry");
     const keyWin = objc(app, "keyWindow");
-    log("statbar: keyWin=0x" + u64(keyWin).toString(16));
-    if (!isNonZero(keyWin)) {
-      log("statbar: no keyWindow - bailing");
-      return 0n;
-    }
+    log("overlay: keyWin=0x" + u64(keyWin).toString(16));
+    if (!isNonZero(keyWin)) { log("overlay: no keyWindow"); return null; }
     const scene = objc(keyWin, "windowScene");
-    log("statbar: scene=0x" + u64(scene).toString(16));
-    if (!isNonZero(scene)) {
-      log("statbar: no windowScene - bailing");
-      return 0n;
-    }
-    const sceneWins = objc(scene, "windows");
-    if (!isNonZero(sceneWins)) {
-      log("statbar: no scene.windows - bailing");
-      return 0n;
-    }
-    const sceneWinCntRaw = objc(sceneWins, "count");
-    const sceneWinCnt = Number(u64(sceneWinCntRaw));
-    log("statbar: scene.windows count=" + sceneWinCnt);
-    const sceneWinLim = sceneWinCnt < 16 ? sceneWinCnt : 16;
-    for (let i = 0; i < sceneWinLim; i++) {
-      const w = objc(sceneWins, "objectAtIndex:", BigInt(i));
-      if (!isNonZero(w)) continue;
-      const preCount = candidates.length;
-      walkFindStatusBarLabels(w, classes.cls17, classes.cls16, candidates, 0, visited);
-      log("statbar: window[" + i + "]=0x" + u64(w).toString(16) + " +" + (candidates.length - preCount) + " candidates");
-    }
-    log("statbar: walk total visited=" + visited[0] + " candidates=" + candidates.length);
+    log("overlay: scene=0x" + u64(scene).toString(16));
+    if (!isNonZero(scene)) { log("overlay: no windowScene"); return null; }
 
-    if (candidates.length === 0) return 0n;
+    // alloc + initWithWindowScene: - pointer argument only, no FP regs.
+    // Avoids -initWithFrame: which takes CGRect and would have to go
+    // through NSInvocation (annoying for a one-liner).
+    const UIWindow = Native.callSymbol("objc_getClass", "UIWindow");
+    if (!isNonZero(UIWindow)) { log("overlay: no UIWindow class"); return null; }
+    const windowRaw = objc(UIWindow, "alloc");
+    log("overlay: window alloc=0x" + u64(windowRaw).toString(16));
+    if (!isNonZero(windowRaw)) return null;
+    const window = objc(windowRaw, "initWithWindowScene:", scene);
+    log("overlay: window init=0x" + u64(window).toString(16));
+    if (!isNonZero(window)) { log("overlay: init failed"); return null; }
 
-    // Prefer a candidate whose current text has ':' (the clock line) so
-    // we don't clobber the cellular / SSID labels. Cache the winner so
-    // subsequent ticks don't need to walk.
-    const colon = nsStr(":");
-    for (let i = 0; i < candidates.length; i++) {
-      const txt = objc(candidates[i], "text");
-      if (!isNonZero(txt)) continue;
-      const hit = objc(txt, "containsString:", colon);
-      if (isNonZero(hit)) {
-        log("statbar: picked candidate " + i + " (has ':' in current text)");
-        globalThis.__sbcust_statbar_label_cached = candidates[i];
-        return candidates[i];
-      }
+    // Geometry via CALayer setBounds:/setPosition: through NSInvocation.
+    // This is the canonical lightsaber/CLAUDE.md pattern for struct args:
+    // the NSInvocation libffi thunk populates d0..d3 correctly, which our
+    // own x-only bridge can't do. UIView.frame mirrors the layer geometry
+    // so visually this is the same as -setFrame:.
+    const winLayer = objc(window, "layer");
+    if (!isNonZero(winLayer)) { log("overlay: no window layer"); return null; }
+    const cx = OVERLAY_SCREEN_W / 2;
+    const cy = OVERLAY_TOP + OVERLAY_H / 2;
+    setLayerBounds(winLayer, 0, 0, OVERLAY_W, OVERLAY_H);
+    setLayerPosition(winLayer, cx, cy);
+
+    // windowLevel is CGFloat but CLAUDE.md confirms scalar KVC via
+    // NSNumber.numberWithLongLong: works specifically for windowLevel -
+    // it gets unboxed through -doubleValue internally without hitting
+    // the -[NSValue getValue:size:] PAC-fault path that blocks struct KVC.
+    // 1001 = UIWindowLevelStatusBar(1000) + 1.
+    objc(window, "setValue:forKey:", nsNumberLL(1001), nsStr("windowLevel"));
+
+    // Background color via +[UIColor blackColor] shared singleton. Nullary
+    // class method, no FP regs.
+    const UIColor = Native.callSymbol("objc_getClass", "UIColor");
+    if (isNonZero(UIColor)) {
+      const black = objc(UIColor, "blackColor");
+      if (isNonZero(black)) objc(window, "setBackgroundColor:", black);
     }
-    log("statbar: no ':' candidate, caching candidate 0");
-    globalThis.__sbcust_statbar_label_cached = candidates[0];
-    return candidates[0];
+
+    // setHidden:NO - BOOL argument, goes in x2, no FP regs.
+    objc(window, "setHidden:", 0n);
+
+    // Create the label. alloc + init is pointer-only.
+    const UILabel = Native.callSymbol("objc_getClass", "UILabel");
+    if (!isNonZero(UILabel)) { log("overlay: no UILabel class"); return null; }
+    const labelRaw = objc(UILabel, "alloc");
+    const label = objc(labelRaw, "init");
+    log("overlay: label=0x" + u64(label).toString(16));
+    if (!isNonZero(label)) { log("overlay: label init failed"); return null; }
+
+    // Label layer geometry: fills the whole window.
+    const labelLayer = objc(label, "layer");
+    if (isNonZero(labelLayer)) {
+      setLayerBounds(labelLayer, 0, 0, OVERLAY_W, OVERLAY_H);
+      setLayerPosition(labelLayer, OVERLAY_W / 2, OVERLAY_H / 2);
+    }
+
+    // White text on the black window bg. Nullary class method, no FP.
+    if (isNonZero(UIColor)) {
+      const white = objc(UIColor, "whiteColor");
+      if (isNonZero(white)) objc(label, "setTextColor:", white);
+    }
+    // NSTextAlignmentCenter = 1. Integer arg, fits in x2.
+    objc(label, "setTextAlignment:", 1n);
+
+    // Root the label into the window before retaining.
+    objc(window, "addSubview:", label);
+
+    // CRITICAL: retain both before returning. Without this, when the
+    // main-thread autorelease pool drains at the end of this dispatch,
+    // the window+label get released and the JS property pointers on
+    // globalThis become dangling. Using objc_msgSend retain is simpler
+    // than CFRetain and works the same on NSObject subclasses.
+    objc(window, "retain");
+    objc(label, "retain");
+
+    log("overlay: created window=0x" + u64(window).toString(16) + " label=0x" + u64(label).toString(16));
+    return { window: window, label: label };
   }
 
-  // Emulation of 34306/excalibur/darksword-kexploit-fun/StatusBarTweak.m
-  // in JS against the lightsaber Native bridge.
-  //
-  // Huy's tweak is a dylib that dlopens into SpringBoard and, in its
-  // constructor, does exactly this:
-  //
-  //   Class cls17 = objc_getClass("STUIStatusBarStringView");  // iOS 17+
-  //   Class cls16 = objc_getClass("_UIStatusBarStringView");   // iOS 16
-  //   if (cls17) hookClass(cls17);  // method_setImplementation(-setText:)
-  //   if (cls16) hookClass(cls16);
-  //
-  // His hook body then checks whether the incoming text contains ':' and,
-  // if so, replaces it with a custom date/time attributed string. The
-  // hook catches EVERY -setText: call on those classes system-wide -
-  // there's no view hierarchy walking at all.
-  //
-  // Our JS bridge doesn't have block or imp_implementationWithBlock
-  // infrastructure, so we can't install a method swizzle from here. But
-  // we can port the underlying insight: resolve the exact same Class
-  // pointers via objc_getClass by name, and then find a live instance
-  // to poke. Finding an instance means walking the UI tree once, which
-  // Huy's tweak avoids via the swizzle but which we have to do manually.
-  //
-  // Every ObjC call on this path is pointer-or-integer only: objc_getClass
-  // / sharedApplication / keyWindow / subviews / count / objectAtIndex: /
-  // isKindOfClass: / text / containsString: / setText:. Nothing touches
-  // d0..d7 and nothing depends on CGRect/CGPoint/CGFloat marshalling, so
-  // the whole SIGBUS surface from the prior VFL and CALayer paths is
-  // gone.
-  //
-  // This is still one-shot: iOS will re-set the clock text on the next
-  // minute tick. Re-inject sbcustomizer with __sbc_statbar=1 to refresh.
+  // Main-thread entry point for the statbar. First call: creates the
+  // overlay and caches pointers on globalThis. Subsequent calls: updates
+  // the cached label's text with a fresh temp / RAM readout. Safe to
+  // call on every loop tick because once the overlay exists we skip the
+  // entire creation path and only do an objc_msgSend setText:.
   function createStatBarOverlay() {
-    log("statbar: entry (replace mode v2)");
-    log("statbar: pre objc_getClass UIApplication");
+    log("statbar: entry");
     const UIApplication = Native.callSymbol("objc_getClass", "UIApplication");
-    log("statbar: UIApplication=0x" + u64(UIApplication).toString(16));
     if (!isNonZero(UIApplication)) { log("statbar: no UIApplication class"); return false; }
-    log("statbar: pre sel sharedApplication");
-    const sharedSel = sel("sharedApplication");
-    log("statbar: sharedSel=0x" + u64(sharedSel).toString(16));
-    log("statbar: pre objc_msgSend sharedApplication");
-    const app = Native.callSymbol("objc_msgSend", UIApplication, sharedSel);
-    log("statbar: app=0x" + u64(app).toString(16));
+    const app = Native.callSymbol("objc_msgSend", UIApplication, sel("sharedApplication"));
     if (!isNonZero(app)) { log("statbar: no sharedApplication"); return false; }
 
-    log("statbar: pre resolveStatusBarClasses");
-    const classes = resolveStatusBarClasses();
-    if (!isNonZero(classes.cls17) && !isNonZero(classes.cls16)) {
-      log("statbar: NEITHER STUIStatusBarStringView nor _UIStatusBarStringView");
-      log("statbar: runtime - need a class-dump of UIKitCore on this build");
-      return false;
+    let label = globalThis.__sbcust_overlay_label;
+    if (label === undefined || !isNonZero(label)) {
+      log("statbar: overlay missing, creating");
+      const overlay = makeOverlayWindow(app);
+      if (!overlay || !isNonZero(overlay.label)) {
+        log("statbar: overlay creation failed");
+        return false;
+      }
+      globalThis.__sbcust_overlay_window = overlay.window;
+      globalThis.__sbcust_overlay_label = overlay.label;
+      label = overlay.label;
     }
 
-    log("statbar: pre findStatusBarClockLabel");
-    const label = findStatusBarClockLabel(app, classes);
-    if (!isNonZero(label)) { log("statbar: no status bar label instance found"); return false; }
-    log("statbar: label=0x" + u64(label).toString(16));
-
     const text = buildStatBarText();
-    log("statbar: text='" + text + "'");
-
-    log("statbar: pre setText:");
+    log("statbar: text='" + text + "' label=0x" + u64(label).toString(16));
     objc(label, "setText:", nsStr(text));
-    log("statbar: post setText:");
-
-    log("statbar: replace complete");
     return true;
   }
 
@@ -1172,10 +1067,11 @@
     // / evaluateScript: bounce used for the initial dispatch) so the
     // repeated work stays on the UI thread where UIKit expects it.
     //
-    // This is the closest we can get to 34306/excalibur's -setText: swizzle
-    // without block/IMP fabrication in the bridge: iOS keeps overwriting
-    // the clock label every ~minute, and we keep overwriting it back every
-    // STATBAR_LOOP_INTERVAL_US microseconds.
+    // First tick creates the overlay UIWindow + label and caches both on
+    // globalThis. Every subsequent tick reuses the cached label pointer
+    // and just calls setText: with a fresh temp / RAM readout - no view
+    // walking, no system view interaction. The overlay is retained so
+    // the autorelease pool can't tear it down between ticks.
     //
     // The loop is the very last thing the IIFE does. Once we enter it,
     // we never return through the outer try/catch under normal operation -

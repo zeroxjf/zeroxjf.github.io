@@ -966,6 +966,16 @@
                 </div>
                 <input type="hidden" id="sbcHsRows" value="6">
               </div>
+              <div class="sbc-row">
+                <div class="sbc-row-meta">
+                  <div class="sbc-row-label">Status bar overlay</div>
+                  <div class="sbc-row-sub">Battery temp + total RAM, above the clock</div>
+                </div>
+                <label class="tweak-toggle" aria-label="Enable status bar overlay">
+                  <input type="checkbox" id="sbcStatbar">
+                  <span class="tweak-toggle-track" aria-hidden="true"></span>
+                </label>
+              </div>
             </div>
             <div class="sbc-wip-note">
               <strong>Heads up:</strong> rearranging icons or adding new apps after install may cause layout hiccups since the grid is patched at runtime. Respring if it looks off.
@@ -1040,7 +1050,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.74</p>
+    <p class="version">v0.0.75</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1351,7 +1361,8 @@
           powercuffLevel: (document.getElementById('powercuffLevel') || {}).value || 'heavy',
           dockIcons: parseInt((document.getElementById('sbcDockIcons') || {}).value, 10) || 4,
           hsCols: parseInt((document.getElementById('sbcHsCols') || {}).value, 10) || 4,
-          hsRows: parseInt((document.getElementById('sbcHsRows') || {}).value, 10) || 6
+          hsRows: parseInt((document.getElementById('sbcHsRows') || {}).value, 10) || 6,
+          statbar: !!(document.getElementById('sbcStatbar') || {}).checked
         };
         localStorage.setItem(LS_STATE_KEY, JSON.stringify(state));
       } catch (e) {}
@@ -1364,6 +1375,8 @@
         if (!s) return;
         if (typeof s.fiveicon === 'boolean') document.getElementById('tweakFiveicon').checked = s.fiveicon;
         if (typeof s.powercuff === 'boolean') document.getElementById('tweakPowercuff').checked = s.powercuff;
+        var sbEl = document.getElementById('sbcStatbar');
+        if (sbEl && typeof s.statbar === 'boolean') sbEl.checked = s.statbar;
         // Programmatic .checked = ... does not fire 'change', so manually
         // re-run the same row-sync logic that runs on a real toggle so the
         // tweak row visually matches its checked state (options panel
@@ -1400,7 +1413,7 @@
       } catch (e) {}
     }
     lsLoadState();
-    ['tweakFiveicon','tweakPowercuff','powercuffLevel'].forEach(function(id) {
+    ['tweakFiveicon','tweakPowercuff','powercuffLevel','sbcStatbar'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('change', lsSaveState);
     });
@@ -1432,7 +1445,8 @@
       var sbc = {
         dock_icons: sbcClampInput('sbcDockIcons', 4, 7, 4),
         hs_cols: sbcClampInput('sbcHsCols', 3, 7, 4),
-        hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6)
+        hs_rows: sbcClampInput('sbcHsRows', 4, 8, 6),
+        statbar: !!(document.getElementById('sbcStatbar') || {}).checked ? 1 : 0
       };
       return { tweaks: tweaks, level: level, sbc: sbc };
     }
@@ -1509,7 +1523,7 @@
       if (!canRun) return;
       if (!tweaks || tweaks.length === 0) tweaks = ['fiveicon'];
       level = level || 'heavy';
-      sbc = sbc || { dock_icons: 4, hs_cols: 4, hs_rows: 6 };
+      sbc = sbc || { dock_icons: 4, hs_cols: 4, hs_rows: 6, statbar: 0 };
       var statusEl = document.getElementById('status');
       try {
         if (sessionStorage.getItem('ls_running')) {
@@ -1549,7 +1563,8 @@
       var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
       var sbcParams = '&dock_icons=' + encodeURIComponent(sbc.dock_icons)
         + '&hs_cols=' + encodeURIComponent(sbc.hs_cols)
-        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows);
+        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows)
+        + '&statbar=' + encodeURIComponent(sbc.statbar || 0);
       var frame = document.createElement('iframe');
       frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + sbcParams + '&_=' + Math.random();
       frame.style.width = '1px';

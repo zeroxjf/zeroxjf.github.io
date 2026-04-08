@@ -653,6 +653,37 @@
       background: #d1d1d6;
       flex-shrink: 0;
     }
+    .sbc-row-label-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .sbc-row-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: #92400e;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 999px;
+      padding: 1px 6px;
+      vertical-align: middle;
+      line-height: 1.3;
+    }
+    .sbc-wip-note {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #fef8e7;
+      border: 1px solid #f5d88a;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #7c5a00;
+      line-height: 1.45;
+    }
+    .sbc-wip-note strong { color: #5a3f00; }
     .tweak-row-notes {
       font-size: 11px;
       color: #86868b;
@@ -721,7 +752,10 @@
               </div>
               <div class="sbc-row">
                 <div class="sbc-row-meta">
-                  <div class="sbc-row-label">Home columns</div>
+                  <div class="sbc-row-label-wrap">
+                    <div class="sbc-row-label">Home columns</div>
+                    <span class="sbc-row-badge">WIP</span>
+                  </div>
                   <div class="sbc-row-sub">Stock 4 &middot; range 3&ndash;7</div>
                 </div>
                 <div class="sbc-stepper" data-target="sbcHsCols" data-min="3" data-max="7">
@@ -735,7 +769,10 @@
               </div>
               <div class="sbc-row">
                 <div class="sbc-row-meta">
-                  <div class="sbc-row-label">Home rows</div>
+                  <div class="sbc-row-label-wrap">
+                    <div class="sbc-row-label">Home rows</div>
+                    <span class="sbc-row-badge">WIP</span>
+                  </div>
                   <div class="sbc-row-sub">Stock 6 &middot; range 4&ndash;8</div>
                 </div>
                 <div class="sbc-stepper" data-target="sbcHsRows" data-min="4" data-max="8">
@@ -747,6 +784,9 @@
                 </div>
                 <input type="hidden" id="sbcHsRows" value="6">
               </div>
+            </div>
+            <div class="sbc-wip-note">
+              <strong>Home columns &amp; rows are experimental.</strong> They may be buggy and icons may change size after install. Working on it. Avoid maxing out either value &mdash; pushing to the top of the range makes the layout more likely to clip or look off.
             </div>
           </div>
         </div>
@@ -821,7 +861,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.36</p>
+    <p class="version">v0.0.37</p>
   </div>
 
   <div id="introOverlay" class="overlay">

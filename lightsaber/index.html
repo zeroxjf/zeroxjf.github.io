@@ -1014,6 +1014,7 @@
       <div style="text-align:center;margin-top:12px">
         <button id="runBtn" class="btn btn-run" onclick="confirmInstall()">Install Selected</button>
       </div>
+      <div id="installStatus" style="font-size:13px;color:#86868b;min-height:16px;margin-top:10px;text-align:center;line-height:1.4"></div>
       <div class="tip">
         <div class="tip-icon">i</div>
         <div class="tip-body">
@@ -1049,7 +1050,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.77</p>
+    <p class="version">v0.0.78</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1457,6 +1458,8 @@
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       var statusEl = document.getElementById('status');
       if (statusEl) statusEl.textContent = '';
+      var installStatusEl = document.getElementById('installStatus');
+      if (installStatusEl) installStatusEl.textContent = '';
       var btn = document.getElementById('runBtn');
       if (btn) {
         btn.textContent = 'Installed';
@@ -1464,10 +1467,25 @@
       }
     }
 
+    // Mirrors the sbx0 printf-via-sandbox-deny breadcrumb that fires right
+    // after SBX1 lands. rce_loader.js forwards every worker 'log' postMessage
+    // to this window as {type:'lightsaber_log', text}, so we just substring
+    // match the stage tag and update the install card.
+    function handleProgressLog(text) {
+      if (!text || typeof text !== 'string') return;
+      if (text.indexOf('sbx0: [+] SBX1 complete') === -1) return;
+      var el = document.getElementById('installStatus');
+      if (!el) return;
+      if (el.dataset.sbx1Done === '1') return;
+      el.dataset.sbx1Done = '1';
+      el.style.color = '#86868b';
+      el.textContent = 'sandbox escape complete, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
+    }
+
     window.addEventListener('message', function(event) {
       var data = event.data || {};
       if (data.type === 'lightsaber_done') markDone();
-      // if (data.type === 'lightsaber_log' && data.text) logAppend(data.text);
+      if (data.type === 'lightsaber_log') handleProgressLog(data.text);
     });
 
     function confirmInstall() {
@@ -1538,6 +1556,11 @@
         btn.textContent = 'Installing (' + tweaks.join(' + ') + ')...';
       }
       if (statusEl) statusEl.textContent = '';
+      var installStatusEl = document.getElementById('installStatus');
+      if (installStatusEl) {
+        installStatusEl.dataset.sbx1Done = '';
+        installStatusEl.textContent = '';
+      }
       /* log UI disabled for now
       var lb = document.getElementById('logBox');
       document.getElementById('logScroll').innerHTML = '';

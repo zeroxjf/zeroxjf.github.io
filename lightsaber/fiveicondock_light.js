@@ -704,6 +704,17 @@
     return sc2;
   }
 
+  function nsStr(str) {
+    // NSString stringWithUTF8String:. We can't use cfstr (CFString)
+    // everywhere because CALayer/UIView KVC on 18.x PAC-faults when the
+    // key is a toll-free bridged CFString instead of a real NSString;
+    // the KVC accessor cache signs an IMP under an isa the bridge
+    // doesn't recognize. stringWithUTF8String: gives us a real
+    // __NSCFConstantString with the expected isa signing.
+    const NSString = Native.callSymbol("objc_getClass", "NSString");
+    return objc(NSString, "stringWithUTF8String:", str);
+  }
+
   function createStatBarOverlay() {
     log("statbar: entry");
     log("statbar: pre objc_getClass UIApplication");
@@ -738,10 +749,9 @@
     if (!text) text = "no data";
     log("statbar: text='" + text + "'");
 
-    // Centered pill under the Dynamic Island. We can't call sizeToFit +
-    // read back the resulting frame (the NSValue<CGRect> read path
-    // PAC-faults on getValue:size:), so estimate the pill width from
-    // the string length. System font at ~11pt averages ~6.2pt per char.
+    // Centered pill under the Dynamic Island. We can't sizeToFit +
+    // read back the frame (NSValue getValue:size: PAC-faults), so
+    // estimate pill width from string length.
     const labelH = 20;
     const labelY = 44; // rough safe-area inset
     const charPx = 6.4;
@@ -749,96 +759,69 @@
     const estTextW = Math.ceil(text.length * charPx);
     const pillW = estTextW + padH;
     const pillX = Math.round((screenW - pillW) / 2);
-    const windowH = labelY + labelH + 6;
     log("statbar: pill=" + pillW + "x" + labelH + " x=" + pillX);
 
-    // UIWindow
-    log("statbar: pre UIWindow class");
-    const UIWindow = Native.callSymbol("objc_getClass", "UIWindow");
-    log("statbar: UIWindow=0x" + u64(UIWindow).toString(16));
-    log("statbar: pre UIWindow alloc");
-    const winAlloc = objc(UIWindow, "alloc");
-    log("statbar: winAlloc=0x" + u64(winAlloc).toString(16));
-    log("statbar: pre initWithWindowScene:");
-    const win = objc(winAlloc, "initWithWindowScene:", scene);
-    log("statbar: win=0x" + u64(win).toString(16));
-    if (!isNonZero(win)) { log("statbar: window init failed"); return false; }
-
-    log("statbar: pre nsValueFromCGRect winFrame");
-    const winFrame = nsValueFromCGRect(0, 0, screenW, windowH);
-    log("statbar: winFrame=0x" + u64(winFrame).toString(16));
-    log("statbar: pre setValue frame");
-    objc(win, "setValue:forKey:", winFrame, cfstr("frame"));
-    log("statbar: post setValue frame");
-    log("statbar: pre setValue windowLevel");
-    objc(win, "setValue:forKey:", nsNumberLL(100001), cfstr("windowLevel"));
-    log("statbar: post setValue windowLevel");
+    // Piggyback on the existing keyWindow rather than creating a new
+    // UIWindow. -[UIWindow setValue:forKey:@"frame"] PAC-faulted on
+    // 18.6.2 inside UIKit's KVC accessor - the new-window setFrame
+    // path appears to trip a signed IMP cache lookup that our bridge
+    // can't satisfy. The keyWindow already has a frame, so we just
+    // add our label into its rootViewController.view hierarchy.
+    log("statbar: pre keyWindow (host)");
+    const hostWin = objc(app, "keyWindow");
+    log("statbar: hostWin=0x" + u64(hostWin).toString(16));
+    if (!isNonZero(hostWin)) { log("statbar: no hostWin"); return false; }
+    log("statbar: pre hostWin rootViewController");
+    const hostVC = objc(hostWin, "rootViewController");
+    log("statbar: hostVC=0x" + u64(hostVC).toString(16));
+    if (!isNonZero(hostVC)) { log("statbar: no hostVC"); return false; }
+    log("statbar: pre hostVC view");
+    const hostView = objc(hostVC, "view");
+    log("statbar: hostView=0x" + u64(hostView).toString(16));
+    if (!isNonZero(hostView)) { log("statbar: no hostView"); return false; }
 
     log("statbar: pre UIColor");
     const UIColor = Native.callSymbol("objc_getClass", "UIColor");
-    const clearC = objc(UIColor, "clearColor");
     const whiteC = objc(UIColor, "whiteColor");
     const blackC = objc(UIColor, "blackColor");
-    log("statbar: colors clear=0x" + u64(clearC).toString(16) + " white=0x" + u64(whiteC).toString(16) + " black=0x" + u64(blackC).toString(16));
-    log("statbar: pre win setBackgroundColor");
-    objc(win, "setBackgroundColor:", clearC);
-    log("statbar: pre win setUserInteractionEnabled");
-    objc(win, "setUserInteractionEnabled:", 0n);
-    log("statbar: pre win setOpaque");
-    objc(win, "setOpaque:", 0n);
-    log("statbar: win props done");
+    log("statbar: whiteC=0x" + u64(whiteC).toString(16) + " blackC=0x" + u64(blackC).toString(16));
 
-    log("statbar: pre UIViewController");
-    const UIViewController = Native.callSymbol("objc_getClass", "UIViewController");
-    const vc = objc(objc(UIViewController, "alloc"), "init");
-    log("statbar: vc=0x" + u64(vc).toString(16));
-    if (!isNonZero(vc)) { log("statbar: vc init failed"); return false; }
-    log("statbar: pre vc view");
-    const vcView = objc(vc, "view");
-    log("statbar: vcView=0x" + u64(vcView).toString(16));
-    objc(vcView, "setBackgroundColor:", clearC);
-    objc(vcView, "setUserInteractionEnabled:", 0n);
-    log("statbar: pre setRootViewController");
-    objc(win, "setRootViewController:", vc);
-    log("statbar: post setRootViewController");
-
-    log("statbar: pre UILabel");
+    log("statbar: pre UILabel alloc init");
     const UILabel = Native.callSymbol("objc_getClass", "UILabel");
     const label = objc(objc(UILabel, "alloc"), "init");
     log("statbar: label=0x" + u64(label).toString(16));
     if (!isNonZero(label)) { log("statbar: label init failed"); return false; }
+
     log("statbar: pre label frame KVC");
     const labelFrame = nsValueFromCGRect(pillX, labelY, pillW, labelH);
-    objc(label, "setValue:forKey:", labelFrame, cfstr("frame"));
+    log("statbar: labelFrame NSValue=0x" + u64(labelFrame).toString(16));
+    objc(label, "setValue:forKey:", labelFrame, nsStr("frame"));
+    log("statbar: post label frame KVC");
     log("statbar: pre setText");
-    objc(label, "setText:", cfstr(text));
+    objc(label, "setText:", nsStr(text));
     log("statbar: pre setTextColor");
     objc(label, "setTextColor:", whiteC);
     log("statbar: pre setTextAlignment");
-    objc(label, "setTextAlignment:", 1n); // NSTextAlignmentCenter
-    log("statbar: pre label setBackgroundColor");
+    objc(label, "setTextAlignment:", 1n);
+    log("statbar: pre setBackgroundColor");
     objc(label, "setBackgroundColor:", blackC);
-    // Rounded corners: setCornerRadius: takes CGFloat (FP reg), so route
-    // through the label.layer via KVC with an NSNumber. KVC unboxes to
-    // CGFloat internally. Same trick for masksToBounds.
+
     log("statbar: pre label layer");
     const layer = objc(label, "layer");
     log("statbar: layer=0x" + u64(layer).toString(16));
     if (isNonZero(layer)) {
-      objc(layer, "setValue:forKey:", nsNumberLL(10), cfstr("cornerRadius"));
+      log("statbar: pre layer cornerRadius KVC");
+      objc(layer, "setValue:forKey:", nsNumberLL(10), nsStr("cornerRadius"));
+      log("statbar: pre layer setMasksToBounds");
       objc(layer, "setMasksToBounds:", 1n);
     }
 
-    log("statbar: pre addSubview");
-    objc(vcView, "addSubview:", label);
-    log("statbar: pre win setHidden");
-    objc(win, "setHidden:", 0n);
-    log("statbar: post win setHidden");
+    log("statbar: pre addSubview on hostView");
+    objc(hostView, "addSubview:", label);
+    log("statbar: post addSubview");
 
     // Retain via associated object on UIApplication so ARC doesn't drop it.
-    // Key just needs to be a stable unique pointer; reuse UIApplication class.
-    const keyPtr = UIApplication;
-    Native.callSymbol("objc_setAssociatedObject", app, keyPtr, win, 1n /* RETAIN_NONATOMIC */);
+    Native.callSymbol("objc_setAssociatedObject", app, UIApplication, label, 1n /* RETAIN_NONATOMIC */);
 
     log("statbar: overlay visible");
     return true;

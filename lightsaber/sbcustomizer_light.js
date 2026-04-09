@@ -50,16 +50,17 @@
   // no FP regs, no new class lookups. Verified against 18.6.2 SpringBoardHome
   // dump (line 27063: -[SBIconListGridLayoutConfiguration setShowsLabels:]).
   const ENABLE_HIDE_LABELS = (globalThis.__sbc_hide_labels === 1 || globalThis.__sbc_hide_labels === true);
-  // Grid reapply loop. SpringBoard is the layout engine (no external daemon
-  // we could hook like powercuff/thermalmonitord), so the only way to keep
-  // our column/row override sticky across drag-to-dock events is to poll
-  // the SBIconListGridLayoutConfiguration and re-apply when it drifts back
-  // to stock. The poll itself is cheap (8 ObjC reads, no writes, no layout);
-  // the heavy patchHomescreenGrid + stabilizeRootListViews only runs when
-  // drift is actually detected, so the stable path costs ~nothing per tick.
-  const ENABLE_GRID_REAPPLY_LOOP = ENABLE_HOMESCREEN_COL_PATCH;
-  const GRID_REAPPLY_INTERVAL_US = 1500000; // 1.5s - fast enough to land before the user notices a drag drift
-  const GRID_REAPPLY_MAX_ITERS = 28800;     // 12h at 1.5s
+  // Grid reapply loop. Disabled by default after v0.0.83 shipped a version
+  // that hung the device: the drift-detect-and-repatch approach works in
+  // theory, but in practice after patchHomescreenGrid + forceRelayout the
+  // provider re-generates cfg.numberOfPortraitColumns from its device-class
+  // defaults before the next poll, so every tick sees drift -> re-patches
+  // -> forces relayout -> animation churn 1.5s apart -> main-thread
+  // starvation -> input freezes. Left in place (gated off) for future
+  // investigation once we understand why the cfg ivar reverts between ticks.
+  const ENABLE_GRID_REAPPLY_LOOP = false;
+  const GRID_REAPPLY_INTERVAL_US = 1500000; // kept for future re-enable
+  const GRID_REAPPLY_MAX_ITERS = 28800;     // kept for future re-enable
 
   class Native {
     static #baseAddr;

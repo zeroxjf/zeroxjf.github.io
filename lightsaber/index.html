@@ -994,7 +994,7 @@
               </div>
             </div>
             <div class="sbc-wip-note">
-              <strong>Heads up:</strong> moving icons to or from the dock can briefly reset the grid, but a background re-apply loop inside SpringBoard catches the drift and puts your layout back within ~1.5 seconds. If it still looks off after a few seconds, respring and rerun.
+              <strong>Heads up:</strong> the grid is patched once during the chain, so moving icons to or from the dock after install can reset some of the layout preferences you set. Respring and rerun if it looks off.
             </div>
           </div>
         </div>
@@ -1066,7 +1066,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.83</p>
+    <p class="version">v0.0.85</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1148,7 +1148,6 @@
     var major = iosParts[0], minor = iosParts[1], patch = iosParts[2] || 0;
     var isIphone = /iPhone/.test(ua);
     var doneSignal = false;
-    var sbxProgressTimer = null;
     /* log UI disabled for now
     var syslogPollTimer = null;
     var lastSyslogText = '';
@@ -1472,7 +1471,6 @@
       if (doneSignal) return;
       doneSignal = true;
       // stopSyslogPolling();
-      if (sbxProgressTimer) { clearTimeout(sbxProgressTimer); sbxProgressTimer = null; }
       try { sessionStorage.removeItem('ls_running'); } catch(e) {}
       var installStatusEl = document.getElementById('installStatus');
       if (installStatusEl) {
@@ -1583,29 +1581,20 @@
         btn.className = 'btn btn-disabled';
         btn.textContent = 'Installing (' + tweaks.join(' + ') + ')...';
       }
+      // Set the progress line SYNCHRONOUSLY before the iframe is created.
+      // iOS Safari shares one WebContent process across the parent page and
+      // its iframes, so once the exploit kicks in and the iframe's JS main
+      // thread stalls during the fcall / sbx0 / sbx1 phase, the PARENT's
+      // main thread also stops servicing the runloop - no setTimeout, no
+      // rAF, no postMessage handler, nothing fires until the chain either
+      // completes or crashes Safari. The only text that's guaranteed to
+      // stay on screen during the freeze is text we write right now, in
+      // this synchronous code path, before the iframe exists.
       if (installStatusEl) {
         installStatusEl.classList.remove('error');
-        installStatusEl.dataset.sbxDone = '';
-        installStatusEl.textContent = '';
+        installStatusEl.dataset.sbxDone = '1';
+        installStatusEl.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
       }
-
-      // The iframe's main thread stalls during the fcall/sbx0 phase, so the
-      // log-forwarding path from the worker via rce_loader rarely makes it
-      // out to this window. Drive the status from the parent side with a
-      // timer - by ~3.5s in, the chain is past setup_fcall and into the
-      // sandbox escape gadgetry, which matches what the message says closely
-      // enough for user-visible feedback. The lightsaber_log detector in
-      // handleProgressLog() stays as a best-effort upgrade if the message
-      // does happen to make it through.
-      if (sbxProgressTimer) { clearTimeout(sbxProgressTimer); sbxProgressTimer = null; }
-      sbxProgressTimer = setTimeout(function() {
-        var el = document.getElementById('installStatus');
-        if (!el || doneSignal) return;
-        if (el.dataset.sbxDone === '1') return;
-        el.dataset.sbxDone = '1';
-        el.classList.remove('error');
-        el.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
-      }, 3500);
 
       /* log UI disabled for now
       var lb = document.getElementById('logBox');
@@ -1624,24 +1613,43 @@
       // notice that "Safari froze/crashed/reloaded means it worked" anyway.
       setTimeout(markDone, 60000);
 
-      // Encode each tweak name individually so the comma between names stays
-      // a literal "," in the URL instead of becoming "%2C". rce_loader.js's
-      // URLSearchParams parser handles either form, but a literal comma is
-      // also more readable in logs and proxies.
-      var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
-      var sbcParams = '&dock_icons=' + encodeURIComponent(sbc.dock_icons)
-        + '&hs_cols=' + encodeURIComponent(sbc.hs_cols)
-        + '&hs_rows=' + encodeURIComponent(sbc.hs_rows)
-        + '&hide_labels=' + encodeURIComponent(sbc.hide_labels || 0);
-      var frame = document.createElement('iframe');
-      frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + sbcParams + '&_=' + Math.random();
-      frame.style.width = '1px';
-      frame.style.height = '1px';
-      frame.style.opacity = '0.01';
-      frame.style.position = 'absolute';
-      frame.style.left = '-9999px';
-      frame.style.border = 'none';
-      document.body.appendChild(frame);
+      // Force a layout flush on the status + button text writes above so
+      // the browser sees them as committed style changes before we yield.
+      // Reading offsetHeight is a well-known barrier that drains pending
+      // style invalidations on WebKit.
+      if (installStatusEl) { void installStatusEl.offsetHeight; }
+      if (btn) { void btn.offsetHeight; }
+
+      // Defer the actual iframe creation one event-loop tick so the
+      // browser has a chance to paint the "Installing..." button text and
+      // the "sandbox escape underway..." install-status line BEFORE the
+      // iframe's worker starts hogging the shared WebContent process. On
+      // iOS Safari a parent page and its same-origin iframes share one
+      // WebContent process, so once the chain kicks in the parent main
+      // thread also stops servicing the runloop - any DOM write still
+      // sitting in the paint queue at that point never reaches the
+      // screen. The setTimeout(0) yields just long enough for the browser
+      // to flush one paint before we hand control over to the exploit.
+      setTimeout(function() {
+        // Encode each tweak name individually so the comma between names stays
+        // a literal "," in the URL instead of becoming "%2C". rce_loader.js's
+        // URLSearchParams parser handles either form, but a literal comma is
+        // also more readable in logs and proxies.
+        var encodedTweaks = tweaks.map(function(t) { return encodeURIComponent(t); }).join(',');
+        var sbcParams = '&dock_icons=' + encodeURIComponent(sbc.dock_icons)
+          + '&hs_cols=' + encodeURIComponent(sbc.hs_cols)
+          + '&hs_rows=' + encodeURIComponent(sbc.hs_rows)
+          + '&hide_labels=' + encodeURIComponent(sbc.hide_labels || 0);
+        var frame = document.createElement('iframe');
+        frame.src = 'frame.html?tweaks=' + encodedTweaks + '&level=' + encodeURIComponent(level) + sbcParams + '&_=' + Math.random();
+        frame.style.width = '1px';
+        frame.style.height = '1px';
+        frame.style.opacity = '0.01';
+        frame.style.position = 'absolute';
+        frame.style.left = '-9999px';
+        frame.style.border = 'none';
+        document.body.appendChild(frame);
+      }, 0);
     }
 
   </script>

@@ -796,65 +796,96 @@
       line-height: 1.2;
     }
     .sbc-row-sub {
-      font-family: var(--mono);
-      font-size: 0.64rem;
+      font-size: 0.74rem;
       color: var(--subtle);
-      margin-top: 3px;
-      letter-spacing: 0.02em;
-    }
-    .sbc-stepper {
-      display: inline-flex;
-      align-items: center;
-      background: var(--card-inset);
-      border: 1px solid var(--border-soft);
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
-      min-height: 32px;
-      box-shadow: var(--shadow-sm);
-    }
-    .sbc-stepper button {
-      background: none;
-      border: none;
-      width: 34px;
-      height: 32px;
-      font-size: 18px;
+      margin-top: 2px;
       font-weight: 500;
-      line-height: 1;
+      line-height: 1.35;
+    }
+    /* Count rows stack vertically: label + current value on top, slider
+       underneath. Gives the slider full row width for proper feel. */
+    .sbc-row-slider {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .sbc-slider-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .sbc-slider-value {
+      font-variant-numeric: tabular-nums;
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--accent);
+      letter-spacing: -0.01em;
+      min-width: 18px;
+      text-align: right;
+    }
+    .sbc-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      background: transparent;
+      accent-color: var(--accent);
+      outline: none;
+      margin: 0;
+      padding: 6px 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-      padding: 0;
-      font-family: inherit;
-      transition: background 0.12s var(--ease);
     }
-    .sbc-stepper button:hover { background: rgba(45,169,255,0.14); }
-    .sbc-stepper button:active { background: rgba(45,169,255,0.24); }
-    .sbc-stepper button:disabled {
-      color: var(--faint);
-      cursor: default;
-    }
-    .sbc-stepper button:disabled:hover,
-    .sbc-stepper button:disabled:active { background: none; }
-    .sbc-stepper .sbc-stepper-value {
-      min-width: 28px;
-      padding: 0 4px;
-      text-align: center;
-      font-family: var(--mono);
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-      line-height: 32px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sbc-stepper .sbc-stepper-sep {
-      width: 1px;
-      height: 20px;
+    .sbc-slider::-webkit-slider-runnable-track {
+      height: 4px;
       background: var(--border);
-      flex-shrink: 0;
+      border-radius: 2px;
     }
+    .sbc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      box-shadow: 0 1px 3px rgba(10,15,28,0.18), 0 0 0 1px rgba(10,15,28,0.10);
+      cursor: pointer;
+      margin-top: -10px;
+      transition: transform 0.12s var(--ease-out), box-shadow 0.12s var(--ease);
+    }
+    .sbc-slider::-webkit-slider-thumb:hover {
+      box-shadow: 0 1px 4px rgba(10,15,28,0.22), 0 0 0 6px rgba(45,169,255,0.16);
+    }
+    .sbc-slider:active::-webkit-slider-thumb {
+      transform: scale(1.08);
+      box-shadow: 0 1px 4px rgba(10,15,28,0.22), 0 0 0 8px rgba(45,169,255,0.22);
+    }
+    .sbc-slider:focus-visible::-webkit-slider-thumb {
+      box-shadow: 0 1px 4px rgba(10,15,28,0.22), 0 0 0 4px rgba(45,169,255,0.35);
+    }
+    .sbc-reset-row {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 2px;
+      border-bottom: none !important;
+    }
+    .sbc-reset-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.15s var(--ease);
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: -0.005em;
+    }
+    .sbc-reset-btn:hover { background: rgba(45,169,255,0.12); }
+    .sbc-reset-btn:active { background: rgba(45,169,255,0.22); }
     .sbc-row-label-wrap {
       display: flex;
       align-items: center;
@@ -956,47 +987,26 @@
           </div>
           <div class="tweak-row-options">
             <div class="sbc-list">
-              <div class="sbc-row">
-                <div class="sbc-row-meta">
-                  <div class="sbc-row-label">Dock icons</div>
-                  <div class="sbc-row-sub">Default 4 &middot; range 4&ndash;7</div>
+              <div class="sbc-row sbc-row-slider">
+                <div class="sbc-slider-head">
+                  <span class="sbc-row-label">Dock icons</span>
+                  <span class="sbc-slider-value" id="sbcDockIconsVal">4</span>
                 </div>
-                <div class="sbc-stepper" data-target="sbcDockIcons" data-min="4" data-max="7">
-                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease dock icons">&#8722;</button>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <span class="sbc-stepper-value" id="sbcDockIconsVal">4</span>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <button type="button" class="sbc-stepper-plus" aria-label="Increase dock icons">+</button>
-                </div>
-                <input type="hidden" id="sbcDockIcons" value="4">
+                <input type="range" id="sbcDockIcons" class="sbc-slider" min="4" max="7" step="1" value="4" aria-label="Dock icons">
               </div>
-              <div class="sbc-row">
-                <div class="sbc-row-meta">
-                  <div class="sbc-row-label">Home columns</div>
-                  <div class="sbc-row-sub">Default 4 &middot; range 3&ndash;7</div>
+              <div class="sbc-row sbc-row-slider">
+                <div class="sbc-slider-head">
+                  <span class="sbc-row-label">Home columns</span>
+                  <span class="sbc-slider-value" id="sbcHsColsVal">4</span>
                 </div>
-                <div class="sbc-stepper" data-target="sbcHsCols" data-min="3" data-max="7">
-                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease home columns">&#8722;</button>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <span class="sbc-stepper-value" id="sbcHsColsVal">4</span>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <button type="button" class="sbc-stepper-plus" aria-label="Increase home columns">+</button>
-                </div>
-                <input type="hidden" id="sbcHsCols" value="4">
+                <input type="range" id="sbcHsCols" class="sbc-slider" min="3" max="7" step="1" value="4" aria-label="Home columns">
               </div>
-              <div class="sbc-row">
-                <div class="sbc-row-meta">
-                  <div class="sbc-row-label">Home rows</div>
-                  <div class="sbc-row-sub">Default 6 &middot; range 4&ndash;8</div>
+              <div class="sbc-row sbc-row-slider">
+                <div class="sbc-slider-head">
+                  <span class="sbc-row-label">Home rows</span>
+                  <span class="sbc-slider-value" id="sbcHsRowsVal">6</span>
                 </div>
-                <div class="sbc-stepper" data-target="sbcHsRows" data-min="4" data-max="8">
-                  <button type="button" class="sbc-stepper-minus" aria-label="Decrease home rows">&#8722;</button>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <span class="sbc-stepper-value" id="sbcHsRowsVal">6</span>
-                  <span class="sbc-stepper-sep" aria-hidden="true"></span>
-                  <button type="button" class="sbc-stepper-plus" aria-label="Increase home rows">+</button>
-                </div>
-                <input type="hidden" id="sbcHsRows" value="6">
+                <input type="range" id="sbcHsRows" class="sbc-slider" min="4" max="8" step="1" value="6" aria-label="Home rows">
               </div>
               <div class="sbc-row">
                 <div class="sbc-row-meta">
@@ -1007,6 +1017,9 @@
                   <input type="checkbox" id="sbcHideLabels">
                   <span class="tweak-toggle-track" aria-hidden="true"></span>
                 </label>
+              </div>
+              <div class="sbc-row sbc-reset-row">
+                <button type="button" class="sbc-reset-btn" id="sbcResetBtn">Reset to defaults</button>
               </div>
             </div>
             <div class="sbc-wip-note">
@@ -1082,7 +1095,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.87</p>
+    <p class="version">v0.0.88</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1347,40 +1360,42 @@
     if (sbcOptionsWrap) {
       sbcOptionsWrap.addEventListener('click', function(e) { e.stopPropagation(); });
     }
-    function sbcWireStepper(stepperEl) {
-      var targetId = stepperEl.getAttribute('data-target');
-      var min = parseInt(stepperEl.getAttribute('data-min'), 10);
-      var max = parseInt(stepperEl.getAttribute('data-max'), 10);
-      var hidden = document.getElementById(targetId);
-      var valueEl = document.getElementById(targetId + 'Val');
-      var minusBtn = stepperEl.querySelector('.sbc-stepper-minus');
-      var plusBtn = stepperEl.querySelector('.sbc-stepper-plus');
+    // Slider binding: keep the display value in sync with the native range
+    // input, live while dragging. The count constants are used by both the
+    // initial wiring and the reset handler so they stay in one place.
+    var SBC_DEFAULTS = { sbcDockIcons: 4, sbcHsCols: 4, sbcHsRows: 6 };
+    function sbcWireSlider(sliderEl) {
+      var valueEl = document.getElementById(sliderEl.id + 'Val');
       function refresh() {
-        var n = parseInt(hidden.value, 10);
-        if (!isFinite(n)) n = min;
-        if (n < min) n = min;
-        if (n > max) n = max;
-        hidden.value = String(n);
-        valueEl.textContent = String(n);
-        minusBtn.disabled = (n <= min);
-        plusBtn.disabled = (n >= max);
+        if (valueEl) valueEl.textContent = String(sliderEl.value);
       }
-      minusBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var n = parseInt(hidden.value, 10) || min;
-        if (n > min) { hidden.value = String(n - 1); refresh(); }
-      });
-      plusBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var n = parseInt(hidden.value, 10) || min;
-        if (n < max) { hidden.value = String(n + 1); refresh(); }
-      });
+      sliderEl.addEventListener('input', refresh);
+      sliderEl.addEventListener('change', refresh);
       refresh();
     }
-    var sbcSteppers = document.querySelectorAll('.sbc-stepper');
-    for (var si = 0; si < sbcSteppers.length; si++) sbcWireStepper(sbcSteppers[si]);
+    var sbcSliders = document.querySelectorAll('.sbc-slider');
+    for (var si = 0; si < sbcSliders.length; si++) sbcWireSlider(sbcSliders[si]);
+
+    // Reset button - restores sliders to their stock defaults and clears
+    // the hide-icon-labels toggle. Fires a synthetic change event on each
+    // control so the lsSaveState listener persists the reset.
+    var sbcResetBtn = document.getElementById('sbcResetBtn');
+    if (sbcResetBtn) {
+      sbcResetBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Object.keys(SBC_DEFAULTS).forEach(function(id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.value = String(SBC_DEFAULTS[id]);
+          var valEl = document.getElementById(id + 'Val');
+          if (valEl) valEl.textContent = String(SBC_DEFAULTS[id]);
+        });
+        var hideLabelsEl = document.getElementById('sbcHideLabels');
+        if (hideLabelsEl) hideLabelsEl.checked = false;
+        lsSaveState();
+      });
+    }
 
     // Persist UI selections across Safari kills via localStorage so the
     // user's toggles/steppers don't reset every time they relaunch.
@@ -1416,32 +1431,22 @@
         for (var ri = 0; ri < tweakRows.length; ri++) syncTweakRow(tweakRows[ri]);
         var lvl = document.getElementById('powercuffLevel');
         if (lvl && typeof s.powercuffLevel === 'string') lvl.value = s.powercuffLevel;
-        function applyStepper(id, val) {
+        function applySlider(id, val) {
           var el = document.getElementById(id);
           if (!el || typeof val !== 'number') return;
-          el.value = String(val);
-          // Do not call sbcWireStepper again - it re-attaches click
-          // listeners and causes double-increments. Just refresh the
-          // visible value + disabled states inline.
-          var stepper = document.querySelector('.sbc-stepper[data-target="' + id + '"]');
-          if (!stepper) return;
-          var min = parseInt(stepper.getAttribute('data-min'), 10);
-          var max = parseInt(stepper.getAttribute('data-max'), 10);
-          var n = parseInt(el.value, 10);
+          var min = parseInt(el.getAttribute('min'), 10);
+          var max = parseInt(el.getAttribute('max'), 10);
+          var n = val;
           if (!isFinite(n)) n = min;
           if (n < min) n = min;
           if (n > max) n = max;
           el.value = String(n);
           var valueEl = document.getElementById(id + 'Val');
           if (valueEl) valueEl.textContent = String(n);
-          var minusBtn = stepper.querySelector('.sbc-stepper-minus');
-          var plusBtn = stepper.querySelector('.sbc-stepper-plus');
-          if (minusBtn) minusBtn.disabled = (n <= min);
-          if (plusBtn) plusBtn.disabled = (n >= max);
         }
-        applyStepper('sbcDockIcons', s.dockIcons);
-        applyStepper('sbcHsCols', s.hsCols);
-        applyStepper('sbcHsRows', s.hsRows);
+        applySlider('sbcDockIcons', s.dockIcons);
+        applySlider('sbcHsCols', s.hsCols);
+        applySlider('sbcHsRows', s.hsRows);
       } catch (e) {}
     }
     lsLoadState();
@@ -1449,9 +1454,10 @@
       var el = document.getElementById(id);
       if (el) el.addEventListener('change', lsSaveState);
     });
-    // Steppers mutate hidden inputs via JS, so hook the buttons directly.
-    document.querySelectorAll('.sbc-stepper button').forEach(function(btn) {
-      btn.addEventListener('click', function() { setTimeout(lsSaveState, 0); });
+    // Native range inputs fire 'change' on release, 'input' continuously
+    // while dragging. Persist on 'change' so we don't spam localStorage.
+    document.querySelectorAll('.sbc-slider').forEach(function(sl) {
+      sl.addEventListener('change', lsSaveState);
     });
     function sbcClampInput(id, lo, hi, def) {
       var el = document.getElementById(id);

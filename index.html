@@ -20,9 +20,6 @@
   <meta name="twitter:description" content="Jailbreak tweaks and iOS security research.">
   <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       /* Sileo-inspired light palette: pale blue-gray canvas, pure white
@@ -84,8 +81,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-feature-settings: 'cv11', 'ss01', 'ss03';
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', sans-serif;
       background: var(--bg);
       background-image: var(--bg-grad);
       color: var(--text);
@@ -105,7 +101,7 @@
       border-radius: 4px;
     }
 
-    .mono { font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace; }
+    .mono { font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace; }
 
     /* ---- Layout ---- */
     .content {
@@ -141,7 +137,7 @@
     .header-left { min-width: 0; }
 
     .header-kicker {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.68rem;
       font-weight: 500;
       color: var(--subtle);
@@ -238,7 +234,7 @@
     a.meta-cell:hover .meta-value { color: var(--accent-hover); }
 
     .meta-label {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.62rem;
       font-weight: 500;
       color: var(--subtle);
@@ -279,7 +275,7 @@
     }
 
     .section-num {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.7rem;
       font-weight: 500;
       color: var(--faint);
@@ -300,7 +296,7 @@
       color: var(--subtle);
       font-weight: 500;
       margin-left: auto;
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       letter-spacing: -0.005em;
       font-variant-numeric: tabular-nums;
     }
@@ -330,7 +326,7 @@
 
     .post-line::after {
       content: "→";
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       position: absolute;
       right: 1.2rem;
       color: var(--accent);
@@ -352,7 +348,7 @@
     }
 
     .line-date {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.7rem;
       color: var(--faint);
       flex-shrink: 0;
@@ -398,7 +394,7 @@
       white-space: nowrap;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       line-height: 1.5;
     }
 
@@ -412,7 +408,7 @@
     .line-tag.sop    { background: rgba(62,32,134,0.14); color: #3e2086; border: 1px solid rgba(62,32,134,0.28); }
 
     .line-stars {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.7rem;
       color: var(--faint);
       flex-shrink: 0;
@@ -433,7 +429,7 @@
     }
 
     .manager-prompt {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.66rem;
       font-weight: 500;
       color: var(--subtle);
@@ -510,7 +506,7 @@
     }
 
     .tweak-ver {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.66rem;
       color: var(--subtle);
       font-variant-numeric: tabular-nums;
@@ -524,7 +520,7 @@
     }
 
     .tweak-arrow {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.9rem;
       color: var(--faint);
       transition: transform 0.25s var(--ease-out), color 0.15s var(--ease);
@@ -545,7 +541,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.68rem;
       color: var(--faint);
       letter-spacing: 0.02em;
@@ -659,7 +655,7 @@
     .dep-markdown li { margin-bottom: 0.25rem; }
 
     .dep-markdown code {
-      font-family: 'SF Mono', 'Menlo', monospace;
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
       font-size: 0.82rem;
       background: var(--code-bg);
       padding: 0.12rem 0.4rem;
@@ -773,8 +769,8 @@
         <div class="meta-value">5 <small>disclosed</small></div>
       </div>
       <div class="meta-cell">
-        <div class="meta-label">Blog Posts</div>
-        <div class="meta-value">1 <small>published</small></div>
+        <div class="meta-label">CVEs</div>
+        <div class="meta-value">2 <small>assigned</small></div>
       </div>
       <a class="meta-cell" href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">
         <div class="meta-label">Media Mention</div>

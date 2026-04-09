@@ -25,42 +25,44 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Surfaces — muted pewter, layered */
-      --bg:         #b7bdc8;
-      --bg-grad:    radial-gradient(1200px 700px at 50% -180px, rgba(15,23,42,0.14), transparent 65%);
-      --card:       #e3e6ec;
-      --card-alt:   #d8dce3;
-      --card-inset: #ccd2dc;
+      /* Sileo-inspired light palette: pale blue-gray canvas, pure white
+         surfaces, sharp system blue accent. Not a carbon copy - softer
+         shadows, more breathing room, consistent 14-18px corner radii. */
+      --bg:         #eef0f5;
+      --bg-grad:    radial-gradient(1200px 700px at 50% -220px, rgba(45,169,255,0.12), transparent 62%);
+      --card:       #ffffff;
+      --card-alt:   #f7f8fb;
+      --card-inset: #f0f2f6;
 
       /* Lines */
-      --border:        #9ea6b3;
-      --border-soft:   #b8bec9;
-      --border-strong: #7d8694;
+      --border:        #e5e7ec;
+      --border-soft:   #eef0f4;
+      --border-strong: #d4d6dd;
 
       /* Elevation */
-      --shadow-sm:  0 1px 2px rgba(15,23,42,0.08);
-      --shadow-md:  0 1px 2px rgba(15,23,42,0.06), 0 8px 24px -8px rgba(15,23,42,0.18);
-      --shadow-lg:  0 4px 12px -4px rgba(15,23,42,0.12), 0 24px 56px -16px rgba(15,23,42,0.22);
-      --shadow-row: 0 1px 3px rgba(15,23,42,0.08), 0 6px 16px -4px rgba(15,23,42,0.10);
-      --ring:       0 0 0 3px rgba(37,99,235,0.18);
+      --shadow-sm:  0 1px 2px rgba(10,15,28,0.05);
+      --shadow-md:  0 1px 3px rgba(10,15,28,0.05), 0 12px 32px -12px rgba(10,15,28,0.14);
+      --shadow-lg:  0 6px 16px -6px rgba(10,15,28,0.10), 0 30px 64px -20px rgba(10,15,28,0.22);
+      --shadow-row: 0 1px 2px rgba(10,15,28,0.05), 0 8px 22px -8px rgba(45,169,255,0.16);
+      --ring:       0 0 0 3px rgba(45,169,255,0.22);
 
       /* Ink */
-      --ink:    #0b0f19;
-      --text:   #1a2030;
-      --muted:  #414a5c;
-      --subtle: #5a6475;
-      --faint:  #7a8393;
+      --ink:    #0a0f1c;
+      --text:   #1b2030;
+      --muted:  #4b5362;
+      --subtle: #8e8e95;
+      --faint:  #aaacb4;
       --line-strong: #242b3b;
 
       /* Accent */
-      --accent:        #2563eb;
-      --accent-hover:  #1d4ed8;
-      --accent-dark:   #1e3a8a;
-      --accent-soft:   #c4d1ea;
-      --accent-border: #96acd4;
+      --accent:        #2da9ff;
+      --accent-hover:  #1596f0;
+      --accent-dark:   #0b66a8;
+      --accent-soft:   #e6f4ff;
+      --accent-border: #b7dcff;
 
-      --hover:    #d0d5de;
-      --code-bg:  #cdd3dc;
+      --hover:    #f0f2f6;
+      --code-bg:  #f0f2f6;
 
       /* Motion */
       --ease:     cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -112,17 +114,17 @@
       padding: 3rem 3.25rem 3rem;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow-md);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
       position: relative;
     }
     .content::before {
       content: "";
       position: absolute;
       inset: 0;
-      border-radius: 14px;
+      border-radius: 20px;
       pointer-events: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
     }
 
     /* ---- Header ---- */
@@ -198,15 +200,15 @@
       color: var(--muted);
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       box-shadow: var(--shadow-sm);
       transition: transform 0.2s var(--ease-out), color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
     }
 
     .social-row a:hover {
-      color: var(--ink);
-      border-color: var(--border-strong);
-      background: var(--card-alt);
+      color: var(--accent-dark);
+      border-color: var(--accent-border);
+      background: var(--accent-soft);
       transform: translateY(-1px);
     }
 
@@ -217,8 +219,8 @@
       gap: 0;
       margin-bottom: 2.5rem;
       background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
@@ -305,9 +307,9 @@
 
     /* ---- Card list wrapper ---- */
     .entry-list {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--card-alt);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
@@ -337,12 +339,12 @@
       transition: all 0.25s var(--ease-out);
       font-weight: 500;
       pointer-events: none;
-      background: var(--card-alt);
+      background: var(--card);
       padding: 0 0.35rem;
     }
 
     .post-line:hover {
-      background: var(--card-alt);
+      background: var(--card);
     }
     .post-line:hover::after {
       opacity: 1;
@@ -426,7 +428,7 @@
       padding: 1.1rem 1rem 1.25rem;
       background: var(--card-alt);
       border: 1px dashed var(--border);
-      border-radius: 10px;
+      border-radius: 14px;
       text-align: center;
     }
 
@@ -451,10 +453,10 @@
       display: inline-flex;
       align-items: center;
       gap: 0.55rem;
-      padding: 0.6rem 1.05rem;
+      padding: 0.65rem 1.1rem;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--text);
       text-decoration: none;
       font-size: 0.82rem;
@@ -466,7 +468,7 @@
 
     .manager-btn:hover {
       border-color: var(--border-strong);
-      background: var(--card-alt);
+      background: var(--card);
       transform: translateY(-1px);
       box-shadow: var(--shadow-row);
       color: var(--ink);
@@ -486,7 +488,7 @@
     }
 
     .tweak-line:last-child { border-bottom: none; }
-    .tweak-line:hover { background: var(--card-alt); }
+    .tweak-line:hover { background: var(--card); }
 
     .tweak-info { flex: 1; min-width: 0; }
 
@@ -514,8 +516,8 @@
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
       background: var(--card-inset);
-      padding: 0.22rem 0.55rem;
-      border-radius: 5px;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
       border: 1px solid var(--border-soft);
       font-weight: 500;
       letter-spacing: 0;
@@ -587,10 +589,10 @@
 
     .detail-version {
       font-size: 0.72rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 10px;
+      padding: 0.22rem 0.65rem;
+      border-radius: 999px;
       background: var(--accent-soft);
-      color: var(--accent-hover);
+      color: var(--accent-dark);
       border: 1px solid var(--accent-border);
       font-weight: 600;
     }
@@ -598,10 +600,11 @@
     .detail-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; }
 
     .detail-depiction {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--card-alt);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
       padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
     }
 
     /* ---- Depiction ---- */

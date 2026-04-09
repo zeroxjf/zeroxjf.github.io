@@ -26,31 +26,34 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     :root {
-      --bg:         #b7bdc8;
-      --bg-grad:    radial-gradient(1200px 700px at 50% -180px, rgba(15,23,42,0.14), transparent 65%);
-      --card:       #e3e6ec;
-      --card-alt:   #d8dce3;
-      --card-inset: #ccd2dc;
-      --border:        #9ea6b3;
-      --border-soft:   #b8bec9;
-      --border-strong: #7d8694;
-      --shadow-sm:  0 1px 2px rgba(15,23,42,0.08);
-      --shadow-md:  0 1px 2px rgba(15,23,42,0.06), 0 8px 24px -8px rgba(15,23,42,0.18);
-      --shadow-lg:  0 4px 12px -4px rgba(15,23,42,0.12), 0 24px 56px -16px rgba(15,23,42,0.22);
-      --shadow-row: 0 1px 3px rgba(15,23,42,0.08), 0 6px 16px -4px rgba(15,23,42,0.10);
-      --ring:       0 0 0 3px rgba(37,99,235,0.18);
-      --ink:    #0b0f19;
-      --text:   #1a2030;
-      --muted:  #414a5c;
-      --subtle: #5a6475;
-      --faint:  #7a8393;
-      --accent:        #2563eb;
-      --accent-hover:  #1d4ed8;
-      --accent-dark:   #1e3a8a;
-      --accent-soft:   #c4d1ea;
-      --accent-border: #96acd4;
-      --hover:    #d0d5de;
-      --code-bg:  #cdd3dc;
+      /* Sileo-inspired light palette: pale blue-gray canvas, pure white
+         surfaces, sharp system blue accent. Not a carbon copy - softer
+         shadows, more breathing room, consistent 14-18px corner radii. */
+      --bg:         #eef0f5;
+      --bg-grad:    radial-gradient(1200px 700px at 50% -220px, rgba(45,169,255,0.12), transparent 62%);
+      --card:       #ffffff;
+      --card-alt:   #f7f8fb;
+      --card-inset: #f0f2f6;
+      --border:        #e5e7ec;
+      --border-soft:   #eef0f4;
+      --border-strong: #d4d6dd;
+      --shadow-sm:  0 1px 2px rgba(10,15,28,0.05);
+      --shadow-md:  0 1px 3px rgba(10,15,28,0.05), 0 12px 32px -12px rgba(10,15,28,0.14);
+      --shadow-lg:  0 6px 16px -6px rgba(10,15,28,0.10), 0 30px 64px -20px rgba(10,15,28,0.22);
+      --shadow-row: 0 1px 2px rgba(10,15,28,0.05), 0 8px 22px -8px rgba(45,169,255,0.16);
+      --ring:       0 0 0 3px rgba(45,169,255,0.22);
+      --ink:    #0a0f1c;
+      --text:   #1b2030;
+      --muted:  #4b5362;
+      --subtle: #8e8e95;
+      --faint:  #aaacb4;
+      --accent:        #2da9ff;
+      --accent-hover:  #1596f0;
+      --accent-dark:   #0b66a8;
+      --accent-soft:   #e6f4ff;
+      --accent-border: #b7dcff;
+      --hover:    #f0f2f6;
+      --code-bg:  #f0f2f6;
       --ease:     cubic-bezier(0.22, 0.61, 0.36, 1);
       --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       --mono: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
@@ -59,7 +62,7 @@
     button, input, select, textarea { font-family: inherit; font-size: inherit; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif;
       font-feature-settings: 'cv11', 'ss01', 'ss03';
       background: var(--bg);
       background-image: var(--bg-grad);
@@ -81,22 +84,22 @@
       margin: 0 auto;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow-md);
-      padding: 24px 22px 22px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      padding: 26px 22px 22px;
       position: relative;
     }
     @media (max-width: 520px) {
       body { padding: 16px 8px; }
-      .page { padding: 20px 16px 18px; border-radius: 12px; }
+      .page { padding: 22px 16px 18px; border-radius: 18px; }
     }
     .page::before {
       content: "";
       position: absolute;
       inset: 0;
-      border-radius: 14px;
+      border-radius: 20px;
       pointer-events: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
     }
     .page-header {
       margin-bottom: 18px;
@@ -104,9 +107,9 @@
       border-bottom: 1px solid var(--border-soft);
     }
     .page-title {
-      font-size: 2rem;
+      font-size: 2.35rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.035em;
       color: var(--ink);
       line-height: 1;
       margin-bottom: 6px;
@@ -155,10 +158,10 @@
     .page-author a svg { opacity: 0.85; }
     .section {
       background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
       box-shadow: var(--shadow-sm);
     }
     .section-title {
@@ -179,11 +182,11 @@
     .btn {
       display: inline-block;
       border: 1px solid var(--border);
-      padding: 13px 36px;
-      border-radius: 10px;
-      font-size: 0.95rem;
+      padding: 14px 40px;
+      border-radius: 14px;
+      font-size: 0.98rem;
       font-family: inherit;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: -0.01em;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
@@ -192,11 +195,16 @@
     .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-row); }
     .btn:active { transform: translateY(0); opacity: 0.85; }
     .btn-run {
-      background: var(--ink);
+      background: var(--accent);
       color: #fff;
-      border-color: var(--ink);
+      border-color: var(--accent);
+      box-shadow: 0 1px 2px rgba(10,15,28,0.06), 0 10px 24px -8px rgba(45,169,255,0.55);
     }
-    .btn-run:hover { background: #1a2338; border-color: #1a2338; }
+    .btn-run:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: 0 2px 4px rgba(10,15,28,0.08), 0 14px 30px -8px rgba(45,169,255,0.65);
+    }
     .btn-disabled {
       background: var(--card-inset);
       color: var(--faint);
@@ -205,9 +213,9 @@
       box-shadow: none;
     }
     .btn-done {
-      background: #0b4f32;
+      background: #30d158;
       color: #fff;
-      border-color: #0b4f32;
+      border-color: #30d158;
       pointer-events: none;
     }
     .note {
@@ -239,24 +247,24 @@
       gap: 10px;
       background: var(--accent-soft);
       border: 1px solid var(--accent-border);
-      border-radius: 10px;
-      padding: 11px 13px;
+      border-radius: 14px;
+      padding: 12px 14px;
       margin-top: 0;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       line-height: 1.55;
       color: var(--accent-dark);
       box-shadow: var(--shadow-sm);
       animation: tipPulse 3.2s ease-in-out infinite;
     }
     .tip-icon {
-      flex: 0 0 18px;
-      width: 18px;
-      height: 18px;
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: var(--accent);
       color: #fff;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 12px;
       font-family: var(--mono);
       display: flex;
       align-items: center;
@@ -267,8 +275,8 @@
     .tip-body { flex: 1; }
     .tip-body strong { color: var(--accent-dark); font-weight: 700; }
     @keyframes tipPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0); }
-      50%      { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.15); }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(45, 169, 255, 0.0); }
+      50%      { box-shadow: 0 0 0 6px rgba(45, 169, 255, 0.18); }
     }
     @keyframes tipIconBob {
       0%, 100% { transform: translateY(0); }
@@ -471,8 +479,8 @@
     .overlay.active { display: flex; }
     .dialog {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
       padding: 28px 24px;
       max-width: 360px;
       width: 100%;
@@ -495,10 +503,10 @@
       transition: transform 0.2s var(--ease-out), background 0.15s var(--ease);
     }
     .dialog-btns button:hover { transform: translateY(-1px); }
-    .btn-cancel { background: var(--card-alt); color: var(--muted); }
-    .btn-cancel:hover { background: var(--card); }
-    .btn-confirm { background: var(--ink); color: #fff; border-color: var(--ink); }
-    .btn-confirm:hover { background: #1a2338; }
+    .btn-cancel { background: var(--card-alt); color: var(--muted); border-color: var(--border); }
+    .btn-cancel:hover { background: var(--hover); }
+    .btn-confirm { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-confirm:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
     .dialog.intro {
       max-width: 420px;
       max-height: 88vh;
@@ -555,21 +563,22 @@
     .tweak-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin: 14px 0 10px;
+      gap: 12px;
+      margin: 16px 0 10px;
     }
     .tweak-row {
       background: var(--card);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
       box-shadow: var(--shadow-sm);
-      transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+      transition: background 0.18s var(--ease), border-color 0.18s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease-out);
     }
     .tweak-row.checked {
-      border-color: var(--accent-border);
-      background: var(--card-alt);
+      border-color: var(--accent);
+      background: var(--card);
       box-shadow: var(--shadow-row);
+      transform: translateY(-1px);
     }
     .tweak-row.experimental {
       opacity: 0.68;
@@ -812,8 +821,8 @@
       font-family: inherit;
       transition: background 0.12s var(--ease);
     }
-    .sbc-stepper button:hover { background: rgba(37,99,235,0.12); }
-    .sbc-stepper button:active { background: rgba(37,99,235,0.22); }
+    .sbc-stepper button:hover { background: rgba(45,169,255,0.14); }
+    .sbc-stepper button:active { background: rgba(45,169,255,0.24); }
     .sbc-stepper button:disabled {
       color: var(--faint);
       cursor: default;
@@ -1066,7 +1075,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.85</p>
+    <p class="version">v0.0.86</p>
   </div>
 
   <div id="introOverlay" class="overlay">
@@ -1499,7 +1508,7 @@
       if (el.dataset.sbxDone === '1') return;
       el.dataset.sbxDone = '1';
       el.classList.remove('error');
-      el.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
+      el.textContent = 'kernel exploit + sandbox escape underway, attempting install. Safari will freeze, wait ~30 more seconds to see if changes took hold';
     }
 
     window.addEventListener('message', function(event) {
@@ -1579,7 +1588,7 @@
       var btn = document.getElementById('runBtn');
       if (btn) {
         btn.className = 'btn btn-disabled';
-        btn.textContent = 'Installing (' + tweaks.join(' + ') + ')...';
+        btn.textContent = 'Installing...';
       }
       // Set the progress line SYNCHRONOUSLY before the iframe is created.
       // iOS Safari shares one WebContent process across the parent page and
@@ -1593,7 +1602,7 @@
       if (installStatusEl) {
         installStatusEl.classList.remove('error');
         installStatusEl.dataset.sbxDone = '1';
-        installStatusEl.textContent = 'sandbox escape underway, attempting install. safari will freeze, wait ~15-30 more seconds to see if changes took hold';
+        installStatusEl.textContent = 'kernel exploit + sandbox escape underway, attempting install. Safari will freeze, wait ~30 more seconds to see if changes took hold';
       }
 
       /* log UI disabled for now

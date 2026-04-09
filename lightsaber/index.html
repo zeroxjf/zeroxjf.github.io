@@ -177,8 +177,8 @@
       margin-bottom: 12px;
       font-weight: 500;
     }
-    .supported { color: #0b4f32; font-weight: 600; }
-    .unsupported { color: #7a1419; font-weight: 600; }
+    .supported { color: #0f7a3d; font-weight: 700; }
+    .unsupported { color: #a51016; font-weight: 700; }
     .btn {
       display: inline-block;
       border: 1px solid var(--border);
@@ -293,26 +293,33 @@
       line-height: 1.6;
       box-shadow: var(--shadow-sm);
     }
+    /* Callout boxes - solid tinted fills with bright borders and saturated
+       text so they keep punch on the new white card background. The old
+       alpha-based fills lost all contrast against white. */
     .warning {
-      background: rgba(139,26,32,0.10);
-      border: 1px solid rgba(139,26,32,0.28);
-      color: #7a1419;
+      background: #ffecec;
+      border: 1px solid #ff6b63;
+      color: #a51016;
+      box-shadow: 0 1px 2px rgba(255,59,48,0.10), 0 4px 14px -6px rgba(255,59,48,0.24);
     }
-    .warning strong { color: #5c0f13; font-weight: 700; }
-    .warning a { color: #7a1419; text-decoration: underline; }
+    .warning strong { color: #7a0a10; font-weight: 700; }
+    .warning a { color: #a51016; text-decoration: underline; }
     .disclaimer {
-      background: rgba(140,76,12,0.10);
-      border: 1px solid rgba(140,76,12,0.30);
-      color: #7a4a0c;
+      background: #fff3df;
+      border: 1px solid #ffae40;
+      color: #8a4a04;
+      box-shadow: 0 1px 2px rgba(255,149,0,0.10), 0 4px 14px -6px rgba(255,149,0,0.24);
     }
-    .disclaimer strong { color: #5a3609; font-weight: 700; }
+    .disclaimer strong { color: #5a3005; font-weight: 700; }
+    .disclaimer a { color: #8a4a04; text-decoration: underline; }
     .caution {
-      background: rgba(140,76,12,0.14);
-      border: 1px solid rgba(140,76,12,0.35);
-      color: #6e3a08;
+      background: #ffe8cc;
+      border: 1px solid #ff9a1f;
+      color: #7d3d02;
+      box-shadow: 0 1px 2px rgba(255,149,0,0.12), 0 4px 14px -6px rgba(255,149,0,0.28);
     }
     .caution strong { color: #4d2806; font-weight: 700; }
-    .caution a { color: #6e3a08; text-decoration: underline; }
+    .caution a { color: #7d3d02; text-decoration: underline; }
     /* Collapsible <details>/<summary> versions of the three warning boxes
        on the page itself. The intro overlay still shows the full text;
        these inline boxes start collapsed and can be tapped to expand. */
@@ -487,7 +494,7 @@
       text-align: center;
       box-shadow: var(--shadow-lg);
     }
-    .dialog h2 { font-size: 1.15rem; font-weight: 700; color: #7a1419; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .dialog h2 { font-size: 1.15rem; font-weight: 700; color: #a51016; margin-bottom: 12px; letter-spacing: -0.02em; }
     .dialog p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
     .dialog-btns { display: flex; gap: 10px; }
     .dialog-btns button {
@@ -594,9 +601,9 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #6e3a08;
-      background: rgba(140,76,12,0.14);
-      border: 1px solid rgba(140,76,12,0.35);
+      color: #7d3d02;
+      background: #ffe8cc;
+      border: 1px solid #ff9a1f;
       border-radius: 999px;
       padding: 1px 7px;
       margin-left: 6px;
@@ -860,9 +867,9 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #6e3a08;
-      background: rgba(140,76,12,0.14);
-      border: 1px solid rgba(140,76,12,0.35);
+      color: #7d3d02;
+      background: #ffe8cc;
+      border: 1px solid #ff9a1f;
       border-radius: 999px;
       padding: 1px 6px;
       vertical-align: middle;
@@ -870,15 +877,15 @@
     }
     .sbc-wip-note {
       margin-top: 8px;
-      padding: 9px 11px;
-      background: rgba(140,76,12,0.08);
-      border: 1px solid rgba(140,76,12,0.28);
-      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff3df;
+      border: 1px solid #ffae40;
+      border-radius: 10px;
       font-size: 0.7rem;
-      color: #6e3a08;
+      color: #8a4a04;
       line-height: 1.55;
     }
-    .sbc-wip-note strong { color: #4d2806; font-weight: 700; }
+    .sbc-wip-note strong { color: #5a3005; font-weight: 700; }
     .tweak-row-notes {
       font-size: 0.7rem;
       color: var(--subtle);
@@ -1075,7 +1082,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.86</p>
+    <p class="version">v0.0.87</p>
   </div>
 
   <div id="introOverlay" class="overlay">

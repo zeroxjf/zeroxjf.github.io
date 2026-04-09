@@ -673,6 +673,26 @@
       color: var(--subtle);
       line-height: 1.55;
     }
+    /* Inline description shown inside .tweak-row-options (e.g. Powercuff
+       shows its blurb next to the level picker whenever the toggle is on,
+       no caret-expand required). */
+    .tweak-row-desc-inline {
+      margin-bottom: 10px;
+    }
+    /* Static row-name variant for rows that don't have a caret-expand
+       button (e.g. Powercuff, whose description now lives inside the
+       options block). Mirrors tweak-row-title's text layout so the
+       label lines up with the other rows' caret+name. */
+    .tweak-row-name-static {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      padding: 4px 0;
+    }
     /* iOS-style toggle switch */
     .tweak-toggle {
       position: relative;
@@ -1030,19 +1050,14 @@
 
         <div class="tweak-row" id="tweakRowPowercuff">
           <div class="tweak-row-head">
-            <button type="button" class="tweak-row-title" aria-expanded="false" aria-controls="tweakDetailPowercuff">
-              <span class="tweak-row-caret" aria-hidden="true">&rsaquo;</span>
-              <span class="tweak-row-name">Powercuff &mdash; battery saver</span>
-            </button>
+            <span class="tweak-row-name tweak-row-name-static">Powercuff &mdash; battery saver</span>
             <label class="tweak-toggle" aria-label="Enable Powercuff">
               <input type="checkbox" id="tweakPowercuff">
               <span class="tweak-toggle-track" aria-hidden="true"></span>
             </label>
           </div>
-          <div class="tweak-row-detail" id="tweakDetailPowercuff" hidden>
-            <div class="tweak-row-desc">Underclocks the CPU/GPU for longer battery, at the cost of speed. Port of <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a>. Lasts until reboot.</div>
-          </div>
           <div class="tweak-row-options">
+            <div class="tweak-row-desc tweak-row-desc-inline">Underclocks the CPU/GPU for longer battery, at the cost of speed. Port of <a href="https://github.com/rpetrich/Powercuff">rpetrich's Powercuff</a>. Lasts until reboot.</div>
             <span class="tweak-row-options-label">Level</span>
             <select id="powercuffLevel">
               <option value="off">Off</option>
@@ -1095,7 +1110,7 @@
       <a href="https://github.com/34306">34306</a> &amp; <a href="https://github.com/khanhduytran0">khanhduytran0</a>, whose <a href="http://34306.lol/darksword/">site design</a> helped stabilize payload delivery on this project, <a href="https://twitter.com/cro4js" target="_blank" rel="noopener">@cro4js</a> for UI suggestions, and anonymous contributors for help stabilizing the exploit chain.
     </div>
 
-    <p class="version">v0.0.88</p>
+    <p class="version">v0.0.89</p>
   </div>
 
   <div id="introOverlay" class="overlay">

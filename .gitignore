@@ -2,5 +2,3 @@ CLAUDE.md
 .DS_Store
 _site/
 .jekyll-cache/
-lightsaber/syslog.py
-lightsaber/syslog.txt

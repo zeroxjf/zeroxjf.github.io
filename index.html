@@ -94,7 +94,16 @@
     .last-login li:last-child { margin-bottom: 15px; }
     .online-now {
       display: flex; align-items: center; gap: 3px;
-      font-size: 8pt; color: #009900;
+      font-size: 8pt; color: #00bb00;
+    }
+    .online-icon { flex-shrink: 0; }
+    .online-icon .wave-l, .online-icon .wave-r {
+      animation: wave-pulse 1.2s ease-in-out infinite;
+    }
+    .online-icon .wave-r { animation-delay: 0.15s; }
+    @keyframes wave-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.1; }
     }
     .pics-videos { grid-area: 1/1; justify-self: center; align-self: end; }
 
@@ -380,7 +389,7 @@
             <li>&nbsp;</li>
             <li>UNITED STATES</li>
             <li>&nbsp;</li>
-            <li class="online-now"><svg width="14" height="14" viewBox="0 0 24 24" fill="#e87a1e"><circle cx="12" cy="7" r="4"/><path d="M12 13c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg> <b>Online Now!</b></li>
+            <li class="online-now"><svg class="online-icon" width="18" height="16" viewBox="0 0 36 28"><circle cx="18" cy="8" r="5" fill="#e87a1e"/><path d="M18 15c-6 0-10 3-10 6v3h20v-3c0-3-4-6-10-6z" fill="#e87a1e"/><path class="wave-l" d="M8 8a8 8 0 0 1 0-8" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-l" d="M5 10a12 12 0 0 1 0-14" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-r" d="M28 8a8 8 0 0 0 0-8" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-r" d="M31 10a12 12 0 0 0 0-14" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg> <b>Online Now!</b></li>
           </ul>
           <ul class="last-login">
             <li>Last Login:</li>

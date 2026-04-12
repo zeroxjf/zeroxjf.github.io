@@ -457,12 +457,20 @@
 
     .line-stars {
       font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
-      font-size: 0.7rem;
-      color: var(--faint);
+      font-size: 0.6rem;
+      color: #7d6a28;
       flex-shrink: 0;
-      width: 2.75rem;
-      text-align: right;
       font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      background: rgba(202,158,20,0.10);
+      border: 1px solid rgba(202,158,20,0.22);
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s var(--ease);
     }
     .post-line:hover .line-stars { opacity: 0; }
 
@@ -845,7 +853,7 @@
           <span class="line-tag uaf">uaf</span>
           <span class="line-tag cve">CVE-2026-20637</span>
         </span>
-        <span class="line-stars">&#9734; 50</span>
+        <span class="line-stars">&#9733; 50</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
@@ -856,7 +864,7 @@
           <span class="line-tag uaf">uaf</span>
           <span class="line-tag race">race</span>
         </span>
-        <span class="line-stars">&#9734; 6</span>
+        <span class="line-stars">&#9733; 6</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
@@ -867,7 +875,7 @@
           <span class="line-tag uaf">uaf</span>
           <span class="line-tag cve">CVE-2026-20687</span>
         </span>
-        <span class="line-stars">&#9734; 15</span>
+        <span class="line-stars">&#9733; 15</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
@@ -877,7 +885,7 @@
           <span class="line-tag kernel">kernel</span>
           <span class="line-tag uaf">uaf</span>
         </span>
-        <span class="line-stars">&#9734; 19</span>
+        <span class="line-stars">&#9733; 19</span>
       </a>
 
       <a class="post-line" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
@@ -887,7 +895,7 @@
           <span class="line-tag sep">kernel/SEP</span>
           <span class="line-tag dos">DoS</span>
         </span>
-        <span class="line-stars">&#9734; 23</span>
+        <span class="line-stars">&#9733; 23</span>
       </a>
 
       </div><!-- /.entry-list -->

@@ -248,43 +248,85 @@
         margin-top: 4px;
       }
 
-      /* -- Middle spacer (shows wallpaper) -- */
-      .i-spacer { flex: 1; }
-
-      /* -- Content below lock screen -- */
-      .i-below {
-        width: 100%;
-        background: #000;
-        padding: 20px 16px 40px;
+      /* -- Notifications -- */
+      .i-notifs {
+        width: calc(100% - 24px);
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        z-index: 2;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 8px;
       }
-      .i-section-label {
+      .i-notif {
+        display: block;
+        background: rgba(0,0,0,0.55);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        overflow: hidden;
+        text-decoration: none;
+        color: #fff;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .i-notif:active {
+        background: rgba(40,40,40,0.7);
+      }
+      .i-notif-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .i-notif-icon {
+        width: 16px; height: 16px;
+        border-radius: 3px;
+        flex-shrink: 0;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .i-notif-app {
         font-size: 11px;
         font-weight: 600;
+        color: rgba(255,255,255,0.5);
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #555;
-        padding: 0 0 6px;
+        letter-spacing: 0.03em;
+        flex: 1;
       }
-      .i-row {
-        display: block;
-        padding: 10px 0;
-        border-bottom: 1px solid #1a1a1a;
+      .i-notif-time {
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+      }
+      .i-notif-body {
+        padding: 6px 10px 8px;
+      }
+      .i-notif-title {
+        font-size: 14px;
+        font-weight: 600;
         color: #fff;
-        text-decoration: none;
+        line-height: 1.3;
       }
-      .i-row:active { background: rgba(255,255,255,0.05); }
-      .i-row-title { font-size: 15px; color: #fff; }
-      .i-row-sub {
-        font-size: 12px; color: #666;
-        font-family: 'Courier New', monospace;
+      .i-notif-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
         margin-top: 1px;
       }
-      .i-links {
-        display: flex; gap: 20px;
-        padding: 0 0 16px;
+      .i-notif-links {
+        display: flex;
+        gap: 12px;
+        padding: 6px 10px 8px;
       }
-      .i-links a { font-size: 13px; color: #555; }
-      .i-links a:active { color: #fff; }
+      .i-notif-links a {
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+      }
+      .i-notif-links a:active { color: #fff; }
 
       /* -- Slide to unlock track -- */
       .slide-track {
@@ -447,8 +489,89 @@
       <div class="i-date" id="lock-date"></div>
     </div>
 
-    <!-- Wallpaper space -->
-    <div class="i-spacer"></div>
+    <!-- Notifications -->
+    <div class="i-notifs">
+      <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#b33;">&#9888;</div>
+          <span class="i-notif-app">CVE-2026-20637</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleSEPKeyStore Use-After-Free</div>
+          <div class="i-notif-sub">Kernel UAF in SEP key management</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#b33;">&#9888;</div>
+          <span class="i-notif-app">CVE-2026-20687</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleJPEGDriver startDecoder UAF</div>
+          <div class="i-notif-sub">Use-after-free in JPEG decoder path</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">SEP Firmware Panic via AppleKeyStore</div>
+          <div class="i-notif-sub">Resource exhaustion causes SEP panic</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleKeyStoreUserClient close() UAF</div>
+          <div class="i-notif-sub">UAF on user client teardown</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">IOHIDFamily FastPathUserClient Race</div>
+          <div class="i-notif-sub">TOCTOU race in HID fast path</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="lightsaber/">
+        <div class="i-notif-header">
+          <div class="i-notif-icon" style="background:#2065e0;">&#9889;</div>
+          <span class="i-notif-app">LightSaber</span>
+          <span class="i-notif-time">iOS 18.4&ndash;18.6</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">Userland Exploit Chain</div>
+          <div class="i-notif-sub">JS injection into SpringBoard. Derived from DarkSword.</div>
+        </div>
+      </a>
+
+      <div class="i-notif">
+        <div class="i-notif-links">
+          <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
+          <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
+          <a href="blog/metal-patch.html">Blog</a>
+          <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank">WIRED</a>
+        </div>
+      </div>
+    </div>
 
     <!-- Slide to unlock -->
     <div class="slide-track">
@@ -456,43 +579,6 @@
         <span class="slide-arrows">&#9654;&#9654;&#9654;</span>
       </div>
       <span class="slide-label">slide to unlock</span>
-    </div>
-
-    <!-- Content below the lock screen -->
-    <div class="i-below">
-      <div class="i-links">
-        <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
-        <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
-        <a href="blog/metal-patch.html">Blog</a>
-      </div>
-
-      <div class="i-section-label">Vulnerabilities</div>
-      <a class="i-row" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
-        <div class="i-row-title">AppleSEPKeyStore Use-After-Free</div>
-        <div class="i-row-sub">CVE-2026-20637</div>
-      </a>
-      <a class="i-row" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
-        <div class="i-row-title">AppleJPEGDriver startDecoder UAF</div>
-        <div class="i-row-sub">CVE-2026-20687</div>
-      </a>
-      <a class="i-row" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-        <div class="i-row-title">SEP Firmware Panic via AppleKeyStore</div>
-        <div class="i-row-sub">Reported</div>
-      </a>
-      <a class="i-row" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
-        <div class="i-row-title">AppleKeyStoreUserClient close() UAF</div>
-        <div class="i-row-sub">Reported</div>
-      </a>
-      <a class="i-row" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-        <div class="i-row-title">IOHIDFamily FastPathUserClient Race</div>
-        <div class="i-row-sub">Reported</div>
-      </a>
-
-      <div class="i-section-label" style="margin-top: 16px;">Projects</div>
-      <a class="i-row" href="lightsaber/">
-        <div class="i-row-title">LightSaber</div>
-        <div class="i-row-sub">iOS 18.4-18.6 &middot; userland exploit chain</div>
-      </a>
     </div>
   </div>
 

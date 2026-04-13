@@ -19,7 +19,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-      background: #fafafa;
+      background: #f6f6f4;
       color: #1a1a1a;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
@@ -34,77 +34,101 @@
 
     /* Header */
     header {
-      margin-bottom: 52px;
-      padding-bottom: 32px;
-      border-bottom: 1px solid #eaeaea;
+      margin-bottom: 48px;
     }
     h1 {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       color: #111;
     }
     .bio {
       font-size: 15px;
       color: #666;
-      margin-top: 6px;
+      margin-top: 8px;
+      line-height: 1.55;
     }
     .bio a {
       color: #1a1a1a;
-      font-weight: 500;
-      border-bottom: 1.5px solid #d4d4d4;
-      transition: border-color 0.15s;
-    }
-    .bio a:hover { border-color: #666; }
-    .nav {
-      display: flex;
-      gap: 16px;
-      margin-top: 14px;
-    }
-    .nav a {
-      font-size: 14px;
-      color: #888;
+      font-weight: 600;
       transition: color 0.15s;
     }
-    .nav a:hover { color: #111; }
+    .bio a:hover { color: #d63031; }
+    .nav {
+      display: flex;
+      gap: 6px;
+      margin-top: 18px;
+    }
+    .nav a {
+      font-size: 13px;
+      font-weight: 500;
+      color: #777;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid #e8e8e6;
+      transition: all 0.15s;
+    }
+    .nav a:hover {
+      color: #333;
+      border-color: #ccc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
 
     /* Sections */
-    section { margin-bottom: 44px; }
+    section { margin-bottom: 40px; }
     .label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 10px;
+      padding-left: 2px;
     }
 
     /* Vuln rows */
+    .vuln-list {
+      background: #fff;
+      border: 1px solid #e8e8e6;
+      border-radius: 12px;
+      overflow: hidden;
+    }
     .vuln {
       display: block;
-      padding: 12px 14px;
-      margin: 0 -14px;
-      border-radius: 10px;
-      transition: background 0.12s;
+      padding: 13px 16px;
+      border-bottom: 1px solid #f2f2f0;
+      transition: background 0.1s;
     }
-    .vuln:hover { background: #f0f0f0; }
+    .vuln:last-child { border-bottom: none; }
+    .vuln:hover { background: #f9f9f7; }
     .vuln-top {
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .vuln-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: #1a1a1a;
       flex: 1;
     }
     .vuln-tag {
       font-family: 'SF Mono', ui-monospace, 'Consolas', monospace;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
       flex-shrink: 0;
     }
-    .vuln-tag--cve { color: #d63031; }
-    .vuln-tag--reported { color: #aaa; }
+    .vuln-tag--cve {
+      color: #d63031;
+      background: #fef2f2;
+    }
+    .vuln-tag--reported {
+      color: #999;
+      background: #f5f5f3;
+    }
     .vuln-desc {
       font-size: 13px;
       color: #999;
@@ -114,39 +138,51 @@
     /* Project */
     .project {
       display: block;
-      padding: 16px;
-      border: 1px solid #eaeaea;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid #e8e8e6;
       border-radius: 12px;
       transition: all 0.15s;
     }
     .project:hover {
-      border-color: #d4d4d4;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-color: #d4d4d2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .project-top {
       display: flex;
       align-items: baseline;
-      gap: 8px;
+      gap: 10px;
     }
     .project-name {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 700;
       color: #111;
     }
     .project-ver {
       font-family: 'SF Mono', ui-monospace, 'Consolas', monospace;
-      font-size: 12px;
-      color: #aaa;
+      font-size: 11px;
+      color: #bbb;
     }
     .project-desc {
-      font-size: 14px;
-      color: #777;
-      margin-top: 4px;
+      font-size: 13px;
+      color: #888;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .project-arrow {
+      float: right;
+      color: #ccc;
+      font-size: 18px;
+      margin-top: -2px;
+      transition: all 0.15s;
+    }
+    .project:hover .project-arrow {
+      color: #999;
+      transform: translateX(2px);
     }
 
     @media (max-width: 500px) {
       .page { padding: 48px 18px 40px; }
-      .vuln { margin: 0 -8px; padding: 10px 8px; }
       .vuln-top { flex-wrap: wrap; gap: 4px; }
     }
   </style>
@@ -165,52 +201,50 @@
 
     <section>
       <div class="label">Vulnerabilities</div>
-
-      <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
-        <div class="vuln-top">
-          <span class="vuln-name">AppleSEPKeyStore Use-After-Free</span>
-          <span class="vuln-tag vuln-tag--cve">CVE-2026-20637</span>
-        </div>
-        <div class="vuln-desc">Kernel UAF in SEP key management</div>
-      </a>
-
-      <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
-        <div class="vuln-top">
-          <span class="vuln-name">AppleJPEGDriver startDecoder UAF</span>
-          <span class="vuln-tag vuln-tag--cve">CVE-2026-20687</span>
-        </div>
-        <div class="vuln-desc">Use-after-free in JPEG decoder path</div>
-      </a>
-
-      <a class="vuln" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-        <div class="vuln-top">
-          <span class="vuln-name">SEP Firmware Panic via AppleKeyStore</span>
-          <span class="vuln-tag vuln-tag--reported">Reported</span>
-        </div>
-        <div class="vuln-desc">Resource exhaustion causes SEP panic</div>
-      </a>
-
-      <a class="vuln" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
-        <div class="vuln-top">
-          <span class="vuln-name">AppleKeyStoreUserClient close() UAF</span>
-          <span class="vuln-tag vuln-tag--reported">Reported</span>
-        </div>
-        <div class="vuln-desc">UAF on user client teardown</div>
-      </a>
-
-      <a class="vuln" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-        <div class="vuln-top">
-          <span class="vuln-name">IOHIDFamily FastPathUserClient Race</span>
-          <span class="vuln-tag vuln-tag--reported">Reported</span>
-        </div>
-        <div class="vuln-desc">TOCTOU race in HID fast path</div>
-      </a>
+      <div class="vuln-list">
+        <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+          <div class="vuln-top">
+            <span class="vuln-name">AppleSEPKeyStore Use-After-Free</span>
+            <span class="vuln-tag vuln-tag--cve">CVE-2026-20637</span>
+          </div>
+          <div class="vuln-desc">Kernel UAF in SEP key management</div>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+          <div class="vuln-top">
+            <span class="vuln-name">AppleJPEGDriver startDecoder UAF</span>
+            <span class="vuln-tag vuln-tag--cve">CVE-2026-20687</span>
+          </div>
+          <div class="vuln-desc">Use-after-free in JPEG decoder path</div>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+          <div class="vuln-top">
+            <span class="vuln-name">SEP Firmware Panic via AppleKeyStore</span>
+            <span class="vuln-tag vuln-tag--reported">Reported</span>
+          </div>
+          <div class="vuln-desc">Resource exhaustion causes SEP panic</div>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+          <div class="vuln-top">
+            <span class="vuln-name">AppleKeyStoreUserClient close() UAF</span>
+            <span class="vuln-tag vuln-tag--reported">Reported</span>
+          </div>
+          <div class="vuln-desc">UAF on user client teardown</div>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+          <div class="vuln-top">
+            <span class="vuln-name">IOHIDFamily FastPathUserClient Race</span>
+            <span class="vuln-tag vuln-tag--reported">Reported</span>
+          </div>
+          <div class="vuln-desc">TOCTOU race in HID fast path</div>
+        </a>
+      </div>
     </section>
 
     <section>
       <div class="label">Projects</div>
 
       <a class="project" href="lightsaber/">
+        <span class="project-arrow">&rsaquo;</span>
         <div class="project-top">
           <span class="project-name">LightSaber</span>
           <span class="project-ver">iOS 18.4 &ndash; 18.6</span>

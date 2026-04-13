@@ -52,13 +52,9 @@
       padding: 0 8px;
       position: relative;
     }
-    .traffic-lights {
-      display: flex;
-      gap: 6px;
-    }
+    .traffic-lights { display: flex; gap: 6px; }
     .dot {
-      width: 12px;
-      height: 12px;
+      width: 12px; height: 12px;
       border-radius: 50%;
       border: 1px solid rgba(0,0,0,0.2);
     }
@@ -66,12 +62,8 @@
     .dot-yellow { background: linear-gradient(180deg, #ffc02f 0%, #e5a000 100%); }
     .dot-green { background: linear-gradient(180deg, #2ace37 0%, #17a722 100%); }
     .titlebar-text {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      font-weight: bold;
-      color: #4a4a4a;
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 11px; font-weight: bold; color: #4a4a4a;
       text-shadow: 0 1px 0 rgba(255,255,255,0.7);
     }
 
@@ -80,22 +72,12 @@
       height: 28px;
       background: linear-gradient(180deg, #f7f7f7 0%, #e6e6e6 100%);
       border-bottom: 1px solid #b0b0b0;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      gap: 12px;
-      font-size: 11px;
+      display: flex; align-items: center;
+      padding: 0 12px; gap: 12px; font-size: 11px;
     }
-    .toolbar a {
-      color: #555;
-      font-weight: 500;
-    }
+    .toolbar a { color: #555; font-weight: 500; }
     .toolbar a:hover { color: #0055d4; text-decoration: none; }
-    .toolbar-sep {
-      width: 1px;
-      height: 14px;
-      background: #ccc;
-    }
+    .toolbar-sep { width: 1px; height: 14px; background: #ccc; }
 
     /* Content */
     .content {
@@ -103,42 +85,25 @@
       background: #fff;
       background-image: linear-gradient(180deg, #f8f8f8 0%, #fff 40px);
     }
-
-    /* Header */
     header { margin-bottom: 28px; }
     h1 {
-      font-size: 20px;
-      font-weight: bold;
-      color: #222;
+      font-size: 20px; font-weight: bold; color: #222;
       text-shadow: 0 1px 0 rgba(255,255,255,0.8);
     }
-    .tagline {
-      font-size: 12px;
-      color: #777;
-      margin-top: 2px;
-    }
+    .tagline { font-size: 12px; color: #777; margin-top: 2px; }
 
-    /* Sections */
     section { margin-bottom: 24px; }
     .section-title {
-      font-size: 10px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #888;
-      margin-bottom: 6px;
-      padding-bottom: 4px;
+      font-size: 10px; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #888;
+      margin-bottom: 6px; padding-bottom: 4px;
       border-bottom: 1px solid #e0e0e0;
     }
 
-    /* Vuln rows */
     .vuln {
-      display: flex;
-      align-items: baseline;
-      padding: 6px 8px;
-      gap: 10px;
-      border-radius: 3px;
-      color: #333;
+      display: flex; align-items: baseline;
+      padding: 6px 8px; gap: 10px;
+      border-radius: 3px; color: #333;
     }
     .vuln:hover {
       background: linear-gradient(180deg, #3f80f4 0%, #2065e0 100%);
@@ -146,80 +111,42 @@
     }
     .vuln-id {
       font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 11px;
-      color: #b33;
-      flex-shrink: 0;
-      min-width: 126px;
+      font-size: 11px; color: #b33;
+      flex-shrink: 0; min-width: 126px;
     }
     .vuln:hover .vuln-id { color: rgba(255,255,255,0.8); }
-    .vuln-name {
-      font-size: 12px;
-      color: #333;
-      flex: 1;
-    }
+    .vuln-name { font-size: 12px; color: #333; flex: 1; }
     .vuln:hover .vuln-name { color: #fff; }
     .vuln-stars {
       font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 10px;
-      color: #aaa;
-      flex-shrink: 0;
+      font-size: 10px; color: #aaa; flex-shrink: 0;
     }
     .vuln:hover .vuln-stars { color: rgba(255,255,255,0.6); }
 
-    /* Project */
-    .project {
-      display: block;
-      padding: 8px;
-      border-radius: 3px;
-      color: #333;
-    }
+    .project { display: block; padding: 8px; border-radius: 3px; color: #333; }
     .project:hover {
       background: linear-gradient(180deg, #3f80f4 0%, #2065e0 100%);
       text-decoration: none;
     }
-    .project-head {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .project-name {
-      font-size: 12px;
-      font-weight: bold;
-      color: #333;
-    }
+    .project-head { display: flex; align-items: baseline; gap: 8px; }
+    .project-name { font-size: 12px; font-weight: bold; color: #333; }
     .project:hover .project-name { color: #fff; }
-    .project-ver {
-      font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 10px;
-      color: #aaa;
-    }
+    .project-ver { font-family: 'Monaco','Menlo',monospace; font-size: 10px; color: #aaa; }
     .project:hover .project-ver { color: rgba(255,255,255,0.6); }
-    .project-desc {
-      font-size: 11px;
-      color: #777;
-      margin-top: 1px;
-    }
+    .project-desc { font-size: 11px; color: #777; margin-top: 1px; }
     .project:hover .project-desc { color: rgba(255,255,255,0.8); }
-    .project-stars {
-      font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 10px;
-      color: #aaa;
-    }
+    .project-stars { font-family: 'Monaco','Menlo',monospace; font-size: 10px; color: #aaa; }
     .project:hover .project-stars { color: rgba(255,255,255,0.6); }
 
-    /* Status bar */
     .statusbar {
       height: 20px;
       background: linear-gradient(180deg, #f0f0f0 0%, #ddd 100%);
       border-top: 1px solid #b0b0b0;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      font-size: 10px;
-      color: #888;
+      display: flex; align-items: center;
+      padding: 0 12px; font-size: 10px; color: #888;
     }
 
-    /* ========== MOBILE: iPhone 1.0 Lock Screen ========== */
+    /* ========== MOBILE: iPhone OS 1.0 Lock Screen ========== */
     @media (max-width: 700px) {
       body {
         background: #000;
@@ -227,160 +154,199 @@
         -webkit-font-smoothing: antialiased;
         overflow-x: hidden;
       }
-
-      /* Hide desktop window */
       .window { display: none; }
 
-      /* Show iPhone lock screen */
       .iphone-lock {
         display: flex;
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
         min-height: 100dvh;
-        background: linear-gradient(180deg, #1a2a3a 0%, #0a1018 30%, #000 60%);
+        background: #000 url('clownfish.jpg') center/cover no-repeat;
         position: relative;
-        padding: 0 20px;
-        overflow: hidden;
       }
 
-      /* Top status bar */
-      .iphone-status {
+      /* -- Status bar -- */
+      .i-status {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        padding: 4px 6px;
+        height: 20px;
+        padding: 0 5px;
+        background: rgba(0,0,0,0.45);
         font-size: 12px;
         font-weight: bold;
         color: #fff;
+        z-index: 2;
       }
-      .iphone-carrier { width: 80px; }
-      .iphone-time-small { text-align: center; }
-      .iphone-battery { width: 80px; text-align: right; }
-      .battery-icon {
-        display: inline-block;
+      .i-status-left {
+        display: flex; align-items: center; gap: 4px; width: 90px;
+      }
+      /* Signal bars */
+      .signal-bars {
+        display: flex; align-items: flex-end; gap: 1px; height: 10px;
+      }
+      .signal-bar {
+        width: 3px;
+        background: #fff;
+        border-radius: 0.5px;
+      }
+      .sb1 { height: 3px; }
+      .sb2 { height: 5px; }
+      .sb3 { height: 7px; }
+      .sb4 { height: 9px; }
+      .sb5 { height: 10px; opacity: 0.35; }
+      .i-carrier { font-size: 12px; font-weight: bold; }
+      .i-status-center { font-size: 12px; font-weight: bold; }
+      .i-status-right {
+        display: flex; align-items: center; justify-content: flex-end;
+        gap: 3px; width: 90px;
+      }
+      .battery-pct { font-size: 12px; font-weight: bold; }
+      .battery-shell {
         width: 22px; height: 10px;
         border: 1.5px solid #fff;
         border-radius: 2px;
         position: relative;
-        vertical-align: middle;
-        margin-left: 3px;
       }
-      .battery-icon::after {
+      .battery-shell::after {
         content: '';
         position: absolute;
-        right: -4px; top: 2px;
-        width: 2px; height: 4px;
+        right: -4px; top: 1.5px;
+        width: 2px; height: 5px;
         background: #fff;
         border-radius: 0 1px 1px 0;
       }
-      .battery-fill {
+      .battery-level {
         position: absolute;
         left: 1px; top: 1px; bottom: 1px;
-        width: 70%;
+        width: 75%;
         background: #4cd964;
-        border-radius: 1px;
+        border-radius: 0.5px;
       }
 
-      /* Clock */
-      .iphone-clock {
-        margin-top: 28px;
-        font-size: 64px;
-        font-weight: 200;
+      /* -- Clock area -- */
+      .i-clock-area {
+        margin-top: 18px;
+        text-align: center;
+        z-index: 2;
+      }
+      .i-clock {
+        font-size: 65px;
+        font-weight: bold;
         color: #fff;
-        letter-spacing: -2px;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+        letter-spacing: -1px;
         line-height: 1;
       }
-      .iphone-date {
-        font-size: 18px;
-        font-weight: 400;
+      .i-date {
+        font-size: 14px;
+        font-weight: 600;
         color: #fff;
-        margin-top: 6px;
-        letter-spacing: 0.5px;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        margin-top: 4px;
       }
 
-      /* Content area - scrollable vuln list */
-      .iphone-content {
+      /* -- Middle spacer (shows wallpaper) -- */
+      .i-spacer { flex: 1; }
+
+      /* -- Content below lock screen -- */
+      .i-below {
         width: 100%;
-        margin-top: 32px;
-        flex: 1;
+        background: #000;
+        padding: 20px 16px 40px;
       }
-      .iphone-section-title {
+      .i-section-label {
         font-size: 11px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #555;
-        padding: 0 4px 6px;
+        padding: 0 0 6px;
       }
-      .iphone-row {
+      .i-row {
         display: block;
-        padding: 10px 4px;
+        padding: 10px 0;
         border-bottom: 1px solid #1a1a1a;
         color: #fff;
         text-decoration: none;
       }
-      .iphone-row:active { background: rgba(255,255,255,0.05); }
-      .iphone-row-title {
-        font-size: 15px;
-        font-weight: 400;
-        color: #fff;
-      }
-      .iphone-row-sub {
-        font-size: 12px;
-        color: #666;
+      .i-row:active { background: rgba(255,255,255,0.05); }
+      .i-row-title { font-size: 15px; color: #fff; }
+      .i-row-sub {
+        font-size: 12px; color: #666;
         font-family: 'Courier New', monospace;
         margin-top: 1px;
       }
+      .i-links {
+        display: flex; gap: 20px;
+        padding: 0 0 16px;
+      }
+      .i-links a { font-size: 13px; color: #555; }
+      .i-links a:active { color: #fff; }
 
-      .iphone-links {
+      /* -- Slide to unlock track -- */
+      .slide-track {
+        width: calc(100% - 32px);
+        height: 52px;
+        margin: 0 auto 32px;
+        background: rgba(0,0,0,0.55);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 26px;
+        position: relative;
         display: flex;
-        gap: 20px;
-        margin-top: 4px;
-        padding: 0 4px;
+        align-items: center;
+        z-index: 2;
+        overflow: hidden;
       }
-      .iphone-links a {
-        font-size: 13px;
-        color: #555;
+      .slide-thumb {
+        width: 44px;
+        height: 44px;
+        margin-left: 4px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, #e8e8e8 0%, #ccc 50%, #aaa 51%, #d0d0d0 100%);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
       }
-      .iphone-links a:active { color: #fff; }
-
-      /* Slide to unlock */
-      .slide-unlock {
-        width: 100%;
-        padding: 24px 0 40px;
+      .slide-arrows {
+        font-size: 18px;
+        color: #666;
+        letter-spacing: -4px;
+        font-weight: bold;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      }
+      .slide-label {
+        flex: 1;
         text-align: center;
-        margin-top: auto;
-      }
-      .slide-text {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 300;
-        letter-spacing: 2px;
-        color: #444;
+        letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.35);
         background: linear-gradient(
           90deg,
-          #444 0%, #444 40%,
-          #fff 50%,
-          #444 60%, #444 100%
+          rgba(255,255,255,0.15) 0%,
+          rgba(255,255,255,0.15) 35%,
+          rgba(255,255,255,0.9) 50%,
+          rgba(255,255,255,0.15) 65%,
+          rgba(255,255,255,0.15) 100%
         );
-        background-size: 200% 100%;
+        background-size: 250% 100%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        animation: shimmer 2.5s ease-in-out infinite;
+        animation: shimmer 3s ease-in-out infinite;
+        margin-right: 48px;
       }
       @keyframes shimmer {
         0% { background-position: 100% 0; }
         100% { background-position: -100% 0; }
       }
-      .slide-arrow {
-        font-size: 14px;
-        margin-right: 4px;
-      }
     }
 
-    /* Desktop: hide iPhone lock screen */
     @media (min-width: 701px) {
       .iphone-lock { display: none; }
     }
@@ -404,13 +370,11 @@
       <div class="toolbar-sep"></div>
       <a href="blog/metal-patch.html">Blog</a>
     </div>
-
     <div class="content">
       <header>
         <h1>zeroxjf</h1>
         <p class="tagline">iOS vulnerability research &mdash; mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a></p>
       </header>
-
       <section>
         <div class="section-title">Vulnerabilities</div>
         <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
@@ -439,7 +403,6 @@
           <span class="vuln-stars">6&#9733;</span>
         </a>
       </section>
-
       <section>
         <div class="section-title">Projects</div>
         <a class="project" href="lightsaber/">
@@ -452,65 +415,84 @@
         </a>
       </section>
     </div>
-
     <div class="statusbar">
       <span>5 vulnerabilities, 2 CVEs assigned</span>
     </div>
   </div>
 
-  <!-- Mobile: iPhone 1.0 Lock Screen -->
+  <!-- Mobile: iPhone OS 1.0 Lock Screen -->
   <div class="iphone-lock">
-    <div class="iphone-status">
-      <span class="iphone-carrier">iPhone</span>
-      <span class="iphone-time-small" id="status-time"></span>
-      <span class="iphone-battery"><span class="battery-icon"><span class="battery-fill"></span></span></span>
+    <!-- Status bar -->
+    <div class="i-status">
+      <div class="i-status-left">
+        <div class="signal-bars">
+          <div class="signal-bar sb1"></div>
+          <div class="signal-bar sb2"></div>
+          <div class="signal-bar sb3"></div>
+          <div class="signal-bar sb4"></div>
+          <div class="signal-bar sb5"></div>
+        </div>
+        <span class="i-carrier">iPhone</span>
+      </div>
+      <span class="i-status-center" id="status-time"></span>
+      <div class="i-status-right">
+        <span class="battery-pct"></span>
+        <div class="battery-shell"><div class="battery-level"></div></div>
+      </div>
     </div>
 
-    <div class="iphone-clock" id="lock-clock"></div>
-    <div class="iphone-date" id="lock-date"></div>
+    <!-- Clock -->
+    <div class="i-clock-area">
+      <div class="i-clock" id="lock-clock"></div>
+      <div class="i-date" id="lock-date"></div>
+    </div>
 
-    <div class="iphone-content">
-      <div class="iphone-links">
+    <!-- Wallpaper space -->
+    <div class="i-spacer"></div>
+
+    <!-- Slide to unlock -->
+    <div class="slide-track">
+      <div class="slide-thumb">
+        <span class="slide-arrows">&#9654;&#9654;&#9654;</span>
+      </div>
+      <span class="slide-label">slide to unlock</span>
+    </div>
+
+    <!-- Content below the lock screen -->
+    <div class="i-below">
+      <div class="i-links">
         <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
         <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
         <a href="blog/metal-patch.html">Blog</a>
       </div>
 
-      <div style="margin-top: 20px;">
-        <div class="iphone-section-title">Vulnerabilities</div>
-        <a class="iphone-row" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
-          <div class="iphone-row-title">AppleSEPKeyStore Use-After-Free</div>
-          <div class="iphone-row-sub">CVE-2026-20637</div>
-        </a>
-        <a class="iphone-row" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
-          <div class="iphone-row-title">AppleJPEGDriver startDecoder UAF</div>
-          <div class="iphone-row-sub">CVE-2026-20687</div>
-        </a>
-        <a class="iphone-row" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-          <div class="iphone-row-title">SEP Firmware Panic via AppleKeyStore</div>
-          <div class="iphone-row-sub">Reported</div>
-        </a>
-        <a class="iphone-row" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
-          <div class="iphone-row-title">AppleKeyStoreUserClient close() UAF</div>
-          <div class="iphone-row-sub">Reported</div>
-        </a>
-        <a class="iphone-row" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-          <div class="iphone-row-title">IOHIDFamily FastPathUserClient Race</div>
-          <div class="iphone-row-sub">Reported</div>
-        </a>
-      </div>
+      <div class="i-section-label">Vulnerabilities</div>
+      <a class="i-row" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+        <div class="i-row-title">AppleSEPKeyStore Use-After-Free</div>
+        <div class="i-row-sub">CVE-2026-20637</div>
+      </a>
+      <a class="i-row" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+        <div class="i-row-title">AppleJPEGDriver startDecoder UAF</div>
+        <div class="i-row-sub">CVE-2026-20687</div>
+      </a>
+      <a class="i-row" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+        <div class="i-row-title">SEP Firmware Panic via AppleKeyStore</div>
+        <div class="i-row-sub">Reported</div>
+      </a>
+      <a class="i-row" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+        <div class="i-row-title">AppleKeyStoreUserClient close() UAF</div>
+        <div class="i-row-sub">Reported</div>
+      </a>
+      <a class="i-row" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+        <div class="i-row-title">IOHIDFamily FastPathUserClient Race</div>
+        <div class="i-row-sub">Reported</div>
+      </a>
 
-      <div style="margin-top: 16px;">
-        <div class="iphone-section-title">Projects</div>
-        <a class="iphone-row" href="lightsaber/">
-          <div class="iphone-row-title">LightSaber</div>
-          <div class="iphone-row-sub">iOS 18.4-18.6 &middot; userland exploit chain</div>
-        </a>
-      </div>
-    </div>
-
-    <div class="slide-unlock">
-      <span class="slide-text"><span class="slide-arrow">&#9654;</span> slide to unlock</span>
+      <div class="i-section-label" style="margin-top: 16px;">Projects</div>
+      <a class="i-row" href="lightsaber/">
+        <div class="i-row-title">LightSaber</div>
+        <div class="i-row-sub">iOS 18.4-18.6 &middot; userland exploit chain</div>
+      </a>
     </div>
   </div>
 
@@ -524,8 +506,7 @@
       var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       function update() {
         var now = new Date();
-        var h = now.getHours();
-        var m = now.getMinutes();
+        var h = now.getHours(), m = now.getMinutes();
         var ampm = h >= 12 ? 'PM' : 'AM';
         var h12 = h % 12 || 12;
         var mm = m < 10 ? '0' + m : m;

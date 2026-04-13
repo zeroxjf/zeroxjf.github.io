@@ -19,8 +19,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-      background: #0c0c0c;
-      color: #d4d4d4;
+      background: #fafafa;
+      color: #1a1a1a;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
@@ -33,182 +33,129 @@
     }
 
     /* Header */
-    header { margin-bottom: 56px; }
-    .name {
-      font-size: 14px;
-      font-weight: 500;
-      color: #666;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+    header {
+      margin-bottom: 52px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eaeaea;
     }
     h1 {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.03em;
-      color: #f5f5f5;
-      margin-top: 8px;
-      line-height: 1.2;
-    }
-    h1 span {
-      background: linear-gradient(135deg, #e74c3c, #e67e22);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      letter-spacing: -0.02em;
+      color: #111;
     }
     .bio {
       font-size: 15px;
-      color: #777;
-      margin-top: 12px;
-      line-height: 1.55;
+      color: #666;
+      margin-top: 6px;
     }
     .bio a {
-      color: #d4d4d4;
-      border-bottom: 1px solid #333;
+      color: #1a1a1a;
+      font-weight: 500;
+      border-bottom: 1.5px solid #d4d4d4;
       transition: border-color 0.15s;
     }
-    .bio a:hover { border-color: #888; }
+    .bio a:hover { border-color: #666; }
     .nav {
       display: flex;
-      gap: 6px;
-      margin-top: 20px;
+      gap: 16px;
+      margin-top: 14px;
     }
     .nav a {
-      font-size: 13px;
-      color: #666;
-      padding: 5px 12px;
-      border: 1px solid #1e1e1e;
-      border-radius: 6px;
-      transition: all 0.15s;
+      font-size: 14px;
+      color: #888;
+      transition: color 0.15s;
     }
-    .nav a:hover {
-      color: #d4d4d4;
-      border-color: #333;
-      background: #161616;
-    }
+    .nav a:hover { color: #111; }
 
     /* Sections */
-    section { margin-bottom: 48px; }
+    section { margin-bottom: 44px; }
     .label {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #444;
-      margin-bottom: 16px;
+      color: #111;
+      margin-bottom: 14px;
+    }
+
+    /* Vuln rows */
+    .vuln {
+      display: block;
+      padding: 12px 14px;
+      margin: 0 -14px;
+      border-radius: 10px;
+      transition: background 0.12s;
+    }
+    .vuln:hover { background: #f0f0f0; }
+    .vuln-top {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #1a1a1a;
-    }
-
-    /* Vuln cards */
-    .vuln {
-      display: block;
-      padding: 14px 16px;
-      margin-bottom: 8px;
-      border-radius: 10px;
-      background: #141414;
-      border: 1px solid #1e1e1e;
-      transition: all 0.15s;
-    }
-    .vuln:hover {
-      border-color: #2a2a2a;
-      background: #181818;
-      transform: translateY(-1px);
-    }
-    .vuln-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
     .vuln-name {
       font-size: 15px;
       font-weight: 600;
-      color: #e8e8e8;
+      color: #1a1a1a;
+      flex: 1;
     }
     .vuln-tag {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 4px;
+      font-family: 'SF Mono', ui-monospace, 'Consolas', monospace;
+      font-size: 12px;
+      font-weight: 500;
       flex-shrink: 0;
     }
-    .vuln-tag--cve {
-      color: #e74c3c;
-      background: rgba(231,76,60,0.1);
-      border: 1px solid rgba(231,76,60,0.15);
-    }
-    .vuln-tag--reported {
-      color: #666;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid #1e1e1e;
-    }
+    .vuln-tag--cve { color: #d63031; }
+    .vuln-tag--reported { color: #aaa; }
     .vuln-desc {
       font-size: 13px;
-      color: #555;
-      margin-top: 4px;
+      color: #999;
+      margin-top: 2px;
     }
 
-    /* Project card */
+    /* Project */
     .project {
       display: block;
       padding: 16px;
-      border-radius: 10px;
-      background: #141414;
-      border: 1px solid #1e1e1e;
+      border: 1px solid #eaeaea;
+      border-radius: 12px;
       transition: all 0.15s;
     }
     .project:hover {
-      border-color: #2a2a2a;
-      background: #181818;
-      transform: translateY(-1px);
+      border-color: #d4d4d4;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .project-top {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       gap: 8px;
     }
     .project-name {
       font-size: 16px;
       font-weight: 600;
-      color: #e8e8e8;
+      color: #111;
     }
     .project-ver {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 11px;
-      color: #555;
-      padding: 2px 8px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid #1e1e1e;
-      border-radius: 4px;
+      font-family: 'SF Mono', ui-monospace, 'Consolas', monospace;
+      font-size: 12px;
+      color: #aaa;
     }
     .project-desc {
       font-size: 14px;
-      color: #666;
-      margin-top: 6px;
-      line-height: 1.5;
+      color: #777;
+      margin-top: 4px;
     }
 
     @media (max-width: 500px) {
       .page { padding: 48px 18px 40px; }
-      h1 { font-size: 26px; }
-      .vuln-top { flex-wrap: wrap; }
+      .vuln { margin: 0 -8px; padding: 10px 8px; }
+      .vuln-top { flex-wrap: wrap; gap: 4px; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <div class="name">zeroxjf</div>
-      <h1>iOS <span>Vulnerability</span> Research</h1>
-      <p class="bio">5 vulnerabilities disclosed, 2 CVEs assigned. Mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a>.</p>
+      <h1>zeroxjf</h1>
+      <p class="bio">iOS vulnerability researcher. 5 disclosed, 2 CVEs. Mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a>.</p>
       <div class="nav">
         <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
         <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>

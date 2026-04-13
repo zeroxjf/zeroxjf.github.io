@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zeroxjf</title>
+  <meta name="description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
+  <meta property="og:title" content="zeroxjf">
+  <meta property="og:description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zeroxjf.github.io/">
+  <meta property="og:image" content="https://zeroxjf.github.io/og-image.png?v=3">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@zeroxjf">
+  <meta name="twitter:title" content="zeroxjf">
+  <meta name="twitter:description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
+  <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png?v=3">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1a1128 url('aurora.jpg') center/cover no-repeat fixed;
+      color: #333;
+      line-height: 1.5;
+      -webkit-font-smoothing: subpixel-antialiased;
+      min-height: 100vh;
+    }
+    a { color: #0055d4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Window chrome */
+    .window {
+      max-width: 660px;
+      margin: 40px auto;
+      background: #ededed;
+      border: 1px solid #888;
+      border-radius: 5px;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.5) inset,
+        0 4px 16px rgba(0,0,0,0.35),
+        0 1px 3px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    /* Title bar */
+    .titlebar {
+      height: 22px;
+      background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 50%, #c8c8c8 51%, #dcdcdc 100%);
+      border-bottom: 1px solid #999;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      position: relative;
+    }
+    .traffic-lights { display: flex; gap: 6px; }
+    .dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    .dot-red { background: linear-gradient(180deg, #fc6058 0%, #e33e32 100%); }
+    .dot-yellow { background: linear-gradient(180deg, #ffc02f 0%, #e5a000 100%); }
+    .dot-green { background: linear-gradient(180deg, #2ace37 0%, #17a722 100%); }
+    .titlebar-text {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 11px; font-weight: bold; color: #4a4a4a;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      height: 28px;
+      background: linear-gradient(180deg, #f7f7f7 0%, #e6e6e6 100%);
+      border-bottom: 1px solid #b0b0b0;
+      display: flex; align-items: center;
+      padding: 0 12px; gap: 12px; font-size: 11px;
+    }
+    .toolbar a { color: #555; font-weight: 500; }
+    .toolbar a:hover { color: #0055d4; text-decoration: none; }
+    .toolbar-sep { width: 1px; height: 14px; background: #ccc; }
+
+    /* Content */
+    .content {
+      padding: 24px 28px 20px;
+      background: #fff;
+      background-image: linear-gradient(180deg, #f8f8f8 0%, #fff 40px);
+    }
+    header { margin-bottom: 28px; }
+    h1 {
+      font-size: 20px; font-weight: bold; color: #222;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .tagline { font-size: 12px; color: #777; margin-top: 2px; }
+
+    section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 10px; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #888;
+      margin-bottom: 6px; padding-bottom: 4px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .vuln {
+      display: flex; align-items: baseline;
+      padding: 6px 8px; gap: 10px;
+      border-radius: 3px; color: #333;
+    }
+    .vuln:hover {
+      background: linear-gradient(180deg, #3f80f4 0%, #2065e0 100%);
+      text-decoration: none;
+    }
+    .vuln-id {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 11px; color: #b33;
+      flex-shrink: 0; min-width: 126px;
+    }
+    .vuln:hover .vuln-id { color: rgba(255,255,255,0.8); }
+    .vuln-name { font-size: 12px; color: #333; flex: 1; }
+    .vuln:hover .vuln-name { color: #fff; }
+    .vuln-stars {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 10px; color: #aaa; flex-shrink: 0;
+    }
+    .vuln:hover .vuln-stars { color: rgba(255,255,255,0.6); }
+
+    .project { display: block; padding: 8px; border-radius: 3px; color: #333; }
+    .project:hover {
+      background: linear-gradient(180deg, #3f80f4 0%, #2065e0 100%);
+      text-decoration: none;
+    }
+    .project-head { display: flex; align-items: baseline; gap: 8px; }
+    .project-name { font-size: 12px; font-weight: bold; color: #333; }
+    .project:hover .project-name { color: #fff; }
+    .project-ver { font-family: 'Monaco','Menlo',monospace; font-size: 10px; color: #aaa; }
+    .project:hover .project-ver { color: rgba(255,255,255,0.6); }
+    .project-desc { font-size: 11px; color: #777; margin-top: 1px; }
+    .project:hover .project-desc { color: rgba(255,255,255,0.8); }
+    .project-stars { font-family: 'Monaco','Menlo',monospace; font-size: 10px; color: #aaa; }
+    .project:hover .project-stars { color: rgba(255,255,255,0.6); }
+
+    .statusbar {
+      height: 20px;
+      background: linear-gradient(180deg, #f0f0f0 0%, #ddd 100%);
+      border-top: 1px solid #b0b0b0;
+      display: flex; align-items: center;
+      padding: 0 12px; font-size: 10px; color: #888;
+    }
+
+    /* ========== MOBILE: iPhone OS 1.0 Lock Screen ========== */
+    @media (max-width: 700px) {
+      body {
+        background: #000;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      .window { display: none; }
+
+      .iphone-lock {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: #000 url('clownfish.jpg') center/cover no-repeat;
+        position: relative;
+      }
+
+      /* -- Status bar -- */
+      .i-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: 20px;
+        padding: 0 5px;
+        background: rgba(0,0,0,0.45);
+        font-size: 12px;
+        font-weight: bold;
+        color: #fff;
+        z-index: 2;
+      }
+      .i-status-left {
+        display: flex; align-items: center; gap: 4px; width: 90px;
+      }
+      /* Signal bars */
+      .signal-bars {
+        display: flex; align-items: flex-end; gap: 1px; height: 10px;
+      }
+      .signal-bar {
+        width: 3px;
+        background: #fff;
+        border-radius: 0.5px;
+      }
+      .sb1 { height: 3px; }
+      .sb2 { height: 5px; }
+      .sb3 { height: 7px; }
+      .sb4 { height: 9px; }
+      .sb5 { height: 10px; opacity: 0.35; }
+      .i-carrier { font-size: 12px; font-weight: bold; }
+      .i-status-center { font-size: 12px; font-weight: bold; }
+      .i-status-right {
+        display: flex; align-items: center; justify-content: flex-end;
+        gap: 3px; width: 90px;
+      }
+      .battery-pct { font-size: 12px; font-weight: bold; }
+      .battery-shell {
+        width: 22px; height: 10px;
+        border: 1.5px solid #fff;
+        border-radius: 2px;
+        position: relative;
+      }
+      .battery-shell::after {
+        content: '';
+        position: absolute;
+        right: -4px; top: 1.5px;
+        width: 2px; height: 5px;
+        background: #fff;
+        border-radius: 0 1px 1px 0;
+      }
+      .battery-level {
+        position: absolute;
+        left: 1px; top: 1px; bottom: 1px;
+        width: 75%;
+        background: #4cd964;
+        border-radius: 0.5px;
+      }
+
+      /* -- Clock area -- */
+      .i-clock-area {
+        margin-top: 18px;
+        text-align: center;
+        z-index: 2;
+      }
+      .i-clock {
+        font-size: 65px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+        letter-spacing: -1px;
+        line-height: 1;
+      }
+      .i-date {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        margin-top: 4px;
+      }
+
+      /* -- Notifications -- */
+      .i-notifs {
+        width: calc(100% - 24px);
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        z-index: 2;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+      }
+      .i-notif {
+        display: block;
+        background: rgba(30,30,30,0.72);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        overflow: hidden;
+        text-decoration: none;
+        color: #fff;
+        backdrop-filter: blur(20px) saturate(1.4);
+        -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        box-shadow:
+          0 2px 8px rgba(0,0,0,0.3),
+          inset 0 0.5px 0 rgba(255,255,255,0.08);
+      }
+      .i-notif:active {
+        background: rgba(50,50,50,0.8);
+      }
+      .i-notif-header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 12px 0;
+      }
+      .i-notif-icon {
+        width: 18px; height: 18px;
+        border-radius: 4px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* CSS-only icons instead of emoji */
+      .i-notif-icon--cve {
+        background: linear-gradient(135deg, #cc3333 0%, #991a1a 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--cve::after {
+        content: '';
+        width: 8px; height: 8px;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        box-sizing: border-box;
+      }
+      .i-notif-icon--reported {
+        background: linear-gradient(135deg, #cc6600 0%, #994d00 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--reported::after {
+        content: '';
+        width: 0; height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 7px solid #fff;
+      }
+      .i-notif-icon--project {
+        background: linear-gradient(135deg, #2065e0 0%, #1550b8 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--project::after {
+        content: '';
+        width: 0; height: 0;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 7px solid #fff;
+        margin-left: 2px;
+      }
+      .i-notif-app {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.45);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        flex: 1;
+      }
+      .i-notif-time {
+        font-size: 11px;
+        color: rgba(255,255,255,0.3);
+      }
+      .i-notif-body {
+        padding: 4px 12px 10px;
+      }
+      .i-notif-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.3;
+      }
+      .i-notif-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,0.45);
+        margin-top: 2px;
+        line-height: 1.3;
+      }
+      .i-notif-links {
+        display: flex;
+        gap: 16px;
+        padding: 10px 12px;
+      }
+      .i-notif-links a {
+        font-size: 13px;
+        color: rgba(255,255,255,0.45);
+      }
+      .i-notif-links a:active { color: #fff; }
+
+      /* -- Slide to unlock track -- */
+      .slide-track {
+        width: calc(100% - 32px);
+        height: 56px;
+        margin: 0 auto 28px;
+        background: rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 28px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        z-index: 2;
+        overflow: hidden;
+      }
+      .slide-thumb {
+        width: 60px;
+        height: 46px;
+        margin-left: 5px;
+        border-radius: 23px;
+        background: linear-gradient(180deg, #f5f5f5 0%, #e2e2e2 45%, #aaa 55%, #c8c8c8 100%);
+        box-shadow:
+          0 1px 3px rgba(0,0,0,0.4),
+          inset 0 1px 0 rgba(255,255,255,0.95),
+          inset 0 -1px 1px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .slide-thumb svg {
+        width: 26px;
+        height: 18px;
+      }
+      .slide-label {
+        flex: 1;
+        text-align: center;
+        font-size: 21px;
+        font-weight: 300;
+        letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.35);
+        background: linear-gradient(
+          90deg,
+          rgba(255,255,255,0.15) 0%,
+          rgba(255,255,255,0.15) 35%,
+          rgba(255,255,255,0.9) 50%,
+          rgba(255,255,255,0.15) 65%,
+          rgba(255,255,255,0.15) 100%
+        );
+        background-size: 250% 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s ease-in-out infinite;
+        margin-right: 48px;
+      }
+      @keyframes shimmer {
+        0% { background-position: 100% 0; }
+        100% { background-position: -100% 0; }
+      }
+    }
+
+    @media (min-width: 701px) {
+      .iphone-lock { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Desktop: Snow Leopard window -->
+  <div class="window">
+    <div class="titlebar">
+      <div class="traffic-lights">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <span class="titlebar-text">zeroxjf</span>
+    </div>
+    <div class="toolbar">
+      <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
+      <div class="toolbar-sep"></div>
+      <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
+      <div class="toolbar-sep"></div>
+      <a href="blog/metal-patch.html">Blog</a>
+    </div>
+    <div class="content">
+      <header>
+        <h1>zeroxjf</h1>
+        <p class="tagline">iOS vulnerability research &mdash; mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a></p>
+      </header>
+      <section>
+        <div class="section-title">Vulnerabilities</div>
+        <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+          <span class="vuln-id">CVE-2026-20637</span>
+          <span class="vuln-name">AppleSEPKeyStore Use-After-Free</span>
+          <span class="vuln-stars">50&#9733;</span>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+          <span class="vuln-id">CVE-2026-20687</span>
+          <span class="vuln-name">AppleJPEGDriver startDecoder UAF</span>
+          <span class="vuln-stars">16&#9733;</span>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+          <span class="vuln-id">Reported</span>
+          <span class="vuln-name">SEP Firmware Panic via AppleKeyStore</span>
+          <span class="vuln-stars">23&#9733;</span>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+          <span class="vuln-id">Reported</span>
+          <span class="vuln-name">AppleKeyStoreUserClient close() UAF</span>
+          <span class="vuln-stars">21&#9733;</span>
+        </a>
+        <a class="vuln" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+          <span class="vuln-id">Reported</span>
+          <span class="vuln-name">IOHIDFamily FastPathUserClient Race Condition</span>
+          <span class="vuln-stars">6&#9733;</span>
+        </a>
+      </section>
+      <section>
+        <div class="section-title">Projects</div>
+        <a class="project" href="lightsaber/">
+          <div class="project-head">
+            <span class="project-name">LightSaber</span>
+            <span class="project-ver">iOS 18.4&ndash;18.6</span>
+            <span class="project-stars">41&#9733;</span>
+          </div>
+          <div class="project-desc">Userland exploit chain with JS injection into SpringBoard. Derived from DarkSword.</div>
+        </a>
+      </section>
+    </div>
+    <div class="statusbar">
+      <span>5 vulnerabilities, 2 CVEs assigned</span>
+    </div>
+  </div>
+
+  <!-- Mobile: iPhone OS 1.0 Lock Screen -->
+  <div class="iphone-lock">
+    <!-- Status bar -->
+    <div class="i-status">
+      <div class="i-status-left">
+        <div class="signal-bars">
+          <div class="signal-bar sb1"></div>
+          <div class="signal-bar sb2"></div>
+          <div class="signal-bar sb3"></div>
+          <div class="signal-bar sb4"></div>
+          <div class="signal-bar sb5"></div>
+        </div>
+        <span class="i-carrier">iPhone</span>
+      </div>
+      <span class="i-status-center" id="status-time"></span>
+      <div class="i-status-right">
+        <span class="battery-pct"></span>
+        <div class="battery-shell"><div class="battery-level"></div></div>
+      </div>
+    </div>
+
+    <!-- Clock -->
+    <div class="i-clock-area">
+      <div class="i-clock" id="lock-clock"></div>
+      <div class="i-date" id="lock-date"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="i-notifs">
+      <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--cve"></div>
+          <span class="i-notif-app">CVE-2026-20637</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleSEPKeyStore Use-After-Free</div>
+          <div class="i-notif-sub">Kernel UAF in SEP key management</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--cve"></div>
+          <span class="i-notif-app">CVE-2026-20687</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleJPEGDriver startDecoder UAF</div>
+          <div class="i-notif-sub">Use-after-free in JPEG decoder path</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--reported"></div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">SEP Firmware Panic via AppleKeyStore</div>
+          <div class="i-notif-sub">Resource exhaustion causes SEP panic</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--reported"></div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">AppleKeyStoreUserClient close() UAF</div>
+          <div class="i-notif-sub">UAF on user client teardown</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--reported"></div>
+          <span class="i-notif-app">Reported</span>
+          <span class="i-notif-time">2026</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">IOHIDFamily FastPathUserClient Race</div>
+          <div class="i-notif-sub">TOCTOU race in HID fast path</div>
+        </div>
+      </a>
+
+      <a class="i-notif" href="lightsaber/">
+        <div class="i-notif-header">
+          <div class="i-notif-icon i-notif-icon--project"></div>
+          <span class="i-notif-app">LightSaber</span>
+          <span class="i-notif-time">iOS 18.4&ndash;18.6</span>
+        </div>
+        <div class="i-notif-body">
+          <div class="i-notif-title">Userland Exploit Chain</div>
+          <div class="i-notif-sub">JS injection into SpringBoard. Derived from DarkSword.</div>
+        </div>
+      </a>
+
+      <div class="i-notif">
+        <div class="i-notif-links">
+          <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
+          <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
+          <a href="blog/metal-patch.html">Blog</a>
+          <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank">WIRED</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide to unlock -->
+    <div class="slide-track">
+      <div class="slide-thumb">
+        <svg viewBox="0 0 28 20" fill="none"><path d="M4 4l8 6-8 6" stroke="#808080" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 4l8 6-8 6" stroke="#808080" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="slide-label">slide to unlock</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var clock = document.getElementById('lock-clock');
+      var date = document.getElementById('lock-date');
+      var statusTime = document.getElementById('status-time');
+      if (!clock) return;
+      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      function update() {
+        var now = new Date();
+        var h = now.getHours(), m = now.getMinutes();
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        var h12 = h % 12 || 12;
+        var mm = m < 10 ? '0' + m : m;
+        clock.textContent = h12 + ':' + mm;
+        statusTime.textContent = h12 + ':' + mm + ' ' + ampm;
+        date.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+      }
+      update();
+      setInterval(update, 10000);
+    })();
+  </script>
+</body>
+</html>

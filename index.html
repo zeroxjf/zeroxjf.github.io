@@ -254,57 +254,93 @@
         margin-top: 14px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
         flex: 1;
         z-index: 2;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 8px;
+        padding-bottom: 10px;
       }
       .i-notif {
         display: block;
-        background: rgba(0,0,0,0.55);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 10px;
+        background: rgba(30,30,30,0.72);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
         overflow: hidden;
         text-decoration: none;
         color: #fff;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(20px) saturate(1.4);
+        -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        box-shadow:
+          0 2px 8px rgba(0,0,0,0.3),
+          inset 0 0.5px 0 rgba(255,255,255,0.08);
       }
       .i-notif:active {
-        background: rgba(40,40,40,0.7);
+        background: rgba(50,50,50,0.8);
       }
       .i-notif-header {
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 10px 4px;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        gap: 7px;
+        padding: 8px 12px 0;
       }
       .i-notif-icon {
-        width: 16px; height: 16px;
-        border-radius: 3px;
+        width: 18px; height: 18px;
+        border-radius: 4px;
         flex-shrink: 0;
-        font-size: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
       }
+      /* CSS-only icons instead of emoji */
+      .i-notif-icon--cve {
+        background: linear-gradient(135deg, #cc3333 0%, #991a1a 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--cve::after {
+        content: '';
+        width: 8px; height: 8px;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        box-sizing: border-box;
+      }
+      .i-notif-icon--reported {
+        background: linear-gradient(135deg, #cc6600 0%, #994d00 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--reported::after {
+        content: '';
+        width: 0; height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 7px solid #fff;
+      }
+      .i-notif-icon--project {
+        background: linear-gradient(135deg, #2065e0 0%, #1550b8 100%);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .i-notif-icon--project::after {
+        content: '';
+        width: 0; height: 0;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 7px solid #fff;
+        margin-left: 2px;
+      }
       .i-notif-app {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
-        color: rgba(255,255,255,0.5);
+        color: rgba(255,255,255,0.45);
         text-transform: uppercase;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.04em;
         flex: 1;
       }
       .i-notif-time {
         font-size: 11px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255,255,255,0.3);
       }
       .i-notif-body {
-        padding: 6px 10px 8px;
+        padding: 4px 12px 10px;
       }
       .i-notif-title {
         font-size: 14px;
@@ -314,17 +350,18 @@
       }
       .i-notif-sub {
         font-size: 12px;
-        color: rgba(255,255,255,0.5);
-        margin-top: 1px;
+        color: rgba(255,255,255,0.45);
+        margin-top: 2px;
+        line-height: 1.3;
       }
       .i-notif-links {
         display: flex;
-        gap: 12px;
-        padding: 6px 10px 8px;
+        gap: 16px;
+        padding: 10px 12px;
       }
       .i-notif-links a {
-        font-size: 12px;
-        color: rgba(255,255,255,0.5);
+        font-size: 13px;
+        color: rgba(255,255,255,0.45);
       }
       .i-notif-links a:active { color: #fff; }
 
@@ -343,23 +380,23 @@
         overflow: hidden;
       }
       .slide-thumb {
-        width: 44px;
+        width: 64px;
         height: 44px;
         margin-left: 4px;
-        border-radius: 22px;
-        background: linear-gradient(180deg, #e8e8e8 0%, #ccc 50%, #aaa 51%, #d0d0d0 100%);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        border-radius: 8px;
+        background: linear-gradient(180deg, #f2f2f2 0%, #e0e0e0 45%, #a8a8a8 55%, #c4c4c4 100%);
+        box-shadow:
+          0 1px 3px rgba(0,0,0,0.45),
+          inset 0 1px 0 rgba(255,255,255,0.9),
+          inset 0 -1px 0 rgba(0,0,0,0.08);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
       }
-      .slide-arrows {
-        font-size: 18px;
-        color: #666;
-        letter-spacing: -4px;
-        font-weight: bold;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      .slide-thumb svg {
+        width: 28px;
+        height: 20px;
       }
       .slide-label {
         flex: 1;
@@ -493,7 +530,7 @@
     <div class="i-notifs">
       <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#b33;">&#9888;</div>
+          <div class="i-notif-icon i-notif-icon--cve"></div>
           <span class="i-notif-app">CVE-2026-20637</span>
           <span class="i-notif-time">2026</span>
         </div>
@@ -505,7 +542,7 @@
 
       <a class="i-notif" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#b33;">&#9888;</div>
+          <div class="i-notif-icon i-notif-icon--cve"></div>
           <span class="i-notif-app">CVE-2026-20687</span>
           <span class="i-notif-time">2026</span>
         </div>
@@ -517,7 +554,7 @@
 
       <a class="i-notif" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <div class="i-notif-icon i-notif-icon--reported"></div>
           <span class="i-notif-app">Reported</span>
           <span class="i-notif-time">2026</span>
         </div>
@@ -529,7 +566,7 @@
 
       <a class="i-notif" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <div class="i-notif-icon i-notif-icon--reported"></div>
           <span class="i-notif-app">Reported</span>
           <span class="i-notif-time">2026</span>
         </div>
@@ -541,7 +578,7 @@
 
       <a class="i-notif" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#c60;">&#9888;</div>
+          <div class="i-notif-icon i-notif-icon--reported"></div>
           <span class="i-notif-app">Reported</span>
           <span class="i-notif-time">2026</span>
         </div>
@@ -553,7 +590,7 @@
 
       <a class="i-notif" href="lightsaber/">
         <div class="i-notif-header">
-          <div class="i-notif-icon" style="background:#2065e0;">&#9889;</div>
+          <div class="i-notif-icon i-notif-icon--project"></div>
           <span class="i-notif-app">LightSaber</span>
           <span class="i-notif-time">iOS 18.4&ndash;18.6</span>
         </div>
@@ -576,7 +613,7 @@
     <!-- Slide to unlock -->
     <div class="slide-track">
       <div class="slide-thumb">
-        <span class="slide-arrows">&#9654;&#9654;&#9654;</span>
+        <svg viewBox="0 0 28 20" fill="none"><path d="M4 4l8 6-8 6" stroke="#808080" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 4l8 6-8 6" stroke="#808080" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <span class="slide-label">slide to unlock</span>
     </div>

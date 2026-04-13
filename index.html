@@ -3,702 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MySpace.com | zeroxjf</title>
-  <meta name="description" content="Jailbreak tweaks and iOS security research by zeroxjf.">
+  <title>zeroxjf</title>
+  <meta name="description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
   <meta property="og:title" content="zeroxjf">
-  <meta property="og:description" content="Jailbreak tweaks and iOS security research.">
+  <meta property="og:description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zeroxjf.github.io/">
-  <meta property="og:image" content="https://zeroxjf.github.io/og-image.png?v=2">
+  <meta property="og:image" content="https://zeroxjf.github.io/og-image.png?v=3">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@zeroxjf">
   <meta name="twitter:title" content="zeroxjf">
-  <meta name="twitter:description" content="Jailbreak tweaks and iOS security research.">
-  <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png?v=2">
+  <meta name="twitter:description" content="iOS vulnerability researcher. CVEs, exploit chains, kernel bugs.">
+  <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png?v=3">
   <style>
-    /* ---- Reset ---- */
-    html { box-sizing: border-box; }
-    *, *:before, *:after { box-sizing: inherit; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: verdana, arial, sans-serif, helvetica;
-      background-color: #e5e5e5;
-      font-size: 9pt;
-      margin: 0;
-      line-height: 1.3;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-    a { font-weight: bold; text-decoration: none; }
-    a:link, a:visited { color: #003399; }
-    a:hover { text-decoration: underline; color: #cc0000; }
-    h1 { font-size: 13.25pt; font-weight: bold; margin-top: 15px; margin-bottom: 0; }
-    h2 { font-size: 10pt; margin: 0; font-weight: bold; }
-    p { line-height: 1.3; }
-    ul { list-style-type: none; padding: 0; margin: 0; }
+    a { color: #e0e0e0; text-decoration: none; }
+    a:hover { color: #fff; }
 
-    /* ---- Master Container ---- */
-    .master-container { margin: auto; width: 800px; background-color: white; }
-
-    /* ---- Header ---- */
-    .main-header {
-      display: flex; flex-direction: column; justify-content: center;
-      height: 151px; background-color: rgb(0, 51, 153); color: #fff;
-    }
-    .main-header a:link, .main-header a:visited { color: #fff; font-weight: normal; }
-    .main-header a:hover { color: #fff; }
-
-    .search-bar { display: grid; grid-template-columns: .25fr 1fr .25fr; }
-    .search-bar form { justify-self: center; margin: 0; }
-    .search-bar form [type="text"] { width: 160px; }
-    .search-bar form [type="radio"] { margin-right: .33rem; }
-    .search-bar ul { display: flex; }
-    .submit-btn {
-      margin: 8px; border: 1px solid rgb(186,186,186); padding: 2px 7px;
-      background-color: #E0FFFF; font-size: 10px;
-    }
-    .topnav { padding: 0; margin: 8px; }
-    .topnav li:first-child::after { content: '|'; margin: .33rem; }
-    .home { justify-self: start; }
-    .signup { justify-self: end; }
-
-    .navbar {
-      display: flex; align-items: center; margin-top: auto;
-      background-color: rgb(102, 153, 204); height: 26px;
-    }
-    .navbar ul { display: flex; margin: 0 auto; padding: 0; }
-    .navbar li::after { content: '|'; margin: .33rem; color: black; }
-    .navbar li:last-child::after { content: ''; }
-    .navbar a:hover { color: #003399; }
-
-    /* ---- Page Content ---- */
-    .page-content-container {
-      display: grid; grid-template-columns: 325px 453px;
-      grid-column-gap: 20px; grid-template-areas: "sidebar main";
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
     }
 
-    /* ---- Sidebar ---- */
-    .profile-sidebar { grid-area: sidebar; margin-left: 27px; width: 300px; }
+    /* Header */
+    header { margin-bottom: 48px; }
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .tagline {
+      font-size: 14px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .tagline a { color: #888; border-bottom: 1px solid #333; }
+    .tagline a:hover { color: #fff; border-color: #666; }
 
-    .profile-picture-container {
-      display: grid; grid-template-columns: 170px 115px;
-      grid-template-rows: 176px; grid-column-gap: 15px; margin-bottom: 12px;
+    /* Links row */
+    .links {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      font-size: 13px;
     }
-    .profile-picture-container p { margin: 0; }
-    .profile-pic {
-      grid-area: 1/1; margin-top: 10px; margin-bottom: 10px;
-      width: 170px; height: 176px; object-fit: cover;
+    .links a {
+      color: #555;
+      transition: color 0.15s;
+    }
+    .links a:hover { color: #fff; }
+
+    /* Section */
+    section { margin-bottom: 40px; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #444;
+      margin-bottom: 12px;
     }
 
-    .personal-msg { grid-area: 1/2; margin: 0; }
-    .gender-age { grid-area: 1/2; }
-    .gender-age li:first-child { margin-top: 28px; }
-    .last-login { grid-area: 1/2; align-self: end; }
-    .last-login li:last-child { margin-bottom: 15px; }
-    .online-now {
-      display: flex; align-items: center; gap: 3px;
-      font-size: 9pt; color: #00bb00;
+    /* Vuln list */
+    .vuln {
+      display: flex;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid #161616;
+      gap: 12px;
+      transition: opacity 0.15s;
     }
-    .online-icon { flex-shrink: 0; }
-    .online-icon .wave-l, .online-icon .wave-r {
-      animation: wave-pulse 1.2s ease-in-out infinite;
+    .vuln:last-child { border-bottom: none; }
+    .vuln:hover { opacity: 1; }
+    .vuln-id {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: #c0392b;
+      flex-shrink: 0;
+      min-width: 136px;
     }
-    .online-icon .wave-r { animation-delay: 0.15s; }
-    @keyframes wave-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.1; }
+    .vuln-name {
+      font-size: 14px;
+      color: #ccc;
+      flex: 1;
     }
-    .pics-videos { grid-area: 1/1; justify-self: center; align-self: end; }
+    a.vuln:hover .vuln-name { color: #fff; }
+    .vuln-stars {
+      font-size: 12px;
+      color: #333;
+      flex-shrink: 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    a.vuln:hover .vuln-stars { color: #555; }
 
-    /* ---- Contact Box ---- */
-    .contact-box {
-      border: 2px solid rgb(102, 153, 204); width: 300px; margin-bottom: 24px;
+    /* Projects */
+    .project {
+      display: block;
+      padding: 10px 0;
+      border-bottom: 1px solid #161616;
     }
-    .contact-box h2 {
-      color: white; background-color: rgb(102, 153, 204);
-      height: 17px; padding-left: 10px;
+    .project:last-child { border-bottom: none; }
+    .project-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
-    .contact-links {
-      display: grid; grid-template-columns: 150px 150px;
-      margin: 5px 0 8px 10px; gap: 4px;
+    .project-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ccc;
     }
-    .contact-links a {
-      display: flex; align-items: center; gap: 4px;
-      font-size: 9pt; font-weight: normal;
+    .project:hover .project-name { color: #fff; }
+    .project-ver {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      color: #333;
     }
-    .contact-links a:link { color: #003399; }
-    .contact-links svg { flex-shrink: 0; }
+    .project-desc {
+      font-size: 13px;
+      color: #555;
+      margin-top: 2px;
+    }
+    .project-stars {
+      font-size: 12px;
+      color: #333;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .project:hover .project-stars { color: #555; }
 
-    /* ---- MySpace URL ---- */
-    .myspace-url-box {
-      border: 1px solid rgb(102, 153, 204); margin-bottom: 24px; padding: 2px 0;
-    }
-    .myspace-url-box h3, .myspace-url-box p { margin: 0; padding: 0; }
-    .myspace-url-box h3 { font-size: 9pt; padding-left: 2px; }
-    .myspace-url-box p { padding-left: 6px; }
-
-    /* ---- Music Player ---- */
-    .music-player {
-      border: 2px solid rgb(102, 153, 204); width: 300px; margin-bottom: 24px;
-    }
-    .music-player h2 {
-      color: white; background-color: rgb(102, 153, 204);
-      height: 17px; padding-left: 10px;
-    }
-    .music-player-body {
-      padding: 8px; display: flex; gap: 8px; align-items: center;
-    }
-    .album-art {
-      width: 60px; height: 60px; flex-shrink: 0; border: 1px solid #ccc;
-    }
-    .album-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .player-info { flex: 1; min-width: 0; }
-    .player-title { font-weight: bold; font-size: 10pt; color: #333; }
-    .player-artist { font-size: 9pt; color: #666; }
-    .player-album { font-size: 8pt; color: #999; margin-bottom: 4px; }
-    .player-controls { display: flex; align-items: center; gap: 4px; }
-    .player-btn { font-size: 9pt; color: #555; cursor: default; }
-    .player-btn.play { font-size: 13pt; color: #003399; }
-    .player-bar {
-      flex: 1; height: 3px; background: #ddd; border-radius: 2px; position: relative;
-    }
-    .player-fill {
-      position: absolute; left: 0; top: 0; width: 42%; height: 100%;
-      background: rgb(102,153,204); border-radius: 2px;
-    }
-    .player-dot {
-      position: absolute; top: -3px; left: 42%; width: 9px; height: 9px;
-      background: #fff; border: 2px solid rgb(102,153,204);
-      border-radius: 50%; margin-left: -4px;
-    }
-    .player-time { font-size: 8pt; color: #999; font-family: 'Courier New', monospace; white-space: nowrap; }
-
-    /* ---- Sidebar Tables ---- */
-    .sidebar-table {
-      border: 2px solid rgb(102, 153, 204);
-      display: table; border-collapse: separate; border-spacing: 3px;
-    }
-    .sidebar-table-h2 {
-      background-color: rgb(102, 153, 204); color: white;
-      text-align: left; height: 17px; padding-left: 15px; padding-top: 2px;
-    }
-    .sidebar-table-header {
-      vertical-align: top; text-align: left; width: 107px;
-      background-color: rgb(177, 208, 240); color: #336699;
-      padding: 3px; font-weight: bold; font-size: 9pt;
-    }
-    .sidebar-table-data {
-      width: 184px; background-color: rgb(213, 232, 251); padding: 3px;
-    }
-    .interests p { margin-top: 0; }
-    .interests p:only-child, .interests p:last-child { margin-bottom: 0; }
-    .interests table { margin-bottom: 13px; }
-    .details table { margin-bottom: 22px; }
-
-    /* ---- Main Column ---- */
-    main { grid-area: main; }
-
-    .user-network {
-      display: flex; justify-content: center; align-items: center;
-      width: 433px; margin: 13px auto 0; height: 75px;
-      border: 2px solid black;
-    }
-    .user-network h2 { font-size: 13pt; }
-
-    .blog {
-      display: grid; grid-auto-rows: 29px;
-      margin: 13px 0 16px 12px;
-    }
-    .blog p { margin-top: 3px; }
-
-    .main-section-header {
-      background-color: #ffcc99; padding-top: 3px; padding-bottom: 3px; margin-bottom: 8px;
-    }
-    .main-section-h2 { color: #FF6600; margin-left: 20px; }
-
-    .blurbs h3 { margin: 0; color: #FF6600; font-size: 10pt; margin-left: 15px; }
-    .blurbs p { margin: 0 10px 15px 15px; }
-
-    /* ---- Vuln entries (in main) ---- */
-    .vuln-entry {
-      display: flex; align-items: baseline; gap: 8px;
-      padding: 4px 15px; text-decoration: none; color: #333;
-    }
-    .vuln-entry:hover { background: #f0f4f8; }
-    .vuln-date { font-size: 8pt; color: #999; flex-shrink: 0; width: 26px; font-family: 'Courier New', monospace; }
-    .vuln-title { flex: 1; font-size: 9pt; color: #003399; font-weight: bold; }
-    .vuln-entry:hover .vuln-title { color: #cc0000; }
-    .vuln-cve { font-family: 'Courier New', monospace; font-size: 8pt; color: #cc0000; flex-shrink: 0; font-weight: bold; }
-    .vuln-stars { font-size: 8pt; color: #996600; flex-shrink: 0; }
-
-    .section-body { margin: 0 10px 15px 15px; }
-
-    /* ---- Project ---- */
-    .project-link { display: block; padding: 4px 15px; text-decoration: none; color: #333; }
-    .project-link:hover { background: #f0f4f8; }
-    .project-head { display: flex; align-items: baseline; gap: 6px; }
-    .project-name { font-size: 9pt; font-weight: bold; color: #003399; }
-    .project-link:hover .project-name { color: #cc0000; }
-    .project-ver { font-size: 8pt; color: #999; font-family: 'Courier New', monospace; }
-    .project-desc { font-size: 9pt; color: #666; margin-top: 2px; }
-
-    /* ---- Tweak entries ---- */
-    .tweak-line {
-      display: flex; align-items: center; gap: 8px;
-      padding: 4px 15px; cursor: pointer;
-    }
-    .tweak-line:hover { background: #f0f4f8; }
-    .tweak-info { flex: 1; min-width: 0; }
-    .tweak-name { font-size: 9pt; font-weight: bold; color: #003399; }
-    .tweak-line:hover .tweak-name { color: #cc0000; }
-    .tweak-desc { font-size: 9pt; color: #666; }
-    .tweak-ver { font-size: 8pt; color: #999; font-family: 'Courier New', monospace; flex-shrink: 0; }
-    .tweak-arrow { font-size: 11pt; color: #ccc; }
-    .tweak-line:hover .tweak-arrow { color: #003399; }
-
-    .manager-wrap {
-      margin: 8px 15px 0; padding: 8px; border: 1px dashed rgb(102,153,204); text-align: center;
-    }
-    .manager-prompt { font-size: 8pt; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .manager-row { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
-    .manager-btn {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 8px; border: 1px solid rgb(102,153,204);
-      background: #f8f8f8; color: #333; font-size: 9pt;
-      font-weight: bold; text-decoration: none; font-family: verdana, sans-serif;
-    }
-    .manager-btn:hover { background: #eef4fa; color: #003399; }
-    .manager-btn img { height: 12px; width: 12px; }
-
-    /* ---- Detail view ---- */
-    .detail-view { display: none; }
-    .detail-view.active { display: block; }
-    .detail-back {
-      color: #003399; font-size: 9pt; cursor: pointer; background: none;
-      border: none; padding: 0; margin: 10px 0 10px 15px;
-      font-family: verdana, sans-serif; text-decoration: underline; font-weight: bold;
-    }
-    .detail-back:hover { color: #cc0000; }
-    .detail-header { display: flex; align-items: baseline; gap: 8px; margin: 0 15px 4px; }
-    .detail-title { font-size: 13pt; font-weight: bold; color: #003399; }
-    .detail-version { font-size: 9pt; color: #999; font-family: 'Courier New', monospace; }
-    .detail-desc { font-size: 9pt; color: #666; margin: 0 15px 10px; }
-    .detail-depiction { border: 1px solid rgb(102,153,204); padding: 10px; margin: 0 15px; background: #fff; }
-    .dep-tabs { display: flex; margin-bottom: 10px; border-bottom: 1px solid rgb(102,153,204); }
-    .dep-tab {
-      padding: 3px 8px; font-size: 9pt; font-weight: bold; color: #666;
-      cursor: pointer; border: none; border-bottom: 2px solid transparent;
-      background: none; font-family: verdana, sans-serif; margin-bottom: -1px;
-    }
-    .dep-tab:hover { color: #333; }
-    .dep-tab.active { color: #003399; border-bottom-color: #003399; }
-    .dep-tab-content { display: none; }
-    .dep-tab-content.active { display: block; }
-    .dep-header { font-size: 9pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin: 10px 0 4px; }
-    .dep-header:first-child { margin-top: 0; }
-    .dep-markdown { font-size: 9pt; line-height: 1.6; color: #333; }
-    .dep-markdown p { margin-bottom: 4px; }
-    .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { font-weight: bold; color: #000; }
-    .dep-markdown ul, .dep-markdown ol { margin: 3px 0 4px 16px; }
-    .dep-markdown li { margin-bottom: 2px; }
-    .dep-markdown code { font-family: 'Courier New', monospace; font-size: 9pt; background: #f0f0f0; padding: 1px 3px; }
-    .dep-markdown pre { background: #f5f5f5; border: 1px solid #ddd; padding: 6px; overflow-x: auto; margin: 4px 0; }
-    .dep-markdown pre code { background: none; padding: 0; }
-    .dep-markdown a { color: #003399; }
-    .dep-markdown a:hover { color: #cc0000; }
-    .dep-separator { border: none; border-top: 1px solid #eee; margin: 6px 0; }
-    .dep-table-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 9pt; border-bottom: 1px solid #eee; }
-    .dep-table-title { color: #888; }
-    .dep-table-value { color: #333; font-weight: bold; }
-    .dep-button { display: inline-block; padding: 3px 8px; margin: 4px 0; font-size: 9pt; font-weight: bold; background: rgb(102,153,204); color: #fff; border: 1px solid rgb(70,120,170); text-decoration: none; }
-    .dep-button:hover { background: rgb(70,120,170); color: #fff; }
-    .dep-loading { text-align: center; padding: 14px; color: #999; font-size: 9pt; }
-
-    /* ---- Footer ---- */
+    /* Footer */
     footer {
-      display: grid; grid-template-rows: 16px 39px;
-      background-color: #e5e5e5; padding-top: 10px; height: 65px;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #161616;
+      font-size: 12px;
+      color: #333;
     }
-    footer a { text-decoration: underline; font-weight: normal; font-size: 9pt; }
-    footer ul { display: flex; flex-wrap: nowrap; justify-content: space-between; list-style-type: none; padding: 0; margin: 0; }
-    footer li:after { content: ' | '; font-weight: normal; }
-    #last:after { content: none; }
-    footer small { display: flex; justify-content: center; align-items: flex-end; height: 100%; font-size: 9pt; font-weight: normal; }
 
-    @media (max-width: 820px) {
-      .master-container { width: 100%; }
-      .page-content-container { grid-template-columns: 1fr; grid-template-areas: "sidebar" "main"; }
-      .profile-sidebar { margin-left: 12px; }
-      .user-network { width: 100%; }
-      .navbar ul { flex-wrap: wrap; justify-content: center; }
-      .search-bar { grid-template-columns: 1fr; }
-      .vuln-cve, .vuln-stars { display: none; }
-      .tweak-desc { display: none; }
+    @media (max-width: 480px) {
+      .container { padding: 48px 20px 40px; }
+      .vuln { flex-wrap: wrap; gap: 4px; }
+      .vuln-id { min-width: auto; }
+      .vuln-stars { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="master-container">
-
-    <header class="main-header">
-      <nav class="search-bar">
-        <ul class="topnav home">
-          <li><a href="#">MySpace.com</a></li>
-          <li><a href="#">Home</a></li>
-        </ul>
-        <form>
-          <label>The Web <input type="radio" name="search-type" value="the-web"></label>
-          <label>MySpace <input type="radio" name="search-type" value="myspace" checked></label>
-          <label><input type="text" name="search"></label>
-          <input class="submit-btn" type="submit" value="Search">
-        </form>
-        <ul class="topnav signup">
-          <li><a href="#">Help</a></li>
-          <li><a href="#">SignUp</a></li>
-        </ul>
-      </nav>
-      <nav class="navbar">
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Browse</a></li>
-          <li><a href="#">Search</a></li>
-          <li><a href="#">Invite</a></li>
-          <li><a href="#">Film</a></li>
-          <li><a href="#">Mail</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">Favorites</a></li>
-          <li><a href="#">Forum</a></li>
-          <li><a href="#">Groups</a></li>
-          <li><a href="#">Events</a></li>
-          <li><a href="#">Videos</a></li>
-          <li><a href="#">Music</a></li>
-          <li><a href="#">Classifieds</a></li>
-        </ul>
-      </nav>
+  <div class="container">
+    <header>
+      <h1>zeroxjf</h1>
+      <p class="tagline">iOS vulnerability research &mdash; mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a></p>
+      <div class="links">
+        <a href="https://github.com/zeroxjf" target="_blank">GitHub</a>
+        <a href="https://twitter.com/zeroxjf" target="_blank">Twitter</a>
+        <a href="blog/metal-patch.html">Blog</a>
+      </div>
     </header>
 
-    <div class="page-content-container">
+    <section>
+      <div class="section-title">Vulnerabilities</div>
+      <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
+        <span class="vuln-id">CVE-2026-20637</span>
+        <span class="vuln-name">AppleSEPKeyStore Use-After-Free</span>
+        <span class="vuln-stars">50&#9733;</span>
+      </a>
+      <a class="vuln" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
+        <span class="vuln-id">CVE-2026-20687</span>
+        <span class="vuln-name">AppleJPEGDriver startDecoder UAF</span>
+        <span class="vuln-stars">16&#9733;</span>
+      </a>
+      <a class="vuln" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
+        <span class="vuln-id">Reported</span>
+        <span class="vuln-name">SEP Firmware Panic via AppleKeyStore</span>
+        <span class="vuln-stars">23&#9733;</span>
+      </a>
+      <a class="vuln" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
+        <span class="vuln-id">Reported</span>
+        <span class="vuln-name">AppleKeyStoreUserClient close() UAF</span>
+        <span class="vuln-stars">21&#9733;</span>
+      </a>
+      <a class="vuln" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
+        <span class="vuln-id">Reported</span>
+        <span class="vuln-name">IOHIDFamily FastPathUserClient Race Condition</span>
+        <span class="vuln-stars">6&#9733;</span>
+      </a>
+    </section>
 
-      <aside class="profile-sidebar">
-        <header><h1>zeroxjf</h1></header>
-
-        <div class="profile-picture-container">
-          <img class="profile-pic" src="icons/profile.jpg" alt="zeroxjf">
-          <p class="personal-msg"><b>"good life"</b></p>
-          <ul class="gender-age">
-            <li>iOS Security</li>
-            <li>Researcher</li>
-            <li>&nbsp;</li>
-            <li>UNITED STATES</li>
-            <li>&nbsp;</li>
-            <li class="online-now"><svg class="online-icon" width="18" height="16" viewBox="0 0 36 28"><circle cx="18" cy="8" r="5" fill="#e87a1e"/><path d="M18 15c-6 0-10 3-10 6v3h20v-3c0-3-4-6-10-6z" fill="#e87a1e"/><path class="wave-l" d="M8 8a8 8 0 0 1 0-8" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-l" d="M5 10a12 12 0 0 1 0-14" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-r" d="M28 8a8 8 0 0 0 0-8" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="wave-r" d="M31 10a12 12 0 0 0 0-14" stroke="#00bb00" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg> <b>Online Now!</b></li>
-          </ul>
-          <ul class="last-login">
-            <li>Last Login:</li>
-            <li>4/12/2026</li>
-          </ul>
-          <p class="pics-videos">View My: <a href="https://github.com/zeroxjf"><b>Repos</b></a> | <a href="blog/metal-patch.html"><b>Blog</b></a></p>
+    <section>
+      <div class="section-title">Projects</div>
+      <a class="project" href="lightsaber/">
+        <div class="project-head">
+          <span class="project-name">LightSaber</span>
+          <span class="project-ver">iOS 18.4&ndash;18.6</span>
+          <span class="project-stars">41&#9733;</span>
         </div>
-
-        <section class="contact-box">
-          <h2>Contacting zeroxjf</h2>
-          <div class="contact-links">
-            <a href="https://github.com/zeroxjf" target="_blank">
-              <svg height="12" width="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-              GitHub
-            </a>
-            <a href="https://twitter.com/zeroxjf" target="_blank">
-              <svg height="11" width="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
-              Twitter
-            </a>
-            <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank">
-              <svg height="12" width="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>
-              Donate
-            </a>
-          </div>
-        </section>
-
-        <section class="myspace-url-box">
-          <h3><b>MySpace URL:</b></h3>
-          <p>https://zeroxjf.github.io</p>
-        </section>
-
-        <section class="music-player">
-          <h2>zeroxjf's Music</h2>
-          <audio id="ms-audio" preload="none" src="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/86/ee/43/86ee4336-6faf-b797-ea65-d5d7b50a1448/mzaf_2392976759773928581.plus.aac.p.m4a"></audio>
-          <div class="music-player-body">
-            <div class="album-art"><img src="icons/graduation.jpg" alt="Graduation"></div>
-            <div class="player-info">
-              <div class="player-title">Good Life</div>
-              <div class="player-artist">Kanye West ft. T-Pain</div>
-              <div class="player-album">Graduation (2007)</div>
-              <div class="player-controls">
-                <span class="player-btn">&#9664;&#9664;</span>
-                <span class="player-btn play" id="ms-play" style="cursor:pointer">&#9654;</span>
-                <span class="player-btn">&#9654;&#9654;</span>
-                <div class="player-bar" id="ms-bar" style="cursor:pointer"><div class="player-fill" id="ms-fill"></div><div class="player-dot" id="ms-dot"></div></div>
-                <span class="player-time" id="ms-time">0:00/0:30</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="interests">
-          <table class="sidebar-table">
-            <caption><h2 class="sidebar-table-h2">zeroxjf's Interests</h2></caption>
-            <tbody>
-              <tr>
-                <th class="sidebar-table-header" scope="row">General</th>
-                <td class="sidebar-table-data"><p>iOS security research, reverse engineering, jailbreaking</p></td>
-              </tr>
-              <tr>
-                <th class="sidebar-table-header" scope="row">Music</th>
-                <td class="sidebar-table-data"><p>Apple commercial music</p></td>
-              </tr>
-              <tr>
-                <th class="sidebar-table-header" scope="row">Heroes</th>
-                <td class="sidebar-table-data"><p>Steve Jobs, Kobe Bryant</p></td>
-              </tr>
-              <tr>
-                <th class="sidebar-table-header" scope="row">Books</th>
-                <td class="sidebar-table-data"><p>*OS Internals</p></td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <section class="details">
-          <table class="sidebar-table">
-            <caption><h2 class="sidebar-table-h2">zeroxjf's Details</h2></caption>
-            <tbody>
-              <tr>
-                <th class="sidebar-table-header" scope="row">Here For:</th>
-                <td class="sidebar-table-data">Networking, Friends</td>
-              </tr>
-              <tr>
-                <th class="sidebar-table-header" scope="row">Occupation:</th>
-                <td class="sidebar-table-data">iOS Security Researcher</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </aside>
-
-      <main>
-        <div id="main-view">
-
-        <section class="user-network">
-          <header><h2>zeroxjf is in your extended network</h2></header>
-        </section>
-
-        <section class="blog">
-          <p><b>zeroxjf's Latest Blog Entry</b> [<a href="blog/metal-patch.html">Subscribe to this Blog</a>]</p>
-          <p>Patching Metal Graphics into vphone (<a href="blog/metal-patch.html">view more</a>)</p>
-          <p>[<a href="blog/metal-patch.html">View All Blog Entries</a>]</p>
-        </section>
-
-        <section class="blurbs">
-          <header class="main-section-header">
-            <h2 class="main-section-h2">zeroxjf's Blurbs</h2>
-          </header>
-          <h3>About me:</h3>
-          <p>Focused on iOS vulnerabilities. <b>5</b> vulnerabilities disclosed, <b>2</b> CVEs assigned, mentioned in <a href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">WIRED</a>.</p>
-          <h3>Who I'd like to meet:</h3>
-          <p>Other iOS security researchers and the occasional Apple engineer.</p>
-        </section>
-
-        <section>
-          <header class="main-section-header">
-            <h2 class="main-section-h2">zeroxjf's Vulnerability Research</h2>
-          </header>
-          <a class="vuln-entry" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
-            <span class="vuln-date">2026</span>
-            <span class="vuln-title">AppleSEPKeyStore Use-After-Free</span>
-            <span class="vuln-cve">CVE-2026-20637</span>
-            <span class="vuln-stars">&#9733; 50</span>
-          </a>
-          <a class="vuln-entry" href="https://github.com/zeroxjf/IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-            <span class="vuln-date">2026</span>
-            <span class="vuln-title">IOHIDFamily FastPathUserClient UAF</span>
-            <span class="vuln-stars">&#9733; 6</span>
-          </a>
-          <a class="vuln-entry" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
-            <span class="vuln-date">2026</span>
-            <span class="vuln-title">AppleJPEGDriver startDecoder UAF</span>
-            <span class="vuln-cve">CVE-2026-20687</span>
-            <span class="vuln-stars">&#9733; 15</span>
-          </a>
-          <a class="vuln-entry" href="https://github.com/zeroxjf/AppleKeyStore-close-UAF" target="_blank">
-            <span class="vuln-date">2026</span>
-            <span class="vuln-title">AppleKeyStoreUserClient close() UAF</span>
-            <span class="vuln-stars">&#9733; 19</span>
-          </a>
-          <a class="vuln-entry" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-            <span class="vuln-date">2026</span>
-            <span class="vuln-title">SEP Firmware Panic via AppleKeyStore</span>
-            <span class="vuln-stars">&#9733; 23</span>
-          </a>
-        </section>
-
-        <section>
-          <header class="main-section-header">
-            <h2 class="main-section-h2">zeroxjf's Projects</h2>
-          </header>
-          <a class="project-link" href="lightsaber/" style="text-decoration:none">
-            <div class="project-head">
-              <span class="project-name">LightSaber</span>
-              <span class="project-ver">iOS 18.4&ndash;18.6</span>
-            </div>
-            <div class="project-desc">Open-source iOS 18.4&ndash;18.6.2 userland exploit chain with JS injection into SpringBoard. Derived from DarkSword.</div>
-          </a>
-        </section>
-
-        <section>
-          <header class="main-section-header">
-            <h2 class="main-section-h2">zeroxjf's iOS Tweaks</h2>
-          </header>
-          <div id="tweak-list"></div>
-          <div class="manager-wrap">
-            <div class="manager-prompt">Add repo to your package manager</div>
-            <div class="manager-row">
-              <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io"><img src="icons/sileo.png" alt="">Sileo</a>
-              <a class="manager-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io"><img src="icons/cydia.png" alt="">Cydia</a>
-              <a class="manager-btn" href="zbra://sources/add/https://zeroxjf.github.io"><img src="icons/zebra.png" alt="">Zebra</a>
-            </div>
-          </div>
-        </section>
-
+        <div class="project-desc">Userland exploit chain with JS injection into SpringBoard. Derived from DarkSword.</div>
+      </a>
+      <a class="project" href="https://github.com/zeroxjf/BrokenBlade" target="_blank">
+        <div class="project-head">
+          <span class="project-name">BrokenBlade</span>
+          <span class="project-ver">dev</span>
+          <span class="project-stars">6&#9733;</span>
         </div>
-        <div class="detail-view" id="detail-view"></div>
-      </main>
-
-    </div>
+        <div class="project-desc">Experimental exploit chains and injection payloads. Unstable, in development.</div>
+      </a>
+    </section>
 
     <footer>
-      <nav>
-        <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Terms</a></li>
-          <li><a href="#">Privacy</a></li>
-          <li><a href="#">Safety Tips</a></li>
-          <li><a href="#">Contact MySpace</a></li>
-          <li><a href="#">Promote!</a></li>
-          <li><a href="#">Advertise</a></li>
-          <li id="last"><a href="#">MySpace International</a></li>
-        </ul>
-      </nav>
-      <small>&copy;2003-2026 MySpace.com. All Rights Reserved.</small>
+      <a href="myspace.html" style="color: #222;">myspace era</a>
     </footer>
   </div>
-
-  <script>
-    const TWEAKS = [
-      { name: 'TypeMillennium', id: 'com.zeroxjf.bartype', slug: 'typemillennium', version: '1.1.1', desc: 'System-wide iMessage typing indicator banner', tint: '#6b8aed', depiction: 'depictions/com.zeroxjf.bartype.json' },
-      { name: 'Zoom5x', id: 'com.zeroxjf.zoom5x', slug: 'zoom5x', version: '1.0.0', desc: 'Adds a 5x zoom button to the Camera app', tint: '#6b8aed', depiction: 'depictions/com.zeroxjf.zoom5x.json' },
-      { name: 'SpringCuts', id: 'com.anthopak.springcuts-rootless', slug: 'springcuts', version: '1.5.2', desc: 'Run Shortcuts from SSH & CLI (rootless port)', tint: '#d4a032', depiction: 'depictions/com.anthopak.springcuts-rootless.json' }
-    ];
-    const tweakBySlug = {};
-    TWEAKS.forEach(t => { tweakBySlug[t.slug] = t; });
-
-    function renderMarkdown(md) {
-      let html = md.replace(/```([^`]*?)```/gs, (_, code) => '<pre><code>' + escapeHtml(code.trim()) + '</code></pre>');
-      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
-      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-      const blocks = html.split(/\n\n+/), out = [];
-      for (const block of blocks) {
-        const lines = block.split('\n');
-        if (lines.every(l => l.match(/^- /) || l.trim() === '')) {
-          out.push('<ul>' + lines.filter(l => l.startsWith('- ')).map(l => '<li>' + l.slice(2) + '</li>').join('') + '</ul>');
-        } else if (block.startsWith('<pre>')) { out.push(block); }
-        else if (block.includes('\n- ')) {
-          const parts = block.split('\n'), result = []; let listItems = [];
-          for (const p of parts) { if (p.startsWith('- ')) { listItems.push('<li>' + p.slice(2) + '</li>'); } else { if (listItems.length) { result.push('<ul>' + listItems.join('') + '</ul>'); listItems = []; } result.push('<p>' + p + '</p>'); } }
-          if (listItems.length) result.push('<ul>' + listItems.join('') + '</ul>');
-          out.push(result.join(''));
-        } else { out.push('<p>' + block.replace(/\n/g, '<br>') + '</p>'); }
-      }
-      return out.join('');
-    }
-    function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-    function renderDepictionView(view, tint) {
-      switch (view.class) {
-        case 'DepictionHeaderView': return `<div class="dep-header">${escapeHtml(view.title)}</div>`;
-        case 'DepictionMarkdownView': return `<div class="dep-markdown">${renderMarkdown(view.markdown)}</div>`;
-        case 'DepictionSeparatorView': return '<hr class="dep-separator">';
-        case 'DepictionTableTextView': return `<div class="dep-table-row"><span class="dep-table-title">${escapeHtml(view.title)}</span><span class="dep-table-value">${escapeHtml(view.text)}</span></div>`;
-        case 'DepictionTableButtonView': return `<a class="dep-button" href="${escapeHtml(view.action)}" target="_blank">${escapeHtml(view.title)}</a>`;
-        default: return '';
-      }
-    }
-    function renderDepiction(data) {
-      const tint = data.tintColor || '#6b8aed', tabs = data.tabs || [];
-      let tabsHtml = '<div class="dep-tabs">', contentsHtml = '';
-      tabs.forEach((tab, i) => { const active = i === 0 ? ' active' : ''; tabsHtml += `<button class="dep-tab${active}" data-tab="${i}">${escapeHtml(tab.tabname)}</button>`; contentsHtml += `<div class="dep-tab-content${active}" data-tab="${i}">${(tab.views || []).map(v => renderDepictionView(v, tint)).join('')}</div>`; });
-      return tabsHtml + '</div>' + contentsHtml;
-    }
-    function bindTabs(container) { container.querySelectorAll('.dep-tab').forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); const idx = btn.dataset.tab; container.querySelectorAll('.dep-tab').forEach(t => t.classList.remove('active')); container.querySelectorAll('.dep-tab-content').forEach(c => c.classList.remove('active')); btn.classList.add('active'); container.querySelector(`.dep-tab-content[data-tab="${idx}"]`).classList.add('active'); }); }); }
-    const depictionCache = {};
-    async function fetchDepiction(tweak) { if (depictionCache[tweak.id]) return depictionCache[tweak.id]; const resp = await fetch(tweak.depiction); const data = await resp.json(); depictionCache[tweak.id] = data; return data; }
-    const mainView = document.getElementById('main-view'), detailView = document.getElementById('detail-view'), list = document.getElementById('tweak-list');
-    function showList() { mainView.style.display = ''; detailView.classList.remove('active'); detailView.innerHTML = ''; document.title = "MySpace.com | zeroxjf"; }
-    async function showDetail(tweak) {
-      mainView.style.display = 'none'; detailView.classList.add('active'); document.title = tweak.name + " \u2014 zeroxjf";
-      detailView.innerHTML = `<button class="detail-back" id="detail-back">\u2190 back</button><div class="detail-header"><span class="detail-title">${escapeHtml(tweak.name)}</span><span class="detail-version">${tweak.version}</span></div><div class="detail-desc">${escapeHtml(tweak.desc)}</div><div class="detail-depiction" id="detail-dep"><div class="dep-loading">loading depiction...</div></div>`;
-      document.getElementById('detail-back').addEventListener('click', () => { history.pushState(null, '', window.location.pathname); showList(); });
-      try { const data = await fetchDepiction(tweak); const depEl = document.getElementById('detail-dep'); depEl.innerHTML = renderDepiction(data); bindTabs(depEl); } catch { document.getElementById('detail-dep').innerHTML = '<div class="dep-loading">failed to load depiction</div>'; }
-    }
-    TWEAKS.forEach(tweak => {
-      const line = document.createElement('div'); line.className = 'tweak-line';
-      line.innerHTML = `<div class="tweak-info"><div class="tweak-name">${escapeHtml(tweak.name)}</div><div class="tweak-desc">${escapeHtml(tweak.desc)}</div></div><span class="tweak-ver">${tweak.version}</span><span class="tweak-arrow">&rsaquo;</span>`;
-      line.addEventListener('click', () => { history.pushState(null, '', '#' + tweak.slug); showDetail(tweak); });
-      list.appendChild(line);
-    });
-    function route() { const hash = window.location.hash.slice(1); const tweak = tweakBySlug[hash]; if (tweak) { showDetail(tweak); } else { showList(); } }
-    window.addEventListener('popstate', route); route();
-
-    // --- Music player ---
-    (function() {
-      const audio = document.getElementById('ms-audio');
-      const playBtn = document.getElementById('ms-play');
-      const fill = document.getElementById('ms-fill');
-      const dot = document.getElementById('ms-dot');
-      const timeEl = document.getElementById('ms-time');
-      const bar = document.getElementById('ms-bar');
-      if (!audio || !playBtn) return;
-
-      function fmt(s) {
-        const m = Math.floor(s / 60);
-        const sec = Math.floor(s % 60);
-        return m + ':' + (sec < 10 ? '0' : '') + sec;
-      }
-
-      playBtn.addEventListener('click', function() {
-        if (audio.paused) { audio.play(); playBtn.innerHTML = '\u275A\u275A'; }
-        else { audio.pause(); playBtn.innerHTML = '\u25B6'; }
-      });
-
-      audio.addEventListener('timeupdate', function() {
-        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-        fill.style.width = pct + '%';
-        dot.style.left = pct + '%';
-        timeEl.textContent = fmt(audio.currentTime) + '/' + fmt(audio.duration || 30);
-      });
-
-      audio.addEventListener('ended', function() {
-        playBtn.innerHTML = '\u25B6';
-        fill.style.width = '0%';
-        dot.style.left = '0%';
-      });
-
-      bar.addEventListener('click', function(e) {
-        if (!audio.duration) return;
-        const rect = bar.getBoundingClientRect();
-        const pct = (e.clientX - rect.left) / rect.width;
-        audio.currentTime = pct * audio.duration;
-        if (audio.paused) { audio.play(); playBtn.innerHTML = '\u275A\u275A'; }
-      });
-    })();
-  </script>
 </body>
 </html>

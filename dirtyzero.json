@@ -1,0 +1,24 @@
+{
+  "repo_name": "zeroxjf DirtyZero",
+  "repo_author": "johnnyfranks",
+  "repo_icon": "https://zeroxjf.github.io/icons/profile.jpg",
+  "tweaks": [
+    {
+      "name": "Five Icon Dock",
+      "kind": "five_icon_dock",
+      "dock_icons": 5
+    },
+    {
+      "name": "Force Floating Dock Support",
+      "kind": "floating_dock_support"
+    },
+    {
+      "name": "Hide Dock Background",
+      "kind": "zeropage",
+      "paths": [
+        "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe",
+        "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe"
+      ]
+    }
+  ]
+}

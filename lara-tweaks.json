@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "updated": "2026-04-16",
+  "tweaks": {
+    "fiveIconDock": {
+      "name": "Five Icon Dock",
+      "description": "Changes dock to hold 5 icons instead of 4",
+      "builds": {
+        "23A355": {
+          "moduleBase": "0x1bdeaf000",
+          "patches": [
+            {
+              "id": "portrait",
+              "moduleOffset": "0x2657c8",
+              "bytes": "b3008052"
+            },
+            {
+              "id": "landscape",
+              "moduleOffset": "0x2657f0",
+              "bytes": "bc008052"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

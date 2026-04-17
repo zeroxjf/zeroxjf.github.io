@@ -1,17 +1,17 @@
 {
-  "version": 2,
+  "version": 3,
   "updated": "2026-04-16",
   "searchPaths": [
-    "/System",
-    "/System/Library",
-    "/System/Library/Caches",
-    "/System/Library/Caches/com.apple.dyld",
-    "/System/Library/dyld",
-    "/System/Cryptexes",
-    "/System/Cryptexes/OS",
-    "/System/Cryptexes/OS/System/Library/dyld",
-    "/private/preboot/Cryptexes",
-    "/var/db/dyld"
+    "/System/Cryptexes/OS/System",
+    "/System/Cryptexes/OS/System/Library",
+    "/System/Cryptexes/OS/System/Library/Caches",
+    "/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld",
+    "/private/preboot/Cryptexes/OS",
+    "/private/preboot/Cryptexes/OS/System",
+    "/private/preboot/Cryptexes/OS/System/Library",
+    "/private/preboot/Cryptexes/OS/System/Library/Caches",
+    "/private/preboot/Cryptexes/OS/System/Library/Caches/com.apple.dyld",
+    "/private/preboot/Cryptexes/OS/System/Library/dyld"
   ],
   "tweaks": {
     "fiveIconDock": {

@@ -1,6 +1,18 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-04-16",
+  "searchPaths": [
+    "/System",
+    "/System/Library",
+    "/System/Library/Caches",
+    "/System/Library/Caches/com.apple.dyld",
+    "/System/Library/dyld",
+    "/System/Cryptexes",
+    "/System/Cryptexes/OS",
+    "/System/Cryptexes/OS/System/Library/dyld",
+    "/private/preboot/Cryptexes",
+    "/var/db/dyld"
+  ],
   "tweaks": {
     "fiveIconDock": {
       "name": "Five Icon Dock",

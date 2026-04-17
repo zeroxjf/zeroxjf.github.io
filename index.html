@@ -40,10 +40,27 @@
     /* ---- Header ---- */
     .main-header {
       display: flex; flex-direction: column; justify-content: center;
-      height: 151px; background-color: rgb(0, 51, 153); color: #fff;
+      height: 170px; background-color: rgb(0, 51, 153); color: #fff;
     }
     .main-header a:link, .main-header a:visited { color: #fff; font-weight: normal; }
     .main-header a:hover { color: #fff; }
+
+    .logo-banner {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; color: #000; border: 1px solid #000;
+      margin: 6px 14px; padding: 6px 14px; height: 54px;
+    }
+    .logo-banner-icon { flex-shrink: 0; }
+    .logo-banner-text { display: flex; flex-direction: column; line-height: 1; }
+    .logo-banner-name {
+      font-family: Arial, Helvetica, sans-serif; font-weight: bold;
+      font-size: 22pt; color: #000; letter-spacing: -0.5px;
+    }
+    .logo-banner-name sup { font-size: 8pt; font-weight: normal; margin-left: 1px; }
+    .logo-banner-tag {
+      font-family: Arial, Helvetica, sans-serif; font-weight: bold;
+      font-size: 9pt; color: #000; margin-top: 2px;
+    }
 
     .search-bar { display: grid; grid-template-columns: .25fr 1fr .25fr; }
     .search-bar form { justify-self: center; margin: 0; }
@@ -355,6 +372,18 @@
           <li><a href="#">SignUp</a></li>
         </ul>
       </nav>
+      <div class="logo-banner">
+        <svg class="logo-banner-icon" width="44" height="32" viewBox="0 0 44 32" fill="#000">
+          <circle cx="28" cy="8" r="5"/>
+          <path d="M28 15c-5 0-8.5 2.5-8.5 5v4h17v-4c0-2.5-3.5-5-8.5-5z"/>
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 17.5c-4 0-7 2-7 4v3h14v-3c0-2-3-4-7-4z"/>
+        </svg>
+        <div class="logo-banner-text">
+          <span class="logo-banner-name">myspace<sup>&reg;</sup></span>
+          <span class="logo-banner-tag">a place for friends</span>
+        </div>
+      </div>
       <nav class="navbar">
         <ul>
           <li><a href="#">Home</a></li>

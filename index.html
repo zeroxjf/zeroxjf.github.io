@@ -173,54 +173,6 @@
       max-width: 48ch;
     }
 
-    .hero-actions {
-      display: flex;
-      gap: 0.7rem;
-      flex-wrap: wrap;
-    }
-
-    .hero-actions {
-      margin-top: 1.15rem;
-    }
-
-    .hero-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 1rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--ink);
-      font-size: 0.9rem;
-      font-weight: 600;
-      box-shadow: var(--shadow-sm);
-      transition:
-        transform 0.2s var(--ease-out),
-        border-color 0.15s var(--ease),
-        background 0.15s var(--ease),
-        box-shadow 0.2s var(--ease);
-    }
-
-    .hero-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-      box-shadow: var(--shadow-md);
-      color: var(--ink);
-    }
-
-    .hero-btn.primary {
-      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-hover) 100%);
-      border-color: transparent;
-      color: #ffffff;
-    }
-
-    .hero-btn.primary:hover {
-      color: #ffffff;
-      background: linear-gradient(180deg, var(--accent-hover) 0%, var(--accent-dark) 100%);
-    }
-
     .header-right {
       display: flex;
       align-items: flex-start;
@@ -829,8 +781,6 @@
       .content::before { display: none; }
       .header-title { font-size: 2.3rem; }
       .header-sub { font-size: 0.96rem; }
-      .hero-actions { flex-direction: column; }
-      .hero-btn { width: 100%; }
       .line-date {
         width: auto;
         min-width: 0;
@@ -852,10 +802,6 @@
       <div class="header-left">
         <div class="header-kicker">Independent iOS Security Research</div>
         <div class="header-title">zeroxjf</div>
-        <div class="hero-actions">
-          <a class="hero-btn primary" href="#research">View research</a>
-          <a class="hero-btn" href="#tweaks">Browse tweaks</a>
-        </div>
       </div>
       <div class="header-right">
         <div class="social-row">

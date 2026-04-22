@@ -22,33 +22,33 @@
 
   <style>
     :root {
-      --bg: #eef3f8;
+      --bg: #e0e8f1;
       --bg-grad:
-        radial-gradient(1200px 700px at 8% -10%, rgba(29, 78, 216, 0.10), transparent 52%),
-        radial-gradient(1000px 640px at 100% 0%, rgba(14, 165, 233, 0.08), transparent 42%),
-        linear-gradient(180deg, #f8fbff 0%, #eef3f8 100%);
-      --card: #ffffff;
-      --card-alt: #f6f8fb;
-      --card-inset: #f1f5f9;
-      --border: #d8e1ec;
-      --border-soft: #e6edf5;
-      --border-strong: #bcc8d6;
-      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-      --shadow-md: 0 10px 28px -18px rgba(15, 23, 42, 0.18);
-      --shadow-lg: 0 32px 80px -42px rgba(15, 23, 42, 0.28);
-      --shadow-row: 0 18px 36px -28px rgba(15, 23, 42, 0.24);
+        radial-gradient(1200px 700px at 8% -10%, rgba(29, 78, 216, 0.14), transparent 52%),
+        radial-gradient(1000px 640px at 100% 0%, rgba(14, 165, 233, 0.10), transparent 42%),
+        linear-gradient(180deg, #eef4fa 0%, #e0e8f1 100%);
+      --card: #fbfdff;
+      --card-alt: #eef3f8;
+      --card-inset: #e8eef5;
+      --border: #c8d3df;
+      --border-soft: #d7e0ea;
+      --border-strong: #acb8c7;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 12px 30px -18px rgba(15, 23, 42, 0.24);
+      --shadow-lg: 0 34px 82px -40px rgba(15, 23, 42, 0.36);
+      --shadow-row: 0 18px 36px -28px rgba(15, 23, 42, 0.28);
       --ink: #0f172a;
       --text: #1e293b;
-      --muted: #475569;
-      --subtle: #64748b;
-      --faint: #94a3b8;
+      --muted: #3f4d63;
+      --subtle: #5f7086;
+      --faint: #7f90a6;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
       --accent-dark: #163da4;
-      --accent-soft: rgba(37, 99, 235, 0.08);
-      --accent-border: rgba(37, 99, 235, 0.18);
-      --hover: #f8fafc;
-      --code-bg: #eef2f7;
+      --accent-soft: rgba(37, 99, 235, 0.10);
+      --accent-border: rgba(37, 99, 235, 0.22);
+      --hover: #f1f5f9;
+      --code-bg: #e7edf4;
       --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
       --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       --fs-xl: 1.15rem;
@@ -90,9 +90,9 @@
       margin: 2rem auto 3.5rem;
       padding: 3.5rem;
       background:
-        linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.015) 180px, transparent 320px),
+        linear-gradient(180deg, rgba(37, 99, 235, 0.07) 0%, rgba(37, 99, 235, 0.02) 180px, transparent 320px),
         var(--card);
-      border: 1px solid rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.45);
       border-radius: 28px;
       box-shadow: var(--shadow-lg);
       position: relative;
@@ -104,8 +104,8 @@
       inset: 0;
       border-radius: 28px;
       pointer-events: none;
-      border: 1px solid rgba(15, 23, 42, 0.05);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
     }
     .content::after {
       content: "";
@@ -195,7 +195,7 @@
       justify-content: center;
       gap: 0.55rem;
       color: var(--muted);
-      background: var(--card);
+      background: rgba(238, 243, 248, 0.75);
       border: 1px solid var(--border);
       border-radius: 999px;
       box-shadow: var(--shadow-sm);
@@ -225,7 +225,7 @@
       padding: 1.15rem 1.2rem;
       border: 1px solid var(--border);
       border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(246,248,251,0.98) 100%);
+      background: linear-gradient(180deg, rgba(251,253,255,0.98) 0%, rgba(238,243,248,0.98) 100%);
       color: var(--text);
       text-decoration: none;
       display: block;
@@ -322,7 +322,7 @@
 
     /* ---- Card list wrapper ---- */
     .entry-list {
-      background: rgba(255,255,255,0.88);
+      background: rgba(246, 249, 252, 0.92);
       border: 1px solid var(--border);
       border-radius: 22px;
       overflow: hidden;
@@ -449,7 +449,7 @@
     .manager-wrap {
       margin-top: 1.15rem;
       padding: 1.25rem;
-      background: linear-gradient(180deg, rgba(246,248,251,0.95) 0%, rgba(241,245,249,0.95) 100%);
+      background: linear-gradient(180deg, rgba(238,243,248,0.96) 0%, rgba(232,238,245,0.96) 100%);
       border: 1px solid var(--border);
       border-radius: 22px;
       text-align: center;
@@ -485,7 +485,7 @@
       gap: 0.55rem;
       min-height: 42px;
       padding: 0 1rem;
-      background: var(--card);
+      background: rgba(251,253,255,0.92);
       border: 1px solid var(--border);
       border-radius: 999px;
       color: var(--text);
@@ -635,7 +635,7 @@
     .detail-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; }
 
     .detail-depiction {
-      background: linear-gradient(180deg, rgba(246,248,251,0.98) 0%, rgba(255,255,255,0.98) 100%);
+      background: linear-gradient(180deg, rgba(238,243,248,0.98) 0%, rgba(251,253,255,0.98) 100%);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 1.5rem;
@@ -811,7 +811,7 @@
           </a>
           <a href="https://twitter.com/zeroxjf" target="_blank" rel="noopener" title="X / Twitter" aria-label="X / Twitter">
             <svg height="15" width="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
-            <span>X</span>
+            <span>Twitter</span>
           </a>
           <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank" rel="noopener" title="Donate" aria-label="Donate">
             <svg height="16" width="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>

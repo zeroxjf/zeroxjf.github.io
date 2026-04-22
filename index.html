@@ -49,6 +49,7 @@
       --accent-border: rgba(96, 165, 250, 0.26);
       --hover: #15223a;
       --code-bg: #0b1425;
+      --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
       --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       --fs-xl: 1.15rem;
@@ -61,7 +62,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       background-image: var(--bg-grad);
       color: var(--text);
@@ -82,7 +83,7 @@
       border-radius: 4px;
     }
 
-    .mono { font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace; }
+    .mono { font-family: var(--font-sans); }
 
     /* ---- Layout ---- */
     .content {
@@ -129,7 +130,7 @@
     .header-left { min-width: 0; }
 
     .header-kicker {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.7rem;
       font-weight: 600;
       color: var(--accent-hover);
@@ -241,7 +242,7 @@
     a.meta-cell:hover .meta-value { color: var(--accent-hover); }
 
     .meta-label {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.64rem;
       font-weight: 600;
       color: var(--subtle);
@@ -293,7 +294,7 @@
     }
 
     .section-num {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.72rem;
       font-weight: 600;
       color: var(--subtle);
@@ -314,7 +315,7 @@
       color: var(--subtle);
       font-weight: 500;
       margin-left: auto;
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       letter-spacing: 0.06em;
       text-transform: uppercase;
       font-variant-numeric: tabular-nums;
@@ -346,7 +347,7 @@
 
     .post-line::after {
       content: "↗";
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       position: absolute;
       right: 1.2rem;
       color: var(--faint);
@@ -368,7 +369,7 @@
     }
 
     .line-date {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.68rem;
       color: #b4c3d8;
       flex-shrink: 0;
@@ -413,7 +414,7 @@
       white-space: nowrap;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       line-height: 1.45;
     }
 
@@ -433,7 +434,7 @@
     .line-tag.sop    { background: rgba(129, 140, 248, 0.18); color: #dbe4ff; border: 1px solid rgba(129, 140, 248, 0.28); }
 
     .line-stars {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.68rem;
       color: #b4c3d8;
       flex-shrink: 0;
@@ -458,7 +459,7 @@
     }
 
     .manager-prompt {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.68rem;
       font-weight: 600;
       color: var(--muted);
@@ -546,7 +547,7 @@
     }
 
     .tweak-ver {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.68rem;
       color: var(--accent-dark);
       font-variant-numeric: tabular-nums;
@@ -560,7 +561,7 @@
     }
 
     .tweak-arrow {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.9rem;
       color: var(--faint);
       transition: transform 0.25s var(--ease-out), color 0.15s var(--ease);
@@ -581,7 +582,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.7rem;
       color: var(--faint);
       letter-spacing: 0.04em;
@@ -695,7 +696,7 @@
     .dep-markdown li { margin-bottom: 0.25rem; }
 
     .dep-markdown code {
-      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+      font-family: var(--font-sans);
       font-size: 0.82rem;
       background: var(--code-bg);
       padding: 0.12rem 0.4rem;

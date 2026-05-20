@@ -4,974 +4,674 @@
   <meta charset="UTF-8">
   <title>zeroxjf</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Jailbreak tweaks and iOS security research by zeroxjf.">
+  <meta name="description" content="Independent iOS security research by zeroxjf.">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a">
 
-  <!-- Open Graph -->
   <meta property="og:title" content="zeroxjf">
-  <meta property="og:description" content="Jailbreak tweaks and iOS security research.">
+  <meta property="og:description" content="Independent iOS security research.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zeroxjf.github.io/">
   <meta property="og:image" content="https://zeroxjf.github.io/og-image.png">
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@zeroxjf">
   <meta name="twitter:title" content="zeroxjf">
-  <meta name="twitter:description" content="Jailbreak tweaks and iOS security research.">
+  <meta name="twitter:description" content="Independent iOS security research.">
   <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png">
+
+  <link rel="icon" href="logo.png" type="image/png">
 
   <style>
     :root {
-      --bg: #08111f;
-      --bg-grad:
-        radial-gradient(1200px 700px at 8% -10%, rgba(37, 99, 235, 0.24), transparent 52%),
-        radial-gradient(1000px 640px at 100% 0%, rgba(14, 165, 233, 0.14), transparent 42%),
-        linear-gradient(180deg, #0b1220 0%, #08111f 100%);
-      --card: #10192d;
-      --card-alt: #152238;
-      --card-inset: #101a2d;
-      --border: #2a3a57;
-      --border-soft: #22324e;
-      --border-strong: #3a4f73;
-      --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.35);
-      --shadow-md: 0 16px 34px -22px rgba(2, 6, 23, 0.55);
-      --shadow-lg: 0 44px 100px -46px rgba(2, 6, 23, 0.72);
-      --shadow-row: 0 20px 40px -30px rgba(2, 6, 23, 0.58);
-      --ink: #f8fbff;
-      --text: #d7e1ef;
-      --muted: #b7c4d6;
-      --subtle: #9fb0c6;
-      --faint: #8296b2;
-      --accent: #60a5fa;
-      --accent-hover: #93c5fd;
-      --accent-dark: #bfdbfe;
-      --accent-soft: rgba(96, 165, 250, 0.14);
-      --accent-border: rgba(96, 165, 250, 0.26);
-      --hover: #15223a;
-      --code-bg: #0b1425;
-      --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --fs-xl: 1.15rem;
-      --fs-3xl: 2.25rem;
+      --bg: #ffffff;
+      --fg: #0a0a0a;
+      --muted: #71717a;
+      --border: #e5e5e7;
+      --accent: rgba(0, 0, 0, 0.045);
+      --accent-strong: rgba(0, 0, 0, 0.08);
+      --inset: rgba(255, 255, 255, 0);
+      --code-bg: #f4f4f5;
+      --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0a;
+        --fg: #fafafa;
+        --muted: #a1a1aa;
+        --border: #27272a;
+        --accent: rgba(255, 255, 255, 0.06);
+        --accent-strong: rgba(255, 255, 255, 0.1);
+        --inset: rgba(255, 255, 255, 0.04);
+        --code-bg: #18181b;
+      }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    button, input, select, textarea { font-family: inherit; font-size: inherit; }
-
     html { scroll-behavior: smooth; }
 
     body {
       font-family: var(--font-sans);
       background: var(--bg);
-      background-image: var(--bg-grad);
-      color: var(--text);
+      color: var(--fg);
       min-height: 100vh;
-      line-height: 1.55;
-      padding: 1.5rem;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
+      font-feature-settings: "ss01", "cv01";
     }
 
-    a { color: var(--accent-hover); text-decoration: none; transition: color 0.15s var(--ease); }
-    a:hover { color: var(--accent-dark); }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; }
 
-    :focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-
-    .mono { font-family: var(--font-sans); }
-
-    /* ---- Layout ---- */
-    .content {
-      max-width: 1040px;
-      margin: 2rem auto 3.5rem;
-      padding: 3.5rem;
-      background:
-        linear-gradient(180deg, rgba(96, 165, 250, 0.09) 0%, rgba(96, 165, 250, 0.025) 180px, transparent 320px),
-        var(--card);
-      border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 28px;
-      box-shadow: var(--shadow-lg);
-      position: relative;
-      overflow: hidden;
-    }
-    .content::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 28px;
-      pointer-events: none;
-      border: 1px solid rgba(148, 163, 184, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-    .content::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(800px 360px at 100% 0%, rgba(96, 165, 250, 0.08), transparent 60%);
-      pointer-events: none;
-    }
-
-    /* ---- Header ---- */
-    .header {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: flex-start;
-      gap: 1.5rem;
-      padding-bottom: 2.1rem;
-      margin-bottom: 2.2rem;
-      border-bottom: 1px solid var(--border-soft);
-    }
-
-    .header-left { min-width: 0; }
-
-    .header-kicker {
-      font-family: var(--font-sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--accent-hover);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
+    main {
       display: flex;
-      align-items: center;
-      gap: 0.55rem;
-    }
-    .header-kicker::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(96, 165, 250, 0.14);
-      flex-shrink: 0;
-    }
-    .header-kicker::after {
-      content: "";
-      width: 72px;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(96, 165, 250, 0.34), transparent);
-    }
-
-    .header-title {
-      font-size: clamp(2.8rem, 6vw, 4.35rem);
-      font-weight: 780;
-      color: var(--ink);
-      letter-spacing: -0.055em;
-      line-height: 0.95;
-      margin-bottom: 0.85rem;
-    }
-
-    .header-sub {
-      font-size: 1.04rem;
-      color: var(--muted);
-      font-weight: 450;
-      line-height: 1.72;
-      max-width: 48ch;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: flex-start;
-      flex-shrink: 0;
-    }
-
-    .social-row {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .social-row a {
-      min-height: 42px;
-      padding: 0 0.9rem;
-      display: inline-flex;
-      align-items: center;
+      min-height: 100vh;
       justify-content: center;
-      gap: 0.55rem;
-      color: var(--muted);
-      background: rgba(17, 28, 49, 0.88);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      box-shadow: var(--shadow-sm);
-      font-size: 0.84rem;
-      font-weight: 600;
+    }
+
+    .shell {
+      width: 100%;
+    }
+
+    .container {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 6rem 1.5rem 0;
+    }
+
+    /* --- Title block --- */
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+    .title-block h1 {
+      font-size: 1.875rem;
+      font-weight: 500;
       letter-spacing: -0.01em;
-      transition: transform 0.2s var(--ease-out), color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease), box-shadow 0.2s var(--ease);
     }
-
-    .social-row a:hover {
-      color: var(--ink);
-      border-color: var(--border-strong);
-      background: var(--hover);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    /* ---- Meta stats row ---- */
-    .meta-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.9rem;
-      margin-bottom: 3rem;
-    }
-
-    .meta-cell {
-      padding: 1.15rem 1.2rem;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: linear-gradient(180deg, rgba(17,28,49,0.98) 0%, rgba(15,23,42,0.98) 100%);
-      color: var(--text);
-      text-decoration: none;
-      display: block;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s var(--ease-out), border-color 0.15s var(--ease), box-shadow 0.2s var(--ease), background 0.15s var(--ease);
-    }
-    a.meta-cell:hover {
-      transform: translateY(-2px);
-      border-color: var(--border-strong);
-      background: var(--card);
-      box-shadow: var(--shadow-md);
-    }
-    a.meta-cell:hover .meta-value { color: var(--accent-hover); }
-
-    .meta-label {
-      font-family: var(--font-sans);
-      font-size: 0.64rem;
-      font-weight: 600;
-      color: var(--subtle);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.55rem;
-    }
-
-    .meta-value {
-      font-size: 1.5rem;
-      font-weight: 760;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-      display: flex;
-      align-items: baseline;
-      gap: 0.4rem;
-    }
-
-    .meta-value small {
-      font-size: 0.74rem;
-      font-weight: 500;
-      color: var(--subtle);
-      letter-spacing: 0;
-    }
-
-    /* ---- Sections ---- */
-    .section { margin-bottom: 3rem; }
-    .section:last-child { margin-bottom: 0; }
-
-    .section-header {
-      display: flex;
-      align-items: baseline;
-      gap: 0.85rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.3rem;
-      border-bottom: none;
-      position: relative;
-    }
-    .section-header::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -0.15rem;
-      width: 42px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent) 0%, rgba(37, 99, 235, 0.15) 100%);
-      border-radius: 2px;
-    }
-
-    .section-num {
-      font-family: var(--font-sans);
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--subtle);
-      letter-spacing: 0.06em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .section-title {
-      font-size: 1.35rem;
-      font-weight: 720;
-      color: var(--ink);
-      letter-spacing: -0.03em;
-      line-height: 1;
-    }
-
-    .section-desc {
-      font-size: 0.74rem;
-      color: var(--subtle);
-      font-weight: 500;
-      margin-left: auto;
-      font-family: var(--font-sans);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ---- Card list wrapper ---- */
-    .entry-list {
-      background: rgba(16, 25, 45, 0.96);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      backdrop-filter: blur(8px);
-    }
-
-    /* ---- Post lines (research & blog) ---- */
-    .post-line {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.95rem;
-      padding: 1rem 1.2rem;
-      border-bottom: 1px solid var(--border-soft);
-      color: var(--text);
-      transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
-    }
-
-    .post-line:last-child { border-bottom: none; }
-
-    .post-line::after {
-      content: "↗";
-      font-family: var(--font-sans);
-      position: absolute;
-      right: 1.2rem;
-      color: var(--faint);
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: all 0.25s var(--ease-out);
-      font-weight: 600;
-      pointer-events: none;
-    }
-
-    .post-line:hover {
-      background: var(--hover);
-      border-color: rgba(147, 197, 253, 0.22);
-    }
-    .post-line:hover::after {
-      color: var(--accent-hover);
-      opacity: 0.9;
-      transform: translateX(0);
-    }
-
-    .line-date {
-      font-family: var(--font-sans);
-      font-size: 0.68rem;
-      color: #b4c3d8;
-      flex-shrink: 0;
-      min-width: 4.75rem;
-      padding: 0.28rem 0.55rem;
-      border-radius: 999px;
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      text-align: center;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .line-title {
-      font-size: 0.95rem;
-      color: var(--ink);
-      flex: 1;
-      min-width: 0;
-      font-weight: 620;
-      letter-spacing: -0.015em;
-      transition: color 0.15s var(--ease);
-    }
-
-    .post-line:hover .line-title { color: var(--ink); }
-
-    .line-tags {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-      flex-shrink: 0;
-      justify-content: flex-end;
-      margin-right: 0.45rem;
-    }
-
-    .line-tag {
-      font-size: 0.58rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 999px;
-      font-weight: 600;
-      white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: var(--font-sans);
-      line-height: 1.45;
-    }
-
-    .line-tag.kernel,
-    .line-tag.sep    { background: rgba(244, 63, 94, 0.18); color: #fec6cc; border: 1px solid rgba(244, 63, 94, 0.28); }
-    .line-tag.uaf,
-    .line-tag.dos,
-    .line-tag.race   { background: rgba(245, 158, 11, 0.18); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.28); }
-    .line-tag.cve {
-      background: #b91c1c;
-      color: #ffffff;
-      border: 1px solid #991b1b;
-      text-transform: none;
-      letter-spacing: 0.02em;
-    }
-    .line-tag.webkit,
-    .line-tag.sop    { background: rgba(129, 140, 248, 0.18); color: #dbe4ff; border: 1px solid rgba(129, 140, 248, 0.28); }
-
-    .line-stars {
-      font-family: var(--font-sans);
-      font-size: 0.68rem;
-      color: #b4c3d8;
-      flex-shrink: 0;
-      min-width: 3.25rem;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      padding: 0.28rem 0.6rem;
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-    }
-
-    /* ---- Package manager buttons ---- */
-    .manager-wrap {
-      margin-top: 1.15rem;
-      padding: 1.25rem;
-      background: linear-gradient(180deg, rgba(17,28,49,0.96) 0%, rgba(16,26,45,0.96) 100%);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .manager-prompt {
-      font-family: var(--font-sans);
-      font-size: 0.68rem;
-      font-weight: 600;
+    .title-block .tagline {
       color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 0.45rem;
+      font-size: 1rem;
+      font-weight: 400;
+      text-wrap: pretty;
     }
 
-    .manager-url {
-      margin-bottom: 1rem;
-      color: var(--subtle);
-      font-size: 0.84rem;
-    }
-
-    .manager-row {
+    /* --- Sections --- */
+    .sections {
       display: flex;
-      gap: 0.65rem;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      gap: 3rem;
+      padding-top: 3rem;
+    }
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .section > h3 {
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 400;
     }
 
-    .manager-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      min-height: 42px;
-      padding: 0 1rem;
-      background: rgba(15, 23, 42, 0.92);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--text);
-      text-decoration: none;
-      font-size: 0.84rem;
-      font-weight: 600;
-      letter-spacing: -0.005em;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s var(--ease-out), border-color 0.15s var(--ease), background 0.15s var(--ease), box-shadow 0.2s var(--ease);
-    }
-
-    .manager-btn:hover {
-      border-color: var(--border-strong);
-      background: var(--hover);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-      color: var(--ink);
-    }
-    .manager-btn img { height: 15px; width: 15px; }
-
-    /* ---- Tweak list ---- */
-    .tweak-line {
+    /* --- Work items (Latest-style rows) --- */
+    .workitem {
       position: relative;
       display: flex;
+      flex-direction: column;
       align-items: flex-start;
-      gap: 0.9rem;
-      padding: 1.05rem 1.2rem;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border-soft);
-      transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+      gap: 0.75rem;
+      padding: 1rem 0 1.5rem;
+      line-height: 1.25;
+      color: var(--fg);
+      box-shadow: inset 0 0.5px 0 var(--border);
+      border-radius: 6px;
+      transition: background-color 120ms ease, padding 120ms ease, margin 120ms ease, box-shadow 120ms ease;
+    }
+    @media (min-width: 768px) {
+      .workitem {
+        flex-direction: row;
+        padding-bottom: 1rem;
+      }
     }
 
-    .tweak-line:last-child { border-bottom: none; }
-    .tweak-line:hover {
-      background: var(--hover);
-      border-color: rgba(37, 99, 235, 0.10);
+    .workitem.is-link { cursor: pointer; }
+    .workitem.is-link:hover {
+      background: var(--accent);
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      box-shadow: inset 0 0.5px 1.5px var(--inset);
     }
+    .workitem.is-link:active { background: var(--accent-strong); }
 
-    .tweak-info { flex: 1; min-width: 0; }
-
-    .tweak-name {
-      font-size: 0.98rem;
-      color: var(--ink);
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.28rem;
-      transition: color 0.15s var(--ease);
-    }
-
-    .tweak-line:hover .tweak-name { color: var(--ink); }
-
-    .tweak-desc {
-      font-size: 0.84rem;
-      color: var(--subtle);
-      letter-spacing: -0.005em;
-      line-height: 1.6;
-    }
-
-    .tweak-ver {
-      font-family: var(--font-sans);
-      font-size: 0.68rem;
-      color: var(--accent-dark);
-      font-variant-numeric: tabular-nums;
+    .workitem .ident {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      width: 9.25rem;
       flex-shrink: 0;
-      background: var(--accent-soft);
-      padding: 0.34rem 0.72rem;
-      border-radius: 999px;
-      border: 1px solid var(--accent-border);
-      font-weight: 600;
-      letter-spacing: 0;
+    }
+    .workitem .ident .icon {
+      width: 1.125rem;
+      height: 1.125rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .workitem .ident .ident-label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .workitem .ident .ident-label.mono {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
     }
 
-    .tweak-arrow {
-      font-family: var(--font-sans);
-      font-size: 0.9rem;
-      color: var(--faint);
-      transition: transform 0.25s var(--ease-out), color 0.15s var(--ease);
-      width: 1rem;
-      text-align: center;
+    .workitem .info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      align-self: stretch;
+      min-width: 0;
     }
-
-    .tweak-line:hover .tweak-arrow {
-      color: var(--accent);
-      transform: translateX(4px);
-    }
-
-    /* ---- Footer ---- */
-    .site-footer {
-      margin-top: 3.25rem;
-      padding-top: 1.35rem;
-      border-top: 1px solid var(--border-soft);
+    .workitem .row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-sans);
-      font-size: 0.7rem;
-      color: var(--faint);
-      letter-spacing: 0.04em;
+      gap: 0.75rem;
+      padding: 0.125rem 0;
     }
-    .site-footer span { display: inline-flex; align-items: center; gap: 0.4rem; }
-    .site-footer .dot {
-      width: 5px; height: 5px; border-radius: 50%;
+    .workitem .row .row-main {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: baseline;
+      min-width: 0;
+    }
+    .workitem .row .row-title {
+      text-wrap: balance;
+    }
+    @media (min-width: 768px) {
+      .workitem .row .row-title { font-weight: 500; }
+    }
+    .workitem .row .row-sub {
+      color: var(--muted);
+      opacity: 0.7;
+      font-size: 0.875rem;
+      display: none;
+    }
+    @media (min-width: 640px) {
+      .workitem .row .row-sub { display: inline; }
+    }
+    .workitem .row .row-dates {
+      display: flex;
+      gap: 0.125rem;
+      min-width: 6rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      justify-content: flex-end;
+    }
+    .workitem .arrow {
+      display: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-left: -0.25rem;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    @media (min-width: 768px) {
+      .workitem .arrow { display: flex; }
+    }
+    .workitem.is-link:hover .arrow { color: var(--fg); }
+    .workitem .arrow svg { width: 0.875rem; height: 0.875rem; }
+
+    .workitem .row-title .uline {
+      box-shadow: 0 1px 0 var(--border);
+      padding-bottom: 1px;
+    }
+
+    .workitem.faded { color: color-mix(in srgb, var(--fg) 70%, transparent); }
+    .workitem.faded .row-title { font-weight: 400; }
+
+    /* --- Misc rows (year + text + supp) --- */
+    .misc-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.4rem 0.75rem 0.4rem 0;
+      font-size: 0.875rem;
+      color: color-mix(in srgb, var(--fg) 70%, transparent);
+      transition: color 120ms ease;
+    }
+    .misc-row:hover { color: var(--fg); }
+    .misc-row .year {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+    .misc-row .text { line-height: 1.55; }
+    .misc-row .text .uline {
+      box-shadow: 0 1px 0 var(--border);
+      padding-bottom: 1px;
+    }
+    .misc-row .text .supp {
+      color: var(--muted);
+      opacity: 0.7;
+      margin-left: 0.75rem;
+    }
+    @media (max-width: 540px) {
+      .misc-row .text .supp { display: block; margin-left: 0; margin-top: 0.125rem; }
+    }
+
+    /* --- License rows --- */
+    .lic-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.4rem 0;
+      font-size: 0.875rem;
+      color: color-mix(in srgb, var(--fg) 70%, transparent);
+    }
+    @media (min-width: 640px) {
+      .lic-row { flex-direction: row; gap: 0.75rem; }
+    }
+    .lic-row .lic-title { flex-grow: 0; }
+    .lic-row .lic-meta {
+      display: flex;
+      gap: 0.25rem;
+      flex-grow: 1;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .lic-row .lic-meta .lic-src { flex-grow: 1; opacity: 0.7; }
+    .lic-row .lic-meta .lic-id {
+      display: flex; gap: 0.25rem; justify-content: flex-end;
+    }
+    .lic-row .lic-meta .lic-id .lic-id-label { opacity: 0.7; }
+
+    /* --- Repo manager --- */
+    .repo-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-top: 0.5rem;
+    }
+    .repo-card .repo-prompt { color: var(--muted); font-size: 0.875rem; }
+    .repo-card .repo-url {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--fg);
+      background: var(--code-bg);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      user-select: all;
+    }
+    .repo-card .repo-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .repo-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
       background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-    }
-
-    /* ---- Detail view ---- */
-    .detail-view { display: none; }
-    .detail-view.active { display: block; }
-
-    .detail-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      color: var(--accent);
-      font-size: 0.88rem;
+      font-size: 0.875rem;
       font-weight: 500;
-      cursor: pointer;
+      transition: background 120ms ease;
+    }
+    .repo-btn:hover { background: var(--accent-strong); }
+    .repo-btn img { width: 16px; height: 16px; border-radius: 4px; }
+
+    /* --- Footer (sticky) --- */
+    .footer {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin: 3rem -0.5rem 0;
+      padding-top: 2.25rem;
+      padding-bottom: 1rem;
+      background: linear-gradient(to bottom, transparent 0%, var(--bg) 60%, var(--bg) 100%);
+    }
+    .footer-group { display: flex; align-items: center; gap: 0.25rem; }
+    .footer a.f-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.4rem;
+      border-radius: 6px;
+      color: var(--fg);
+      transition: background 120ms ease, opacity 120ms ease;
+    }
+    .footer a.f-icon:hover { background: var(--accent); }
+    .footer .footer-utility a.f-icon { opacity: 0.5; }
+    .footer .footer-utility a.f-icon:hover { opacity: 1; }
+    .footer a.f-icon svg { width: 1.25rem; height: 1.25rem; stroke-width: 1.85; }
+
+    /* --- Detail view --- */
+    .detail-view {
+      display: none;
+    }
+    .detail-view.active { display: block; }
+    .detail-back {
       background: none;
       border: none;
-      padding: 0;
-      margin-bottom: 1.5rem;
+      color: var(--muted);
       font-family: inherit;
+      font-size: 0.875rem;
+      cursor: pointer;
+      padding: 0.4rem 0.5rem 0.4rem 0;
+      margin-bottom: 1rem;
+      transition: color 120ms ease;
     }
-
-    .detail-back:hover { color: var(--accent-hover); }
-
+    .detail-back:hover { color: var(--fg); }
     .detail-header {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       gap: 0.75rem;
-      margin-bottom: 0.5rem;
+      padding-bottom: 0.25rem;
     }
-
-    .detail-title { font-size: 1.4rem; font-weight: 700; color: var(--ink); }
-
+    .detail-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
     .detail-version {
-      font-size: 0.72rem;
-      padding: 0.22rem 0.65rem;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent-dark);
-      border: 1px solid var(--accent-border);
-      font-weight: 600;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
     }
-
-    .detail-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; }
-
-    .detail-depiction {
-      background: linear-gradient(180deg, rgba(17,28,49,0.98) 0%, rgba(15,23,42,0.98) 100%);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* ---- Depiction ---- */
+    .detail-desc { color: var(--muted); padding-bottom: 1.5rem; }
+    .dep-loading { color: var(--muted); font-size: 0.875rem; padding: 1rem 0; }
     .dep-tabs {
       display: flex;
-      margin-bottom: 1.25rem;
+      gap: 0.25rem;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
     }
-
     .dep-tab {
-      padding: 0.55rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
       background: none;
-      border-top: none;
-      border-left: none;
-      border-right: none;
+      border: none;
+      color: var(--muted);
       font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      border-bottom: 1.5px solid transparent;
       margin-bottom: -1px;
+      transition: color 120ms ease, border-color 120ms ease;
     }
-
-    .dep-tab:hover { color: var(--text); }
-    .dep-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
+    .dep-tab:hover { color: var(--fg); }
+    .dep-tab.active { color: var(--fg); border-bottom-color: var(--fg); }
     .dep-tab-content { display: none; }
     .dep-tab-content.active { display: block; }
-
-    .dep-header {
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin: 1.25rem 0 0.6rem;
-    }
-
-    .dep-header:first-child { margin-top: 0; }
-
-    .dep-markdown {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--text);
-    }
-    .dep-markdown p { margin-bottom: 0.6rem; }
-    .dep-markdown p:last-child { margin-bottom: 0; }
-    .dep-markdown strong { font-weight: 600; color: var(--ink); }
-    .dep-markdown em { font-style: italic; }
-    .dep-markdown ul, .dep-markdown ol { margin: 0.4rem 0 0.6rem 1.25rem; }
-    .dep-markdown li { margin-bottom: 0.25rem; }
-
+    .dep-header { font-weight: 500; font-size: 1rem; margin: 1rem 0 0.5rem; }
+    .dep-markdown { font-size: 0.95rem; line-height: 1.65; }
+    .dep-markdown p { margin: 0.5rem 0; }
+    .dep-markdown ul { margin: 0.5rem 0; padding-left: 1.25rem; }
     .dep-markdown code {
-      font-family: var(--font-sans);
-      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      font-size: 0.85em;
       background: var(--code-bg);
-      padding: 0.12rem 0.4rem;
+      padding: 0.1em 0.35em;
       border-radius: 4px;
-      color: var(--ink);
     }
-
     .dep-markdown pre {
       background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.85rem 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
       overflow-x: auto;
-      margin: 0.6rem 0;
+      margin: 0.75rem 0;
     }
-
-    .dep-markdown pre code { background: none; padding: 0; font-size: 0.8rem; }
-    .dep-markdown a { color: var(--accent); }
-    .dep-markdown a:hover { text-decoration: underline; }
-
-    .dep-separator { border: none; border-top: 1px solid var(--border-soft); margin: 0.85rem 0; }
-
+    .dep-markdown pre code { background: none; padding: 0; }
+    .dep-markdown a { box-shadow: 0 1px 0 var(--border); }
+    .dep-markdown a:hover { box-shadow: 0 1px 0 var(--fg); }
+    .dep-separator { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
     .dep-table-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 0.65rem 0;
-      font-size: 0.88rem;
-      border-bottom: 1px solid var(--border-soft);
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      font-size: 0.875rem;
+      box-shadow: inset 0 0.5px 0 var(--border);
     }
-
-    .dep-table-title { color: var(--muted); }
-    .dep-table-value { color: var(--ink); font-weight: 500; }
-
+    .dep-table-row .dep-table-title { color: var(--muted); }
+    .dep-table-row .dep-table-value {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
     .dep-button {
       display: inline-block;
-      padding: 0.5rem 1.1rem;
-      margin: 0.5rem 0;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-decoration: none;
+      padding: 0.5rem 0.875rem;
+      border-radius: 6px;
       background: var(--accent);
-      color: #ffffff;
-      border: 1px solid var(--accent);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin: 0.25rem 0;
+      transition: background 120ms ease;
     }
-
-    .dep-button:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #ffffff; }
-
-    .dep-loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; }
-
-    /* ---- Responsive ---- */
-    @media (max-width: 860px) {
-      body { padding: 0.75rem; }
-      .content {
-        margin: 0;
-        padding: 2rem 1.4rem 2.2rem;
-        border-radius: 24px;
-      }
-      .header {
-        grid-template-columns: 1fr;
-        gap: 1.4rem;
-      }
-      .header-right { align-items: flex-start; }
-      .social-row { justify-content: flex-start; }
-      .meta-row { grid-template-columns: 1fr; }
-      .post-line { padding: 0.95rem 1rem; gap: 0.75rem; }
-      .tweak-line { padding: 0.95rem 1rem; }
-      .site-footer {
-        gap: 0.6rem;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 720px) {
-      body { padding: 0; }
-      .content {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        box-shadow: none;
-      }
-      .content::before { display: none; }
-      .header-title { font-size: 2.3rem; }
-      .header-sub { font-size: 0.96rem; }
-      .line-date {
-        width: auto;
-        min-width: 0;
-        font-size: 0.65rem;
-      }
-      .tweak-desc { display: none; }
-      .line-tags { display: none; }
-      .line-stars { display: none; }
-      .post-line::after { right: 1rem; }
-      .social-row a span { display: none; }
-      .social-row a { width: 42px; padding: 0; border-radius: 12px; }
-    }
+    .dep-button:hover { background: var(--accent-strong); }
   </style>
 </head>
 <body>
-  <div class="content">
+  <main>
+    <div class="shell">
+      <div class="container">
 
-    <div class="header">
-      <div class="header-left">
-        <div class="header-kicker">Independent iOS Security Research</div>
-        <div class="header-title">zeroxjf</div>
-      </div>
-      <div class="header-right">
-        <div class="social-row">
-          <a href="https://github.com/zeroxjf" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
-            <svg height="17" width="17" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            <span>GitHub</span>
-          </a>
-          <a href="https://twitter.com/zeroxjf" target="_blank" rel="noopener" title="X / Twitter" aria-label="X / Twitter">
-            <svg height="15" width="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h2.039L6.486 3.24H4.298z"/></svg>
-            <span>Twitter</span>
-          </a>
-          <a href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank" rel="noopener" title="Donate" aria-label="Donate">
-            <svg height="16" width="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.28a.78.78 0 0 1 .771-.657h7.813c2.759 0 4.77.57 5.976 1.696 1.172 1.095 1.571 2.708 1.185 4.793-.028.15-.058.301-.09.454-.942 4.834-4.16 6.497-8.271 6.497H9.976a.96.96 0 0 0-.949.812l-.95 5.462zm14.146-14.73c-.017.1-.036.2-.056.302-.856 4.393-3.658 6.64-8.327 6.64H10.3a.48.48 0 0 0-.474.406l-1.101 6.334a.32.32 0 0 0 .316.374h3.379a.686.686 0 0 0 .677-.579l.028-.144.537-3.405.034-.187a.686.686 0 0 1 .677-.579h.426c2.76 0 4.92-1.121 5.552-4.364.264-1.355.127-2.487-.571-3.281a2.72 2.72 0 0 0-.638-.517z"/></svg>
-            <span>Donate</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Meta stats -->
-    <div class="meta-row">
-      <div class="meta-cell">
-        <div class="meta-label">Vulnerabilities</div>
-        <div class="meta-value">4 <small>disclosed</small></div>
-      </div>
-      <div class="meta-cell">
-        <div class="meta-label">CVEs</div>
-        <div class="meta-value">3 <small>assigned</small></div>
-      </div>
-      <a class="meta-cell" href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">
-        <div class="meta-label">Press</div>
-        <div class="meta-value">WIRED <small>mention ↗</small></div>
-      </a>
-    </div>
-
-    <div id="main-view">
-
-    <!-- Vulnerability Research -->
-    <div class="section" id="research">
-      <div class="section-header">
-        <span class="section-num">01 —</span>
-        <div class="section-title">Vulnerability Research</div>
-        <span class="section-desc">Apple kernel / SEP</span>
-      </div>
-      <div class="entry-list">
-
-      <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank">
-        <span class="line-date">2026</span>
-        <span class="line-title">AppleJPEGDriver startDecoder UAF</span>
-        <span class="line-tags">
-          <span class="line-tag kernel">kernel</span>
-          <span class="line-tag uaf">uaf</span>
-          <span class="line-tag cve">CVE-2026-20687</span>
-        </span>
-        <span class="line-stars">&#9734; 15</span>
-      </a>
-
-      <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-28992-IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank">
-        <span class="line-date">2026</span>
-        <span class="line-title">IOHIDFamily FastPathUserClient UAF</span>
-        <span class="line-tags">
-          <span class="line-tag kernel">kernel</span>
-          <span class="line-tag uaf">uaf</span>
-          <span class="line-tag race">race</span>
-          <span class="line-tag cve">CVE-2026-28992</span>
-        </span>
-        <span class="line-stars">&#9734; 6</span>
-      </a>
-
-      <a class="post-line" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank">
-        <span class="line-date">2026</span>
-        <span class="line-title">AppleSEPKeyStore Use-After-Free</span>
-        <span class="line-tags">
-          <span class="line-tag kernel">kernel</span>
-          <span class="line-tag uaf">uaf</span>
-          <span class="line-tag cve">CVE-2026-20637</span>
-        </span>
-        <span class="line-stars">&#9734; 50</span>
-      </a>
-
-      <a class="post-line" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank">
-        <span class="line-date">2026</span>
-        <span class="line-title">SEP Firmware Panic via AppleKeyStore</span>
-        <span class="line-tags">
-          <span class="line-tag sep">kernel/SEP</span>
-          <span class="line-tag dos">DoS</span>
-        </span>
-        <span class="line-stars">&#9734; 23</span>
-      </a>
-
-      </div><!-- /.entry-list -->
-    </div>
-
-    <!-- Projects -->
-    <div class="section" id="projects">
-      <div class="section-header">
-        <span class="section-num">02 —</span>
-        <div class="section-title">Projects</div>
-        <span class="section-desc">Open-source tooling</span>
-      </div>
-      <div class="entry-list">
-        <a class="tweak-line" href="lightsaber/" style="text-decoration:none">
-          <div class="tweak-info">
-            <div class="tweak-name">LightSaber</div>
-            <div class="tweak-desc">Open-source iOS 18.4–18.6.2 userland exploit chain with JS injection into SpringBoard. Derived from DarkSword.</div>
+        <div id="main-view">
+          <div class="title-block">
+            <h1>zeroxjf</h1>
+            <div class="tagline">Independent iOS Security Research</div>
           </div>
-          <span class="tweak-ver">iOS 18.4–18.6</span>
-          <span class="tweak-arrow">&rsaquo;</span>
-        </a>
-      </div>
-    </div>
 
-    <!-- Blog -->
-    <div class="section" id="blog">
-      <div class="section-header">
-        <span class="section-num">03 —</span>
-        <div class="section-title">Blog</div>
-        <span class="section-desc">Long-form notes</span>
-      </div>
-      <div class="entry-list">
+          <div class="sections">
 
-      <a class="post-line" href="blog/metal-patch.html">
-        <span class="line-date">Feb 2026</span>
-        <span class="line-title">Patching Metal Graphics into vphone</span>
-      </a>
+            <!-- Vulnerabilities -->
+            <div class="section" id="research">
+              <h3>Vulnerabilities</h3>
+              <div>
 
-      </div><!-- /.entry-list -->
-    </div>
+                <a class="workitem is-link" href="https://github.com/zeroxjf/CVE-2026-20687-AppleJPEGDriver-UAF" target="_blank" rel="noopener">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"/></svg>
+                    <div class="ident-label mono">CVE-2026-20687</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">AppleJPEGDriver startDecoder UAF</span></div>
+                        <div class="row-sub">kernel · UAF</div>
+                      </div>
+                      <div class="row-dates"><div>2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
 
-    <!-- iOS Tweaks -->
-    <div class="section" id="tweaks">
-      <div class="section-header">
-        <span class="section-num">04 —</span>
-        <div class="section-title">iOS Tweaks</div>
-        <span class="section-desc">iOS 16 / 17 · rootless</span>
-      </div>
-      <div class="entry-list" id="tweak-list"></div>
+                <a class="workitem is-link" href="https://github.com/zeroxjf/CVE-2026-28992-IOHIDFamily-FastPathUserClient-Race-Conditions" target="_blank" rel="noopener">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"/></svg>
+                    <div class="ident-label mono">CVE-2026-28992</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">IOHIDFamily FastPathUserClient UAF</span></div>
+                        <div class="row-sub">kernel · UAF · race</div>
+                      </div>
+                      <div class="row-dates"><div>2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
 
-      <!-- Add Repo -->
-      <div class="manager-wrap">
-        <div class="manager-prompt">Tap to add my repo to your package manager</div>
-        <div class="manager-url mono">https://zeroxjf.github.io</div>
-        <div class="manager-row">
-          <a class="manager-btn" href="sileo://source/https://zeroxjf.github.io">
-            <img src="icons/sileo.png" alt="">Sileo
-          </a>
-          <a class="manager-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io">
-            <img src="icons/cydia.png" alt="">Cydia
-          </a>
-          <a class="manager-btn" href="zbra://sources/add/https://zeroxjf.github.io">
-            <img src="icons/zebra.png" alt="">Zebra
-          </a>
+                <a class="workitem is-link" href="https://github.com/zeroxjf/CVE-2026-20637-AppleSEPKeyStore-UAF" target="_blank" rel="noopener">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"/></svg>
+                    <div class="ident-label mono">CVE-2026-20637</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">AppleSEPKeyStore Use-After-Free</span></div>
+                        <div class="row-sub">kernel · UAF</div>
+                      </div>
+                      <div class="row-dates"><div>2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
+
+                <a class="workitem is-link" href="https://github.com/zeroxjf/SEP-Exhaustion-Kernel-Panic" target="_blank" rel="noopener">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"/></svg>
+                    <div class="ident-label mono">SEP-DoS</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">SEP Firmware Panic via AppleKeyStore</span></div>
+                        <div class="row-sub">kernel/SEP · DoS</div>
+                      </div>
+                      <div class="row-dates"><div>2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
+
+              </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="section" id="projects">
+              <h3>Projects</h3>
+              <div>
+                <a class="workitem is-link" href="lightsaber/">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3l3-2 3 2v3H9zM12 6v14"/><path d="M9 20h6"/></svg>
+                    <div class="ident-label">LightSaber</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">Userland exploit chain w/ SpringBoard JS injection</span></div>
+                        <div class="row-sub">iOS 18.4–18.6 · derived from DarkSword</div>
+                      </div>
+                      <div class="row-dates"><div>2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
+              </div>
+            </div>
+
+            <!-- Blog -->
+            <div class="section" id="blog">
+              <h3>Blog</h3>
+              <div>
+                <a class="workitem is-link" href="blog/metal-patch.html">
+                  <div class="ident">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M16 4v4h4"/><path d="M8 12h8M8 16h6"/></svg>
+                    <div class="ident-label">Notes</div>
+                  </div>
+                  <div class="info">
+                    <div class="row">
+                      <div class="row-main">
+                        <div class="row-title"><span class="uline">Patching Metal Graphics into vphone</span></div>
+                      </div>
+                      <div class="row-dates"><div>Feb 2026</div></div>
+                    </div>
+                  </div>
+                  <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg></div>
+                </a>
+              </div>
+            </div>
+
+            <!-- iOS Tweaks -->
+            <div class="section" id="tweaks">
+              <h3>iOS Tweaks</h3>
+              <div id="tweak-list"></div>
+              <div class="repo-card">
+                <div class="repo-prompt">Add my repo to your package manager</div>
+                <div class="repo-url">https://zeroxjf.github.io</div>
+                <div class="repo-row">
+                  <a class="repo-btn" href="sileo://source/https://zeroxjf.github.io"><img src="icons/sileo.png" alt="">Sileo</a>
+                  <a class="repo-btn" href="cydia://url/https://cydia.saurik.com/api/share#?source=https://zeroxjf.github.io"><img src="icons/cydia.png" alt="">Cydia</a>
+                  <a class="repo-btn" href="zbra://sources/add/https://zeroxjf.github.io"><img src="icons/zebra.png" alt="">Zebra</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Press -->
+            <div class="section" id="press">
+              <h3>Press</h3>
+              <div>
+                <a class="misc-row" href="https://www.wired.com/story/apple-will-push-out-rare-backported-patches-to-protect-ios-18-users-from-darksword-hacking-tool/#:~:text=Independent%20security%20researcher%20Johnny%20Franks" target="_blank" rel="noopener">
+                  <div class="year">2025</div>
+                  <div class="text">
+                    <span class="uline">Apple will push out rare backported patches to protect iOS 18 users from DarkSword hacking tool</span>
+                    <span class="supp">WIRED</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="footer">
+            <div class="footer-group">
+              <a class="f-icon" href="https://github.com/zeroxjf" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2c2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2a4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0c-2.4-1.6-3.5-1.3-3.5-1.3a4.2 4.2 0 0 0-.1 3.2a4.6 4.6 0 0 0-1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6.6-.6 1.2-.5 2v3.5"/></svg>
+              </a>
+              <a class="f-icon" href="https://twitter.com/zeroxjf" target="_blank" rel="noopener" aria-label="X / Twitter" title="X">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733-16z"/><path d="M4 20l6.768-6.768m2.46-2.46l6.772-6.772"/></svg>
+              </a>
+              <a class="f-icon" href="https://www.paypal.com/paypalme/JohnFranks224" target="_blank" rel="noopener" aria-label="Donate" title="Donate via PayPal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l1-7h6c2 0 4 1 4 4-.5 4-3 5-6 5h-2l-1 5"/><path d="M6 14h2c3 0 5-1 5.5-5 .5-3-1-4-3-4H8L5 21h3l1-7"/></svg>
+              </a>
+            </div>
+            <div class="footer-group footer-utility">
+              <a class="f-icon" href="#research" aria-label="Vulnerabilities" title="Vulnerabilities">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"/></svg>
+              </a>
+              <a class="f-icon" href="#blog" aria-label="Blog" title="Blog">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M16 4v4h4"/><path d="M8 12h8M8 16h6"/></svg>
+              </a>
+            </div>
+          </div>
+
         </div>
+
+        <div class="detail-view" id="detail-view"></div>
+
       </div>
     </div>
+  </main>
 
-    <footer class="site-footer">
-      <span>© 2026 zeroxjf</span>
-      <span><span class="dot"></span>zeroxjf.github.io</span>
-    </footer>
-
-    </div><!-- /#main-view -->
-
-    <div class="detail-view" id="detail-view"></div>
-
-  </div>
-
-  <!-- Tweaks & depiction logic -->
   <script>
     const TWEAKS = [
       {
@@ -1005,6 +705,10 @@
 
     const tweakBySlug = {};
     TWEAKS.forEach(t => { tweakBySlug[t.slug] = t; });
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
     // --- Markdown renderer ---
     function renderMarkdown(md) {
@@ -1046,12 +750,8 @@
       return out.join('');
     }
 
-    function escapeHtml(s) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
     // --- Depiction renderer ---
-    function renderDepictionView(view, tint) {
+    function renderDepictionView(view) {
       switch (view.class) {
         case 'DepictionHeaderView':
           return `<div class="dep-header">${escapeHtml(view.title)}</div>`;
@@ -1072,14 +772,13 @@
     }
 
     function renderDepiction(data) {
-      const tint = data.tintColor || '#6b8aed';
       const tabs = data.tabs || [];
       let tabsHtml = '<div class="dep-tabs">';
       let contentsHtml = '';
       tabs.forEach((tab, i) => {
         const active = i === 0 ? ' active' : '';
         tabsHtml += `<button class="dep-tab${active}" data-tab="${i}">${escapeHtml(tab.tabname)}</button>`;
-        const views = (tab.views || []).map(v => renderDepictionView(v, tint)).join('');
+        const views = (tab.views || []).map(v => renderDepictionView(v)).join('');
         contentsHtml += `<div class="dep-tab-content${active}" data-tab="${i}">${views}</div>`;
       });
       tabsHtml += '</div>';
@@ -1101,7 +800,6 @@
 
     // --- Depiction cache & loader ---
     const depictionCache = {};
-
     async function fetchDepiction(tweak) {
       if (depictionCache[tweak.id]) return depictionCache[tweak.id];
       const resp = await fetch(tweak.depiction);
@@ -1125,10 +823,10 @@
     async function showDetail(tweak) {
       mainView.style.display = 'none';
       detailView.classList.add('active');
-      document.title = tweak.name + " \u2014 zeroxjf";
+      document.title = tweak.name + " — zeroxjf";
 
       detailView.innerHTML = `
-        <button class="detail-back" id="detail-back">\u2190 back</button>
+        <button class="detail-back" id="detail-back">← back</button>
         <div class="detail-header">
           <span class="detail-title">${escapeHtml(tweak.name)}</span>
           <span class="detail-version">${tweak.version}</span>
@@ -1156,22 +854,40 @@
     }
 
     // --- Build tweak list ---
+    const arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 18l6-6"/><path d="M13 6l6 6"/></svg>';
     TWEAKS.forEach(tweak => {
-      const line = document.createElement('div');
-      line.className = 'tweak-line';
-      line.innerHTML = `
-        <div class="tweak-info">
-          <div class="tweak-name">${escapeHtml(tweak.name)}</div>
-          <div class="tweak-desc">${escapeHtml(tweak.desc)}</div>
+      const row = document.createElement('div');
+      row.className = 'workitem is-link';
+      row.setAttribute('role', 'link');
+      row.setAttribute('tabindex', '0');
+      row.innerHTML = `
+        <div class="ident">
+          <span class="icon" style="display:inline-block;width:0.625rem;height:0.625rem;border-radius:50%;background:${tweak.tint};"></span>
+          <div class="ident-label">${escapeHtml(tweak.name)}</div>
         </div>
-        <span class="tweak-ver">${tweak.version}</span>
-        <span class="tweak-arrow">&rsaquo;</span>
+        <div class="info">
+          <div class="row">
+            <div class="row-main">
+              <div class="row-title"><span class="uline">${escapeHtml(tweak.desc)}</span></div>
+            </div>
+            <div class="row-dates"><div>${escapeHtml(tweak.version)}</div></div>
+          </div>
+        </div>
+        <div class="arrow">${arrowSvg}</div>
       `;
-      line.addEventListener('click', () => {
+      const navigate = () => {
         history.pushState(null, '', '#' + tweak.slug);
         showDetail(tweak);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      };
+      row.addEventListener('click', navigate);
+      row.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate();
+        }
       });
-      list.appendChild(line);
+      list.appendChild(row);
     });
 
     // --- Hash routing ---

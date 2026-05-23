@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyanide — zeroxjf</title>
+  <title>Cyanide: Writing Tweaks — zeroxjf</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="iOS tweak runner built on top of the DarkSword kernel r/w primitive — CVE-2025-43510 and CVE-2025-43520. Supports iOS/iPadOS 17.0–18.7.1 and 26.0–26.0.1.">
+  <meta name="description" content="Developer reference for writing Cyanide tweaks — RemoteCall sessions, the remote_objc API, a minimal tweak walkthrough, wiring into Settings, and porting from Theos.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Cyanide">
-  <meta property="og:description" content="iOS tweak runner built on top of the DarkSword kernel r/w primitive — CVE-2025-43510 and CVE-2025-43520.">
+  <meta property="og:title" content="Cyanide: Writing Tweaks">
+  <meta property="og:description" content="Developer reference for writing Cyanide tweaks — RemoteCall sessions, the remote_objc API, a minimal tweak walkthrough, wiring into Settings, and porting from Theos.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://zeroxjf.github.io/blog/cyanide.html">
   <meta property="og:image" content="https://zeroxjf.github.io/og-image.png">
@@ -16,8 +16,8 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@zeroxjf">
-  <meta name="twitter:title" content="Cyanide">
-  <meta name="twitter:description" content="iOS tweak runner built on top of the DarkSword kernel r/w primitive — CVE-2025-43510 and CVE-2025-43520.">
+  <meta name="twitter:title" content="Cyanide: Writing Tweaks">
+  <meta name="twitter:description" content="Developer reference for writing Cyanide tweaks — RemoteCall sessions, the remote_objc API, a minimal tweak walkthrough, wiring into Settings, and porting from Theos.">
   <meta name="twitter:image" content="https://zeroxjf.github.io/og-image.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,15 +76,6 @@
       padding: 2rem 1.5rem 3rem;
     }
 
-    .post-icon {
-      display: block;
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      margin-bottom: 1.1rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-    }
-
     .post-title {
       font-size: 1.5rem;
       font-weight: 700;
@@ -113,30 +104,6 @@
       line-height: 1.55;
     }
 
-    .post-install {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1.25rem;
-      flex-wrap: wrap;
-    }
-
-    .post-install-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.35rem 0.75rem;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      color: #1d1d1f;
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 500;
-      transition: box-shadow 0.15s, color 0.15s;
-    }
-
-    .post-install-btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); color: #0071e3; }
-
     .post-divider {
       border: none;
       border-top: 1px solid #d2d2d7;
@@ -153,17 +120,28 @@
       font-size: 1.1rem;
       font-weight: 600;
       color: #1d1d1f;
-      margin: 2rem 0 0.65rem;
-    }
-
-    .post-body h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin: 1.25rem 0 0.4rem;
+      margin: 2.25rem 0 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .post-body h2:first-child { margin-top: 0; }
+
+    .section-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .section-icon svg {
+      width: 0.85rem;
+      height: 0.85rem;
+    }
 
     .post-body p { margin-bottom: 0.75rem; }
     .post-body strong { color: #1d1d1f; font-weight: 600; }
@@ -184,47 +162,38 @@
     .post-body pre {
       background: #f5f5f7;
       border: 1px solid #d2d2d7;
-      border-left: 3px solid #0071e3;
-      border-radius: 6px;
-      padding: 1.1rem 1.25rem;
+      border-radius: 8px;
       overflow-x: auto;
       margin: 0.65rem 0 1.1rem;
     }
 
-    .post-body pre code {
-      background: none;
-      padding: 0;
-      font-size: 0.8rem;
-      color: #1d1d1f;
-      line-height: 1.6;
-      border: none;
+    .pre-filename {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.72rem;
+      color: #48484a;
+      padding: 0.55rem 1rem 0.45rem;
+      border-bottom: 1px solid #d2d2d7;
     }
 
-    .sh-comment { color: #48484a; font-style: italic; }
-    .sh-var     { color: #b95000; }
-    .sh-string  { color: #268800; }
-    .sh-flag    { color: #7f4098; }
-    .sh-cmd     { color: #0055d4; }
+    .post-body pre code {
+      display: block;
+      background: none;
+      padding: 0.9rem 1rem;
+      font-size: 0.78rem;
+      color: #1d1d1f;
+      line-height: 1.65;
+      border: none;
+      white-space: pre;
+    }
 
     .post-body a { color: #0071e3; text-decoration: none; }
     .post-body a:hover { text-decoration: underline; }
 
-    .post-body blockquote {
-      border-left: 2px solid #d2d2d7;
-      padding-left: 0.75rem;
-      margin: 0.5rem 0;
+    .section-footer {
+      font-size: 0.82rem;
       color: #48484a;
-      font-size: 0.87rem;
-    }
-
-    .warn-box {
-      border-left: 3px solid #ff9f0a;
-      background: #fff9f0;
-      padding: 0.75rem 1rem;
-      border-radius: 0 6px 6px 0;
-      margin-bottom: 1rem;
-      font-size: 0.87rem;
-      color: #48484a;
+      margin: -0.25rem 0 1.5rem;
+      line-height: 1.55;
     }
 
     @media (max-width: 500px) {
@@ -242,116 +211,265 @@
   </div>
 
   <div class="content">
-    <img class="post-icon" src="https://raw.githubusercontent.com/zeroxjf/cyanide-ios/main/Cyanide/Assets.xcassets/AppIcon.appiconset/icon-ios-1024x1024.png" alt="Cyanide">
-    <h1 class="post-title">Cyanide</h1>
+    <h1 class="post-title">Cyanide: Writing Tweaks</h1>
     <div class="post-meta">
       <span>May 2026</span>
       <span class="post-meta-sep">/</span>
       <span><a href="https://github.com/zeroxjf/cyanide-ios" target="_blank">zeroxjf/cyanide-ios</a></span>
     </div>
-    <p class="post-excerpt">iOS tweak runner built on top of the DarkSword kernel r/w primitive. A fork of <a href="https://github.com/wh1te4ever/darksword-kexploit-fun" target="_blank">wh1te4ever/darksword-kexploit-fun</a> that wraps the native DarkSword kernel stages in an Objective-C iOS app. Supports iOS/iPadOS 17.0&ndash;18.7.1 and 26.0&ndash;26.0.1 via CVE-2025-43510 and CVE-2025-43520.</p>
-
-    <div class="post-install">
-      <a class="post-install-btn" href="https://celloserenity.github.io/altdirect/?url=https://raw.githubusercontent.com/zeroxjf/cyanide-ios/main/source.json" target="_blank">&#8853; Add AltSource</a>
-      <a class="post-install-btn" href="https://github.com/zeroxjf/cyanide-ios/releases/latest" target="_blank">&#8595; Download .ipa</a>
-    </div>
+    <p class="post-excerpt">Developer reference for writing Cyanide tweaks &mdash; RemoteCall sessions, the remote_objc API, a minimal tweak walkthrough, wiring into Settings, and porting from Theos/Substrate.</p>
 
     <hr class="post-divider">
 
     <div class="post-body">
 
-      <h2>Overview</h2>
-      <p>Cyanide is a fork of <a href="https://github.com/wh1te4ever/darksword-kexploit-fun" target="_blank">wh1te4ever/darksword-kexploit-fun</a> for iOS kernel research. It wraps the native DarkSword kernel stages in an Objective-C iOS app, restructures the UI as an Installer/Settings split, and adds reliability fixes for repeated local testing. It does not ship the browser-delivered WebKit/dyld parts of the original DarkSword chain.</p>
+      <!-- How tweaks work -->
+      <h2>
+        <span class="section-icon" style="background:#f3eaff;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7b3fbf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v13"/><path d="M4 19a2 2 0 0 0 2 2h13"/><path d="M9 10h6M9 14h4"/></svg>
+        </span>
+        How tweaks work
+      </h2>
+      <p>Cyanide tweaks are app-side drivers. No SpringBoard dylibs, no Substrate hooks, no swizzled methods. The app reaches into the target from outside.</p>
+      <p>A RemoteCall session is the bridge. From inside one you send Objective-C messages, read and write memory, and call C symbols in the target process.</p>
+      <p>Settings holds the SpringBoard channel during Apply Tweaks. Your code runs inside it under <code>settings_rc_lock()</code>, via three entrypoints: <code>apply_in_session</code>, optional <code>stop_in_session</code>, and <code>forget_remote_state</code>.</p>
+      <p class="section-footer">Read <code>sbcustomizer.m</code>, <code>statbar.m</code>, <code>rssidisplay.m</code>, and <code>axonlite.m</code> in <code>Cyanide/tweaks/</code> for shipped patterns at increasing complexity.</p>
 
-      <h2>Tweaks</h2>
-      <p>These tweaks have only been tested on iOS 18.x. Expect version drift in SpringBoard and related daemons to break things on other releases.</p>
+      <!-- The remote_objc API -->
+      <h2>
+        <span class="section-icon" style="background:#e6f2ff;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0055d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </span>
+        The remote_objc API
+      </h2>
+      <p>Import <code>remote_objc.h</code> and <code>../TaskRop/RemoteCall.h</code>. Helpers assume an active session &mdash; don&rsquo;t call <code>init_remote_call</code> yourself unless you need a private channel.</p>
+      <div class="pre-filename">remote_objc.h</div>
+<pre><code>r_class("UILabel")                  // remote Class *
+r_sel("setHidden:")                 // remote SEL
+r_msg2(obj, "setHidden:", 1,0,0,0)  // objc_msgSend in target
+r_msg2_main(label, "setText:", text,
+            0,0,0)                   // UIKit/main-thread send
+r_msg2_main_raw(obj, "setFrame:",
+  &amp;rect, sizeof(rect), NULL,0,
+  NULL,0, NULL,0)                    // pass a struct by value
+r_msg2_main_struct_ret(obj, "bounds",
+  &amp;out, sizeof(out), NULL,0,
+  NULL,0, NULL,0, NULL,0)            // copy a struct return
 
-      <h3>Status Bar</h3>
-      <ul>
-        <li><strong>StatBar</strong> &mdash; battery temperature and free-RAM overlay anchored to the SpringBoard status bar, with optional C/F and network-speed display.</li>
-      </ul>
+r_alloc_str("hi") / r_free(ptr)     // C string into remote
+r_nsstr_retained("hi")              // NSString*, caller releases
+r_cfstr("hi")                       // CFStringRef, caller CFReleases
+r_settle_us(1000)                    // tune helper delay; restore old value
 
-      <h3>Home Screen Layout</h3>
-      <ul>
-        <li><strong>SBCustomizer</strong> &mdash; dock icon count, home-screen columns/rows, and hidden icon labels. Native port of the lightsaber sbcustomizer payload.</li>
-      </ul>
+r_dlsym_call(R_TIMEOUT,
+  "objc_setAssociatedObject",
+  obj, key, val, policy, 0,0,0,0)    // any C function
+r_is_objc_ptr(p)                     // sanity check
+r_ivar_value(obj, "_name")          // read ivar
+r_responds_main(obj, "sel:")        // -respondsToSelector:
+remote_read / remote_write           // raw memory helpers
+init_remote_call("SpringBoard", false)
+destroy_remote_call()                // one-shot sessions only
+abandon_remote_call()                // remote task is already gone</code></pre>
+      <p class="section-footer"><code>_main</code> variants dispatch to the target main thread (use them for UIKit). <code>_raw</code> passes non-pointer arguments by value. <code>r_msg2_main_struct_ret</code> copies struct returns such as CGRect.</p>
 
-      <h3>Performance</h3>
-      <ul>
-        <li><strong>Powercuff</strong> &mdash; CPU/GPU underclocking through simulated <code>thermalmonitord</code> pressure levels (off, nominal, light, moderate, heavy). Lasts until reboot. Port of <a href="https://github.com/rpetrich/Powercuff" target="_blank">rpetrich/Powercuff</a>.</li>
-      </ul>
+      <!-- A minimal tweak -->
+      <h2>
+        <span class="section-icon" style="background:#fff3e6;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#c45000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </span>
+        A minimal tweak
+      </h2>
+      <p>A complete RemoteCall-only tweak: paints an 80&times;80 red square on a SpringBoard window.</p>
+      <p>Idempotent on reapply, undoes itself on stop, drops cached pointers on respawn.</p>
+      <div class="pre-filename">hello_tweak.h</div>
+<pre><code>#ifndef hello_tweak_h
+#define hello_tweak_h
+#include &lt;stdbool.h&gt;
+bool hello_tweak_apply_in_session(void);
+bool hello_tweak_stop_in_session(void);
+void hello_tweak_forget_remote_state(void);
+#endif</code></pre>
+      <div class="pre-filename">hello_tweak.m</div>
+<pre><code>#import "hello_tweak.h"
+#import "remote_objc.h"
+#import "../TaskRop/RemoteCall.h"
+#import &lt;stdint.h&gt;
 
-      <h3>SpringBoard Tweaks</h3>
-      <p>Ported from <a href="https://github.com/kolbicz/DarkSword-Tweaks" target="_blank">kolbicz/DarkSword-Tweaks</a>:</p>
-      <ul>
-        <li><strong>Disable App Library</strong> &mdash; removes the App Library page past the last home screen.</li>
-        <li><strong>Disable Icon Fly-In</strong> &mdash; skips the spring-in animation when icons appear.</li>
-        <li><strong>Zero Wake Animation</strong> &mdash; snaps the display on instantly when waking.</li>
-        <li><strong>Zero Backlight Fade</strong> &mdash; instant lock/unlock backlight.</li>
-        <li><strong>Double-Tap to Lock</strong> &mdash; lock the device with a wallpaper double-tap.</li>
-      </ul>
+static const uint64_t kHelloTag = 0xC0A11DE;
+static uint64_t gHelloView = 0;
 
-      <h3>System Updates</h3>
-      <ul>
-        <li><strong>Disable OTA Updates</strong> &mdash; toggles the launchd OTA <code>disabled.plist</code> to block or unblock update prompts. Persists across reboots.</li>
-      </ul>
+static uint64_t hello_first_window(void) {
+    uint64_t UIApplication = r_class("UIApplication");
+    uint64_t app = r_msg2_main(UIApplication, "sharedApplication",
+                               0, 0, 0, 0);
+    if (!r_is_objc_ptr(app)) return 0;
 
-      <h3>Beta</h3>
-      <div class="warn-box">&#9888;&#xFE0E; Work in progress &mdash; these may be unstable or change between builds.</div>
-      <ul>
-        <li><strong>Signal Readouts</strong> &mdash; replaces the signal-strength glyphs with live numeric readouts &mdash; RSRP dBm on cellular, bar count on WiFi.</li>
-        <li><strong>Axon Lite</strong> &mdash; groups Notification Center requests by app with a SpringBoard overlay and dedups duplicates while the RemoteCall session is alive.</li>
-      </ul>
+    uint64_t keyWindow = r_msg2_main(app, "keyWindow", 0, 0, 0, 0);
+    if (r_is_objc_ptr(keyWindow)) return keyWindow;
 
-      <h2>Supported Targets</h2>
-      <ul>
-        <li>iOS/iPadOS 17.0 through 18.7.1</li>
-        <li>iOS/iPadOS 26.0 through 26.0.1</li>
-        <li>A19/M5 devices are not supported</li>
-      </ul>
-      <p>The kernel bugs used here, <code>CVE-2025-43510</code> and <code>CVE-2025-43520</code>, were fixed in iOS/iPadOS 18.7.2 and 26.1. Later builds are outside this kernel exploit window.</p>
+    uint64_t windows = r_msg2_main(app, "windows", 0, 0, 0, 0);
+    uint64_t count = r_msg2_main(windows, "count", 0, 0, 0, 0);
+    for (uint64_t i = 0; r_is_objc_ptr(windows) &amp;&amp; i &lt; count &amp;&amp; i &lt; 16; i++) {
+        uint64_t window = r_msg2_main(windows, "objectAtIndex:", i, 0, 0, 0);
+        if (r_is_objc_ptr(window)) return window;
+    }
+    return 0;
+}
 
-      <h2>What This Fork Changes</h2>
-      <ul>
-        <li>Cleans shared exploit state before each attempt.</li>
-        <li>Matches the target process with an explicit marker.</li>
-        <li>Validates sockets before using the spray path.</li>
-        <li>Treats missed races as retryable failures instead of hard failures.</li>
-        <li>Tightens the A18/M4 <code>pe_v2</code> path with initialized target-file contents, stable local remap addresses, bounded page freeing, socket-spray preflight checks, and controlled zone-trim retries.</li>
-      </ul>
+static uint64_t hello_existing_view(uint64_t window) {
+    if (!r_is_objc_ptr(window)) return 0;
+    uint64_t view = r_msg2_main(window, "viewWithTag:", kHelloTag, 0, 0, 0);
+    if (r_is_objc_ptr(view)) gHelloView = view;
+    return r_is_objc_ptr(view) ? view : 0;
+}
 
-      <h2>Kernel Research Features</h2>
-      <ul>
-        <li>Escape the app sandbox.</li>
-        <li>Control or crash userspace processes from the app.</li>
-        <li>Change UID, GID, and sticky bits on target files.</li>
-        <li>Disable ASLR by setting <code>P_DISABLE_ASLR</code> in <code>launchd</code>&rsquo;s <code>proc-&gt;p_flag</code>.</li>
-      </ul>
+bool hello_tweak_apply_in_session(void) {
+    uint64_t window = hello_first_window();
+    if (!r_is_objc_ptr(window)) return false;
 
-      <h2>Build</h2>
-<pre><code>./scripts/build.sh</code></pre>
-      <p>The build script uses the <code>Cyanide</code> scheme, disables code signing, and writes an unsigned IPA to <code>build/Cyanide.ipa</code>.</p>
-      <p>Equivalent manual build:</p>
-<pre><code><span class="sh-cmd">xcodebuild</span> \
-  <span class="sh-flag">-project</span> Cyanide.xcodeproj \
-  <span class="sh-flag">-scheme</span> Cyanide \
-  <span class="sh-flag">-sdk</span> iphoneos \
-  <span class="sh-flag">-configuration</span> Debug \
-  <span class="sh-var">CODE_SIGNING_ALLOWED</span>=NO \
-  build</code></pre>
+    uint64_t existing = hello_existing_view(window);
+    if (r_is_objc_ptr(existing)) {
+        r_msg2_main(existing, "setHidden:", 0, 0, 0, 0);
+        r_msg2_main(window, "bringSubviewToFront:", existing, 0, 0, 0);
+        return true;
+    }
 
-      <hr class="post-divider">
+    uint64_t UIView = r_class("UIView");
+    uint64_t view = r_msg2_main(r_msg2_main(UIView, "alloc", 0, 0, 0, 0),
+                                "init", 0, 0, 0, 0);
+    if (!r_is_objc_ptr(view)) return false;
 
-      <h2>Credits</h2>
-      <ul>
-        <li><a href="https://github.com/opa334" target="_blank">opa334</a> &mdash; original <a href="https://github.com/opa334/darksword-kexploit" target="_blank">darksword-kexploit</a>, ChOma, and XPF &mdash; the kernel r/w primitive Cyanide is built on.</li>
-        <li><a href="https://github.com/wh1te4ever" target="_blank">wh1te4ever</a> &mdash; <a href="https://github.com/wh1te4ever/darksword-kexploit-fun" target="_blank">kfun / darksword-kexploit-fun</a> &mdash; the RemoteCall implementation that lets a sideloaded app apply tweaks inside SpringBoard. Cyanide is a fork of this project.</li>
-        <li><a href="https://github.com/rooootdev" target="_blank">rooootdev</a> &mdash; working kexploit behavior used to stabilize this fork.</li>
-        <li><a href="https://github.com/neonmodder123" target="_blank">neonmodder123</a> &mdash; Web Respring method.</li>
-        <li><a href="https://github.com/kolbicz" target="_blank">kolbicz</a> &mdash; OTA Disabler and SpringBoard tweaks.</li>
-        <li><a href="https://github.com/rpetrich" target="_blank">rpetrich</a> &mdash; Powercuff.</li>
-      </ul>
-      <p>UI inspiration: the classic <a href="https://github.com/AppTapp/Installer-3" target="_blank">Installer.app</a> (Ripdev &amp; Nullriver Software, now maintained by AppTapp and the Legacy Jailbreak community) &mdash; the iPhoneOS 1 package-manager look that the Cyanide Installer tab is modeled after. The <a href="https://github.com/Sileo/Sileo" target="_blank">Sileo Project</a> (the Sileo Team) &mdash; the queue &rarr; review &rarr; confirm install flow and the bottom queue-popup pattern.</p>
+    struct { double x, y, w, h; } frame = { 40.0, 120.0, 80.0, 80.0 };
+    r_msg2_main_raw(view, "setFrame:",
+                    &amp;frame, sizeof(frame),
+                    NULL, 0, NULL, 0, NULL, 0);
+
+    uint64_t UIColor = r_class("UIColor");
+    uint64_t color = r_msg2_main(UIColor, "systemRedColor", 0, 0, 0, 0);
+    if (!r_is_objc_ptr(color)) color = r_msg2_main(UIColor, "redColor", 0, 0, 0, 0);
+    r_msg2_main(view, "setBackgroundColor:", color, 0, 0, 0);
+    r_msg2_main(view, "setTag:", kHelloTag, 0, 0, 0);
+    r_msg2_main(window, "addSubview:", view, 0, 0, 0);
+    r_msg2_main(view, "release", 0, 0, 0, 0);
+
+    gHelloView = view;
+    return true;
+}
+
+bool hello_tweak_stop_in_session(void) {
+    uint64_t window = hello_first_window();
+    uint64_t view = hello_existing_view(window);
+    if (!r_is_objc_ptr(view)) return false;
+
+    r_msg2_main(view, "setHidden:", 1, 0, 0, 0);
+    r_msg2_main(view, "removeFromSuperview", 0, 0, 0, 0);
+    gHelloView = 0;
+    return true;
+}
+
+void hello_tweak_forget_remote_state(void) {
+    // SpringBoard respawned or RemoteCall was abandoned; cached
+    // remote pointers are from the old address space.
+    gHelloView = 0;
+}</code></pre>
+      <p class="section-footer">Drop both files in <code>Cyanide/tweaks/</code>. The Xcode project uses <code>PBXFileSystemSynchronizedRootGroup</code>, so new files are picked up automatically &mdash; no pbxproj edits needed.</p>
+
+      <!-- Wiring into Settings -->
+      <h2>
+        <span class="section-icon" style="background:#e6f7ec;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1a7f3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        Wiring into Settings
+      </h2>
+      <p><code>SettingsViewController.m</code> is the orchestrator. Add five things: a defaults key, a switch row, a Run-path apply, a live-apply branch, and <code>forget_remote_state</code> in cleanup.</p>
+      <p>Every apply checks <code>g_springboard_rc_ready</code> inside <code>@synchronized(settings_rc_lock())</code>. <code>settings_mark_tweak_applied()</code> keeps package state honest. <code>forget_remote_state()</code> runs on respring and abandon.</p>
+      <div class="pre-filename">SettingsViewController.m</div>
+<pre><code>#import "tweaks/hello_tweak.h"
+NSString * const kSettingsHelloEnabled = @"HelloEnabled";
+
+// Add kSettingsHelloEnabled to settings_register_defaults(),
+// settings_rc_backed_tweak_keys(), settings_key_affects_package_state(),
+// and the Settings rows that render the switch.
+static BOOL settings_key_is_hello(NSString *key) {
+    return [key isEqualToString:kSettingsHelloEnabled];
+}
+
+// In the Run path, after settings_ensure_springboard_remote_call_locked():
+if ([d boolForKey:kSettingsHelloEnabled]) {
+    bool ok = hello_tweak_apply_in_session();
+    settings_mark_tweak_applied(kSettingsHelloEnabled,
+                                ok &amp;&amp; [d boolForKey:kSettingsHelloEnabled]);
+    printf("[SETTINGS] Hello result=%d\n", ok);
+}
+
+// In settings_schedule_live_apply_for_key():
+if (settings_key_is_hello(key)) {
+    if ([d boolForKey:kSettingsHelloEnabled] &amp;&amp; g_springboard_rc_ready) {
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            @synchronized (settings_rc_lock()) {
+                if (settings_cleanup_in_progress() || !g_springboard_rc_ready) return;
+                bool ok = hello_tweak_apply_in_session();
+                settings_mark_tweak_applied(kSettingsHelloEnabled,
+                                            ok &amp;&amp; [d boolForKey:kSettingsHelloEnabled]);
+            }
+            settings_notify_package_queue_changed_async();
+        });
+    } else if (![d boolForKey:kSettingsHelloEnabled]) {
+        settings_mark_tweak_applied(kSettingsHelloEnabled, NO);
+        settings_notify_package_queue_changed_async();
+        if (g_springboard_rc_ready) dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            @synchronized (settings_rc_lock()) {
+                if (g_springboard_rc_ready) hello_tweak_stop_in_session();
+            }
+        });
+    }
+    return;
+}
+
+// In SpringBoard restart/abandon and manual cleanup paths:
+hello_tweak_forget_remote_state();</code></pre>
+      <p class="section-footer">Mirror an existing <code>kSettings&hellip;Enabled</code> path &mdash; search <code>kSettingsStatBarEnabled</code> or <code>kSettingsAxonLiteEnabled</code> for a complete template covering defaults, rows, package state, Run, live apply, stop, and cleanup.</p>
+
+      <!-- Porting from Theos / Substrate -->
+      <h2>
+        <span class="section-icon" style="background:#fff0f5;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#c0185c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </span>
+        Porting from Theos / Substrate
+      </h2>
+      <p>RemoteCall isn&rsquo;t a hook framework. You can&rsquo;t intercept a method or replace a C function in place.</p>
+      <p>Ports work when the effect is a finite mutation &mdash; set this property, call this controller method, add this view, hold this assertion, or refresh on a timer.</p>
+      <div class="pre-filename">Theos &rarr; RemoteCall</div>
+<pre><code>%hook UIView                         not portable as a hook
+- (void)setHidden:(BOOL)h { ... }    rewrite as explicit
+                                     r_msg2_main(view,
+                                     "setHidden:", h,0,0,0)
+
+[%c(Foo) bar]                        r_msg2(r_class("Foo"),
+                                           "bar", 0,0,0,0)
+
+struct { double x,y,w,h; } r = {0};  r_msg2_main_struct_ret(view,
+                                     "bounds", &amp;r, sizeof(r),
+                                     NULL,0, NULL,0, NULL,0, NULL,0)
+
+%new -[X cyanideOverlay]             associated object via
+                                     objc_setAssociatedObject
+                                     through r_dlsym_call
+
+MSHookFunction(...)                  not available here</code></pre>
+      <p>Targeting another process? Open a separate session with <code>init_remote_call(name, false)</code>, do the work, <code>destroy_remote_call</code> before switching back. Powercuff does this for <code>thermalmonitord</code>.</p>
+      <p class="section-footer">Shipped templates: <code>sbcustomizer</code> (dock layout), <code>darksword_tweaks</code> (SpringBoard state toggles), <code>powercuff</code> (thermalmonitord one-shot), <code>statbar</code> (overlay window), <code>rssidisplay</code> (per-icon overlays), <code>axonlite</code> (cached NC state).</p>
+
+      <!-- Contribute -->
+      <h2>
+        <span class="section-icon" style="background:#fff0f0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#c00020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </span>
+        Contribute
+      </h2>
+      <p>Build with <code>./scripts/build.sh</code> &mdash; the IPA is packaged under <code>build/</code>. Sideload, test on device, attach Log-tab output to your PR.</p>
+      <p>Source and issues: <a href="https://github.com/zeroxjf/cyanide-ios" target="_blank">github.com/zeroxjf/cyanide-ios</a></p>
 
     </div>
   </div>

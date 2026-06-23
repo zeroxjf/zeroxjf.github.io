@@ -5,8 +5,9 @@
     {
       "id": "lightsaber.hide-dock",
       "name": "Hide Dock",
-      "description": "Hides the SpringBoard dock background. Move any icons out of the dock before applying — dock icons will be hidden too. Credits: @MinePlayer16.",
+      "description": "Hides the SpringBoard dock background. Move any icons out of the dock before applying — dock icons will be hidden too.",
       "version": "1.0.4",
+      "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/lightsaber/hide_dock.js"
     }
   ]

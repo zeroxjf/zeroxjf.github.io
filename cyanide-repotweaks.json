@@ -1,0 +1,13 @@
+{
+  "repoName": "zeroxjf",
+  "author": "zeroxjf",
+  "tweaks": [
+    {
+      "id": "lightsaber.hide-dock",
+      "name": "Hide Dock",
+      "description": "Hides the SpringBoard dock background. Move any icons out of the dock before applying — dock icons will be hidden too. Credits: @MinePlayer16.",
+      "version": "1.0.4",
+      "scriptURL": "https://zeroxjf.github.io/lightsaber/hide_dock.js"
+    }
+  ]
+}

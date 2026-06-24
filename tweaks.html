@@ -85,6 +85,74 @@
 
     <div id="tweaks"><div class="loading">Loading tweaks…</div></div>
 
+    <div id="docs" style="margin-top:3rem;">
+      <h2 style="font-size:1.5rem;font-weight:500;margin-bottom:1.5rem;">Developer Docs</h2>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Writing a Tweak</div>
+        <div class="tweak-desc">
+          Tweaks are plain JavaScript files that run inside Cyanide's SpringBoard bridge. Use <code>@param</code> comments to declare user-configurable settings.
+        </div>
+        <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">// @param: switch | enabled | Enable Tweak | true
+// @param: slider | radius | Corner Radius | 12.0 | 0.0-30.0
+// @param: color  | tint   | Tint Color    | #FF6600
+// @param: text   | label  | Custom Label  | Hello
+
+var cls = r_class("SBDockView");
+var dock = r_msg2(r_msg2(cls, "sharedInstance"), "dockView");
+r_msg2(dock, "setHidden:", 1);</pre>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          <strong>RemoteCall API:</strong>
+          <code>r_class(name)</code>,
+          <code>r_sel(name)</code>,
+          <code>r_nsstr(str)</code>,
+          <code>r_msg2(target, sel, arg1..arg4)</code>,
+          <code>r_msg2_main(target, sel, arg1..arg4)</code>,
+          <code>r_responds(target, sel)</code>,
+          <code>r_ivar_value(obj, name)</code>,
+          <code>r_pref_num(key)</code>,
+          <code>r_pref_bool(key)</code>,
+          <code>r_pref_str(key)</code>
+          <br><br>
+          <strong>Timers:</strong>
+          <code>setInterval(fn, ms)</code>,
+          <code>clearInterval(id)</code>,
+          <code>setTimeout(fn, ms)</code>,
+          <code>clearTimeout(id)</code>
+        </div>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Setting Up a Repo</div>
+        <div class="tweak-desc">
+          Host a JSON file on any HTTPS server. Users add the URL in Cyanide's Sources tab.
+        </div>
+        <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">{
+  "repoName": "My Repo",
+  "author": "yourname",
+  "tweaks": [
+    {
+      "id": "me.my-tweak",
+      "name": "My Tweak",
+      "description": "What it does",
+      "version": "1.0.0",
+      "symbol": "sparkle",
+      "author": "tweakauthor",
+      "scriptURL": "https://example.com/tweak.js"
+    }
+  ]
+}</pre>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          <strong>Required:</strong> <code>repoName</code>, <code>author</code>, <code>tweaks[].id</code>, <code>tweaks[].name</code>, <code>tweaks[].description</code>, <code>tweaks[].version</code>, <code>tweaks[].scriptURL</code>
+          <br>
+          <strong>Optional:</strong> <code>tweaks[].symbol</code> (SF Symbol name for icon), <code>tweaks[].author</code> (per-tweak author override)
+          <br><br>
+          Host on GitHub Pages: create a public repo, add your .js files and JSON index, enable Pages in Settings, and share <code>https://yourname.github.io/repo/tweaks.json</code>.
+          Bump <code>version</code> on every update — Cyanide detects updates automatically.
+        </div>
+      </div>
+    </div>
+
     <div class="footer">
       <p class="footer-text">These tweaks run through <a href="https://github.com/zeroxjf/cyanide">Cyanide</a>'s SpringBoard JavaScript bridge. Only install scripts from sources you trust.</p>
     </div>

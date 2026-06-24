@@ -33,10 +33,10 @@
       "id": "lightsaber.hide-search-pill",
       "name": "Hide Search Pill",
       "description": "Hides the search pill on the home screen.",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "author": "@MinePlayer16",
       "symbol": "magnifyingglass",
-      "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=5"
+      "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=6"
     },
     {
       "id": "lightsaber.floating-icons",

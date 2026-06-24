@@ -1,10 +1,10 @@
 // hide_searchpill.js
-// Root-served Cyanide RepoTweak. Hides the home-screen search pill using iOS 26+ and legacy-safe direct paths.
+// Root-served Cyanide RepoTweak. Hides the home-screen search pill with conservative iOS 26-safe view calls.
 
 (function () {
     "use strict";
 
-    var VERSION = "1.0.4";
+    var VERSION = "1.0.5";
     say("[Hide Search Pill] Running v" + VERSION + "...");
 
     function say(msg) {
@@ -30,11 +30,6 @@
     function msgMain(obj, sel, a1, a2, a3, a4) { if (!isPtr(obj)) return 0; try { return r_msg2_main(obj, sel, a1 || 0, a2 || 0, a3 || 0, a4 || 0); } catch (_) { return 0; } }
     function responds(obj, sel) { if (!isPtr(obj)) return false; try { return typeof r_responds === "function" ? truthy(r_responds(obj, sel)) : true; } catch (_) { return false; } }
     function call(obj, sel, main, a1, a2, a3, a4) { if (!isPtr(obj) || !responds(obj, sel)) return 0; return main ? msgMain(obj, sel, a1, a2, a3, a4) : msg(obj, sel, a1, a2, a3, a4); }
-    function count(arrayObj) { var c = parseInt(msg(arrayObj, "count"), 0); return isFinite(c) ? c : 0; }
-    function isKind(obj, className) {
-        var c = cls(className);
-        return isPtr(c) && truthy(msg(obj, "isKindOfClass:", c));
-    }
 
     function iconManager() {
         var ctrl = msg(cls("SBIconController"), "sharedInstance");
@@ -49,154 +44,38 @@
         return rootView;
     }
 
-    function clearGlass(view, label) {
-        if (!isPtr(view)) return false;
-        var ok = false;
-        if (responds(view, "sbh_pauseSpecularHighlightAnimationOnSearchPillGlass")) {
-            msgMain(view, "sbh_pauseSpecularHighlightAnimationOnSearchPillGlass");
-            ok = true;
-        }
-        if (responds(view, "setHasVisibleGlass:")) {
-            msgMain(view, "setHasVisibleGlass:", 0);
-            ok = true;
-        }
-        if (responds(view, "updateGlassVisibility:")) {
-            msgMain(view, "updateGlassVisibility:", 0);
-            ok = true;
-        }
-        if (responds(view, "sbh_removeGlass")) {
-            msgMain(view, "sbh_removeGlass");
-            ok = true;
-        }
-        var clear = msg(cls("UIColor"), "clearColor");
-        if (isPtr(clear) && responds(view, "setBackgroundColor:")) msgMain(view, "setBackgroundColor:", clear);
-        var layer = call(view, "layer", true);
-        if (isPtr(layer)) {
-            if (responds(layer, "removeAllAnimations")) msgMain(layer, "removeAllAnimations");
-            if (responds(layer, "setHidden:")) msgMain(layer, "setHidden:", 1);
-        }
-        if (ok) say("[Hide Search Pill] Cleared glass from " + label + ".");
-        return ok;
-    }
-
     function hide(view, label) {
         if (!isPtr(view)) return false;
-        clearGlass(view, label);
+
+        // v1.0.4 could crash SpringBoard before the next log. Keep this path
+        // boring: no removeFromSuperview, no sbh_* glass category calls, no
+        // CALayer messaging, and no layout forcing. On iOS 26 those can touch
+        // deallocated Liquid Glass internals through RemoteCall/NSInvocation.
         msgMain(view, "setHidden:", 1);
         if (responds(view, "setUserInteractionEnabled:")) msgMain(view, "setUserInteractionEnabled:", 0);
-        msgMain(view, "setNeedsLayout");
         say("[Hide Search Pill] Hid " + label + ".");
         return true;
     }
 
-    function removeOnly(view, label) {
-        if (!isPtr(view)) return false;
-        if (responds(view, "removeFromSuperview")) {
-            msgMain(view, "removeFromSuperview");
-            say("[Hide Search Pill] Removed " + label + ".");
-            return true;
-        }
-        return false;
-    }
-
-    function remove(view, label) {
-        if (!isPtr(view)) return false;
-        hide(view, label);
-        // Important: never message this pointer again after removeFromSuperview.
-        // The iOS 26 glass/search views can be deallocated immediately, and a
-        // later RemoteCall objc_msgSend can PAC-fail SpringBoard.
-        return removeOnly(view, label);
-    }
-
-    function hideChild(view, sel, label, removeIt) {
-        if (!responds(view, sel)) return false;
+    function hideChild(view, sel, label) {
+        if (!isPtr(view) || !responds(view, sel)) return false;
         var child = msgMain(view, sel);
-        return removeIt ? remove(child, label) : hide(child, label);
-    }
-
-    function queueUniqueView(list, seen, view, label) {
-        if (!isPtr(view)) return false;
-        var key = String(view);
-        if (seen[key]) return false;
-        seen[key] = true;
-        list.push({ view: view, label: label });
-        return true;
+        return hide(child, label);
     }
 
     function hideSearchPillView(pill, labelPrefix) {
         if (!isPtr(pill)) return false;
         var ok = false;
 
-        // SBHSearchPillView owns the text/glyph, while iOS 26 Liquid Glass can
-        // live in separate background/reference views. Hide/remove those first.
-        ok = clearGlass(pill, labelPrefix) || ok;
-        var removeLater = [];
-        var removeSeen = {};
-        if (responds(pill, "backgroundView")) {
-            queueUniqueView(removeLater, removeSeen, msgMain(pill, "backgroundView"), labelPrefix + ".backgroundView");
-        }
-        if (responds(pill, "searchAffordanceBackgroundView")) {
-            queueUniqueView(removeLater, removeSeen, msgMain(pill, "searchAffordanceBackgroundView"), labelPrefix + ".searchAffordanceBackgroundView");
-        }
-        if (responds(pill, "searchAffordanceReferenceBackgroundView")) {
-            queueUniqueView(removeLater, removeSeen, msgMain(pill, "searchAffordanceReferenceBackgroundView"), labelPrefix + ".searchAffordanceReferenceBackgroundView");
-        }
-        ok = hideChild(pill, "searchAffordanceContentView", labelPrefix + ".searchAffordanceContentView", false) || ok;
-        ok = hideChild(pill, "searchAffordanceReferenceView", labelPrefix + ".searchAffordanceReferenceView", false) || ok;
-        ok = hideChild(pill, "contentContainerView", labelPrefix + ".contentContainerView", false) || ok;
-        ok = hideChild(pill, "searchLabel", labelPrefix + ".searchLabel", false) || ok;
-        ok = hideChild(pill, "searchGlyphImageView", labelPrefix + ".searchGlyphImageView", false) || ok;
-        for (var i = 0; i < removeLater.length; i++) {
-            var item = removeLater[i];
-            ok = remove(item.view, item.label) || ok;
-        }
+        ok = hideChild(pill, "contentContainerView", labelPrefix + ".contentContainerView") || ok;
+        ok = hideChild(pill, "searchLabel", labelPrefix + ".searchLabel") || ok;
+        ok = hideChild(pill, "searchGlyphImageView", labelPrefix + ".searchGlyphImageView") || ok;
+        ok = hideChild(pill, "searchAffordanceContentView", labelPrefix + ".searchAffordanceContentView") || ok;
+        ok = hideChild(pill, "searchAffordanceReferenceView", labelPrefix + ".searchAffordanceReferenceView") || ok;
+        ok = hideChild(pill, "backgroundView", labelPrefix + ".backgroundView") || ok;
+        ok = hideChild(pill, "searchAffordanceBackgroundView", labelPrefix + ".searchAffordanceBackgroundView") || ok;
+        ok = hideChild(pill, "searchAffordanceReferenceBackgroundView", labelPrefix + ".searchAffordanceReferenceBackgroundView") || ok;
         ok = hide(pill, labelPrefix) || ok;
-        return ok;
-    }
-
-    function scrubKnownSearchGlass(root, labelPrefix) {
-        if (!isPtr(root)) return false;
-        var queue = [{ v: root, label: labelPrefix, depth: 0 }];
-        var seen = {};
-        var scanned = 0;
-        var ok = false;
-
-        while (queue.length > 0 && scanned < 64) {
-            var item = queue.shift();
-            var view = item.v;
-            var key = String(view);
-            if (seen[key]) continue;
-            seen[key] = true;
-            scanned++;
-
-            if (isKind(view, "SBHSearchPillView")) {
-                ok = hideSearchPillView(view, item.label + ".SBHSearchPillView") || ok;
-            } else if (isKind(view, "SBHMultiplexingWrapperGlassBackgroundView")) {
-                // Do not remove views found during the scan: we still need the
-                // pointer for subview walking below. Hide/clear only; direct
-                // removal happens on explicitly-owned root views after the scan.
-                ok = hide(view, item.label + ".SBHMultiplexingWrapperGlassBackgroundView") || ok;
-            } else if (responds(view, "searchAffordanceBackgroundView") ||
-                       responds(view, "searchAffordanceContentView") ||
-                       responds(view, "searchLabel") ||
-                       responds(view, "searchGlyphImageView")) {
-                ok = hideSearchPillView(view, item.label + ".searchAffordance") || ok;
-            } else if (responds(view, "setHasVisibleGlass:") ||
-                       responds(view, "updateGlassVisibility:")) {
-                ok = clearGlass(view, item.label) || ok;
-            }
-
-            if (item.depth >= 2) continue;
-            var subviews = msg(view, "subviews");
-            var n = count(subviews);
-            if (n <= 0 || n > 40) continue;
-            for (var i = 0; i < n; i++) {
-                var child = msg(subviews, "objectAtIndex:", i);
-                if (isPtr(child)) queue.push({ v: child, label: item.label + ".subview" + i, depth: item.depth + 1 });
-            }
-        }
-
-        if (ok) say("[Hide Search Pill] Scrubbed iOS 26 glass near " + labelPrefix + " (" + scanned + " view(s)).");
         return ok;
     }
 
@@ -206,9 +85,8 @@
             msgMain(rootView, "setSearchHidden:", 1);
             say("[Hide Search Pill] Set rootFolderView.searchHidden=YES.");
         }
-        // Do not force layoutSearchableViews/layoutIfNeeded here on iOS 26:
-        // it can recreate the Liquid Glass backing view while we are removing it.
-        msgMain(rootView, "setNeedsLayout");
+        // Do not call setNeedsLayout/layoutIfNeeded/layoutSearchableViews here.
+        // The iOS 26 search accessory rebuild path has been crashy under JS RemoteCall.
     }
 
     var mgr = iconManager();
@@ -218,40 +96,17 @@
     if (isPtr(rootView)) {
         refreshRootLayout(rootView);
 
-        // iOS 26 direct path from SBRootFolderView. Avoid any deep scan here:
-        // QuickLoader has a 15s limit and remote isKind/subview walks are slow.
+        say("[Hide Search Pill] Fetching search accessory views...");
         var aux = call(rootView, "scrollAccessoryAuxiliaryView", true);
         ok = hideSearchPillView(aux, "scrollAccessoryAuxiliaryView") || ok;
-        ok = scrubKnownSearchGlass(aux, "scrollAccessoryAuxiliaryView") || ok;
 
         var bg = call(rootView, "scrollAccessoryBackgroundView", true);
-        if (isPtr(bg)) {
-            ok = scrubKnownSearchGlass(bg, "scrollAccessoryBackgroundView") || ok;
-            // Remove only after all inspection is done; do not reuse bg after this.
-            ok = remove(bg, "scrollAccessoryBackgroundView") || ok;
-        }
+        ok = hide(bg, "scrollAccessoryBackgroundView") || ok;
 
-        // v1.0.2 wedged here on iOS 26 when asking rootFolderView for
-        // scrollAccessoryView. Walk up from the already-known auxiliary view
-        // instead; this reaches the same container without invoking that getter.
-        var parent = call(aux, "superview", false);
-        if (isPtr(parent)) {
-            ok = scrubKnownSearchGlass(parent, "scrollAccessoryAuxiliaryView.superview") || ok;
-            if (isKind(parent, "SBFolderScrollAccessoryView") ||
-                isKind(parent, "SBHMultiplexingWrapperGlassBackgroundView") ||
-                responds(parent, "setHasVisibleGlass:") ||
-                responds(parent, "updateGlassVisibility:")) {
-                ok = clearGlass(parent, "scrollAccessoryAuxiliaryView.superview") || ok;
-            }
-            var grand = call(parent, "superview", false);
-            if (isPtr(grand) && String(grand) !== String(rootView)) {
-                ok = scrubKnownSearchGlass(grand, "scrollAccessoryAuxiliaryView.superview.superview") || ok;
-            }
-        }
-
+        // Legacy/fallback views. These are direct root properties only; no scans.
         ok = hide(call(rootView, "searchPresentableView", true), "searchPresentableView") || ok;
         ok = hide(call(rootView, "pullDownSearchView", true), "pullDownSearchView") || ok;
     }
 
-    say(ok ? "[Hide Search Pill] SUCCESS: search pill hidden." : "[Hide Search Pill] Search pill not found (possibly already hidden)." );
+    say(ok ? "[Hide Search Pill] SUCCESS: search pill hidden." : "[Hide Search Pill] Search pill not found (possibly already hidden).");
 })();

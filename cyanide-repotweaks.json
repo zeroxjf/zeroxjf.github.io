@@ -13,10 +13,10 @@
     {
       "id": "lightsaber.hide-homebar",
       "name": "Hide Home Bar",
-      "description": "Zeros the MaterialKit home-indicator asset page using the DirtyZero-style method. Respring after applying so SpringBoard refreshes the asset cache. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
-      "version": "1.0.1",
+      "description": "Zeros the MaterialKit home-indicator asset page using Cyanide's stable file-page zero path. Respring after applying so SpringBoard refreshes the asset cache. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
+      "version": "1.0.2",
       "author": "zeroxjf",
-      "scriptURL": "https://zeroxjf.github.io/hide_homebar.js?v=2"
+      "scriptURL": "https://zeroxjf.github.io/hide_homebar.js?v=3"
     }
   ]
 }

@@ -1,10 +1,10 @@
 // hide_homebar.js
 //
-// Repo-served JS wrapper for Cyanide's DirtyZero-style Hide Home Bar path.
+// Repo-served JS wrapper for Cyanide's stable Hide Home Bar file-page zero path.
 //
 // Credits:
 // - C4ndyF1sh / ZeroCalories for the MaterialKit home-indicator target
-// - jailbreakdotparty / dirtyZero for the page-zeroing technique
+// - jailbreakdotparty / dirtyZero for the original page-zeroing idea
 // - zeroxjf for the Cyanide/Lightsaber JS port
 
 (function () {
@@ -36,7 +36,7 @@
         return;
     }
 
-    say("Zeroing MaterialKit Assets.car page using DirtyZero-style page zeroing...");
+    say("Zeroing MaterialKit Assets.car page using Cyanide's stable file-page zero path...");
     var ok = dz_zero_system_file_page(target, 0);
     if (ok) {
         say("SUCCESS: home bar asset page zeroed. Respring to refresh SpringBoard assets.");

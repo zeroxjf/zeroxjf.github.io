@@ -4,7 +4,7 @@
 (function () {
     "use strict";
 
-    var VERSION = "1.0.0";
+    var VERSION = "1.0.1";
     say("[Hide Search Pill] Running v" + VERSION + "...");
 
     function say(msg) {
@@ -49,28 +49,77 @@
     function hide(view, label) {
         if (!isPtr(view)) return false;
         msgMain(view, "setHidden:", 1);
+        if (responds(view, "setUserInteractionEnabled:")) msgMain(view, "setUserInteractionEnabled:", 0);
         msgMain(view, "setNeedsLayout");
         say("[Hide Search Pill] Hid " + label + ".");
         return true;
     }
 
+    function remove(view, label) {
+        if (!isPtr(view)) return false;
+        hide(view, label);
+        if (responds(view, "removeFromSuperview")) {
+            msgMain(view, "removeFromSuperview");
+            say("[Hide Search Pill] Removed " + label + ".");
+        }
+        return true;
+    }
+
+    function hideChild(view, sel, label, aggressive) {
+        if (!responds(view, sel)) return false;
+        var child = msgMain(view, sel);
+        return aggressive ? remove(child, label) : hide(child, label);
+    }
+
+    function hideSearchPillView(pill, labelPrefix) {
+        if (!isPtr(pill)) return false;
+        var ok = false;
+
+        // iOS 26 SBHSearchPillView keeps Liquid Glass/material in separate
+        // background views. Hiding only the label/glyph leaves the glass pill
+        // visible, so remove the background siblings too.
+        ok = hideChild(pill, "backgroundView", labelPrefix + ".backgroundView", true) || ok;
+        ok = hideChild(pill, "searchAffordanceBackgroundView", labelPrefix + ".searchAffordanceBackgroundView", true) || ok;
+        ok = hideChild(pill, "searchAffordanceReferenceBackgroundView", labelPrefix + ".searchAffordanceReferenceBackgroundView", true) || ok;
+        ok = hideChild(pill, "searchAffordanceReferenceView", labelPrefix + ".searchAffordanceReferenceView", false) || ok;
+        ok = hideChild(pill, "contentContainerView", labelPrefix + ".contentContainerView", false) || ok;
+        ok = hideChild(pill, "searchLabel", labelPrefix + ".searchLabel", false) || ok;
+        ok = hideChild(pill, "searchGlyphImageView", labelPrefix + ".searchGlyphImageView", false) || ok;
+
+        ok = hide(pill, labelPrefix) || ok;
+        return ok;
+    }
+
     function hideAccessoryParts(accessory, labelPrefix) {
         var ok = false;
-        if (responds(accessory, "auxiliaryView")) ok = hide(msgMain(accessory, "auxiliaryView"), labelPrefix + ".auxiliaryView") || ok;
-        if (responds(accessory, "backgroundView")) ok = hide(msgMain(accessory, "backgroundView"), labelPrefix + ".backgroundView") || ok;
+        if (responds(accessory, "backgroundView")) ok = remove(msgMain(accessory, "backgroundView"), labelPrefix + ".backgroundView") || ok;
+        if (responds(accessory, "auxiliaryView")) {
+            var auxiliary = msgMain(accessory, "auxiliaryView");
+            ok = hideSearchPillView(auxiliary, labelPrefix + ".auxiliaryView") || ok;
+        }
+        ok = hideSearchPillView(accessory, labelPrefix) || ok;
         if (!ok) ok = hide(accessory, labelPrefix);
         return ok;
     }
 
-    function findAccessory(root, accessoryCls) {
-        if (!isPtr(root) || !isPtr(accessoryCls)) return 0;
+    function findAndHideMatching(root, classes, labelPrefix, aggressiveMaterials) {
+        if (!isPtr(root) || !classes || classes.length === 0) return false;
         var queue = [{ view: root, depth: 0 }];
         var budget = 160;
+        var ok = false;
         while (queue.length && budget-- > 0) {
             var item = queue.shift();
             var view = item.view;
-            if (isKind(view, accessoryCls)) return view;
-            if (item.depth >= 5) continue;
+            for (var cidx = 0; cidx < classes.length; cidx++) {
+                var clsPtr = classes[cidx].cls;
+                if (isPtr(clsPtr) && isKind(view, clsPtr)) {
+                    if (classes[cidx].accessory) ok = hideAccessoryParts(view, labelPrefix + "." + classes[cidx].name) || ok;
+                    else if (classes[cidx].pill) ok = hideSearchPillView(view, labelPrefix + "." + classes[cidx].name) || ok;
+                    else if (aggressiveMaterials) ok = remove(view, labelPrefix + "." + classes[cidx].name) || ok;
+                    else ok = hide(view, labelPrefix + "." + classes[cidx].name) || ok;
+                }
+            }
+            if (item.depth >= 6) continue;
             var subs = call(view, "subviews", true);
             var c = count(subs);
             for (var i = 0; i < c && queue.length < 160; i++) {
@@ -78,7 +127,7 @@
                 if (isPtr(child)) queue.push({ view: child, depth: item.depth + 1 });
             }
         }
-        return 0;
+        return ok;
     }
 
     var mgr = iconManager();
@@ -89,17 +138,29 @@
     // exposes scrollAccessoryAuxiliaryView / scrollAccessoryBackgroundView /
     // scrollAccessoryView directly.
     if (isPtr(rootView)) {
-        if (responds(rootView, "scrollAccessoryAuxiliaryView")) ok = hide(msgMain(rootView, "scrollAccessoryAuxiliaryView"), "scrollAccessoryAuxiliaryView") || ok;
-        if (responds(rootView, "scrollAccessoryBackgroundView")) ok = hide(msgMain(rootView, "scrollAccessoryBackgroundView"), "scrollAccessoryBackgroundView") || ok;
-        if (!ok && responds(rootView, "scrollAccessoryView")) ok = hideAccessoryParts(msgMain(rootView, "scrollAccessoryView"), "scrollAccessoryView") || ok;
+        if (responds(rootView, "scrollAccessoryAuxiliaryView")) ok = hideSearchPillView(msgMain(rootView, "scrollAccessoryAuxiliaryView"), "scrollAccessoryAuxiliaryView") || ok;
+        if (responds(rootView, "scrollAccessoryBackgroundView")) ok = remove(msgMain(rootView, "scrollAccessoryBackgroundView"), "scrollAccessoryBackgroundView") || ok;
+
+        // Always continue into scrollAccessoryView. The auxiliary direct path
+        // can hide only the Search text on iOS 26 while leaving the Liquid
+        // Glass overlay in SBHSearchPillView/backgroundView.
+        if (responds(rootView, "scrollAccessoryView")) {
+            var scrollAccessory = msgMain(rootView, "scrollAccessoryView");
+            ok = hideAccessoryParts(scrollAccessory, "scrollAccessoryView") || ok;
+            ok = findAndHideMatching(scrollAccessory, [
+                { name: "SBHSearchPillView", cls: cls("SBHSearchPillView"), pill: true },
+                { name: "SBHomeScreenMaterialView", cls: cls("SBHomeScreenMaterialView") },
+                { name: "SBHMultiplexingWrapperGlassBackgroundView", cls: cls("SBHMultiplexingWrapperGlassBackgroundView") },
+                { name: "MTMaterialView", cls: cls("MTMaterialView") }
+            ], "scrollAccessoryView", true) || ok;
+        }
     }
 
     // Legacy/deep fallback: find SBFolderScrollAccessoryView under folderView/rootView.
-    if (!ok) {
-        var accessoryCls = cls("SBFolderScrollAccessoryView");
-        var found = findAccessory(rootView, accessoryCls);
-        if (isPtr(found)) ok = hideAccessoryParts(found, "SBFolderScrollAccessoryView") || ok;
-    }
+    ok = findAndHideMatching(rootView, [
+        { name: "SBHSearchPillView", cls: cls("SBHSearchPillView"), pill: true },
+        { name: "SBFolderScrollAccessoryView", cls: cls("SBFolderScrollAccessoryView"), accessory: true }
+    ], "rootScan", false) || ok;
 
     say(ok ? "[Hide Search Pill] SUCCESS: search pill hidden." : "[Hide Search Pill] Search pill not found (possibly already hidden)." );
 })();

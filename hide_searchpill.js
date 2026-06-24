@@ -1,10 +1,10 @@
 // hide_searchpill.js
-// Root-served Cyanide RepoTweak. Hides the home-screen search pill using iOS 26+ and legacy paths.
+// Root-served Cyanide RepoTweak. Hides the home-screen search pill using iOS 26+ and legacy-safe direct paths.
 
 (function () {
     "use strict";
 
-    var VERSION = "1.0.1";
+    var VERSION = "1.0.2";
     say("[Hide Search Pill] Running v" + VERSION + "...");
 
     function say(msg) {
@@ -30,8 +30,6 @@
     function msgMain(obj, sel, a1, a2, a3, a4) { if (!isPtr(obj)) return 0; try { return r_msg2_main(obj, sel, a1 || 0, a2 || 0, a3 || 0, a4 || 0); } catch (_) { return 0; } }
     function responds(obj, sel) { if (!isPtr(obj)) return false; try { return typeof r_responds === "function" ? truthy(r_responds(obj, sel)) : true; } catch (_) { return false; } }
     function call(obj, sel, main, a1, a2, a3, a4) { if (!isPtr(obj) || !responds(obj, sel)) return 0; return main ? msgMain(obj, sel, a1, a2, a3, a4) : msg(obj, sel, a1, a2, a3, a4); }
-    function count(arrayObj) { var c = msgMain(arrayObj, "count"); var n = parseInt(c, 0); return isFinite(n) ? n : 0; }
-    function isKind(obj, classPtr) { return isPtr(obj) && isPtr(classPtr) && truthy(msgMain(obj, "isKindOfClass:", classPtr)); }
 
     function iconManager() {
         var ctrl = msg(cls("SBIconController"), "sharedInstance");
@@ -65,19 +63,18 @@
         return true;
     }
 
-    function hideChild(view, sel, label, aggressive) {
+    function hideChild(view, sel, label, removeIt) {
         if (!responds(view, sel)) return false;
         var child = msgMain(view, sel);
-        return aggressive ? remove(child, label) : hide(child, label);
+        return removeIt ? remove(child, label) : hide(child, label);
     }
 
     function hideSearchPillView(pill, labelPrefix) {
         if (!isPtr(pill)) return false;
         var ok = false;
 
-        // iOS 26 SBHSearchPillView keeps Liquid Glass/material in separate
-        // background views. Hiding only the label/glyph leaves the glass pill
-        // visible, so remove the background siblings too.
+        // SBHSearchPillView owns the text/glyph, while iOS 26 Liquid Glass can
+        // live in separate background/reference views. Hide/remove those first.
         ok = hideChild(pill, "backgroundView", labelPrefix + ".backgroundView", true) || ok;
         ok = hideChild(pill, "searchAffordanceBackgroundView", labelPrefix + ".searchAffordanceBackgroundView", true) || ok;
         ok = hideChild(pill, "searchAffordanceReferenceBackgroundView", labelPrefix + ".searchAffordanceReferenceBackgroundView", true) || ok;
@@ -85,82 +82,45 @@
         ok = hideChild(pill, "contentContainerView", labelPrefix + ".contentContainerView", false) || ok;
         ok = hideChild(pill, "searchLabel", labelPrefix + ".searchLabel", false) || ok;
         ok = hideChild(pill, "searchGlyphImageView", labelPrefix + ".searchGlyphImageView", false) || ok;
-
         ok = hide(pill, labelPrefix) || ok;
         return ok;
     }
 
-    function hideAccessoryParts(accessory, labelPrefix) {
-        var ok = false;
-        if (responds(accessory, "backgroundView")) ok = remove(msgMain(accessory, "backgroundView"), labelPrefix + ".backgroundView") || ok;
-        if (responds(accessory, "auxiliaryView")) {
-            var auxiliary = msgMain(accessory, "auxiliaryView");
-            ok = hideSearchPillView(auxiliary, labelPrefix + ".auxiliaryView") || ok;
+    function refreshRootLayout(rootView) {
+        if (!isPtr(rootView)) return;
+        if (responds(rootView, "setSearchHidden:")) {
+            msgMain(rootView, "setSearchHidden:", 1);
+            say("[Hide Search Pill] Set rootFolderView.searchHidden=YES.");
         }
-        ok = hideSearchPillView(accessory, labelPrefix) || ok;
-        if (!ok) ok = hide(accessory, labelPrefix);
-        return ok;
-    }
-
-    function findAndHideMatching(root, classes, labelPrefix, aggressiveMaterials) {
-        if (!isPtr(root) || !classes || classes.length === 0) return false;
-        var queue = [{ view: root, depth: 0 }];
-        var budget = 160;
-        var ok = false;
-        while (queue.length && budget-- > 0) {
-            var item = queue.shift();
-            var view = item.view;
-            for (var cidx = 0; cidx < classes.length; cidx++) {
-                var clsPtr = classes[cidx].cls;
-                if (isPtr(clsPtr) && isKind(view, clsPtr)) {
-                    if (classes[cidx].accessory) ok = hideAccessoryParts(view, labelPrefix + "." + classes[cidx].name) || ok;
-                    else if (classes[cidx].pill) ok = hideSearchPillView(view, labelPrefix + "." + classes[cidx].name) || ok;
-                    else if (aggressiveMaterials) ok = remove(view, labelPrefix + "." + classes[cidx].name) || ok;
-                    else ok = hide(view, labelPrefix + "." + classes[cidx].name) || ok;
-                }
-            }
-            if (item.depth >= 6) continue;
-            var subs = call(view, "subviews", true);
-            var c = count(subs);
-            for (var i = 0; i < c && queue.length < 160; i++) {
-                var child = msgMain(subs, "objectAtIndex:", i);
-                if (isPtr(child)) queue.push({ view: child, depth: item.depth + 1 });
-            }
-        }
-        return ok;
+        if (responds(rootView, "layoutSearchableViews")) msgMain(rootView, "layoutSearchableViews");
+        msgMain(rootView, "setNeedsLayout");
+        if (responds(rootView, "layoutIfNeeded")) msgMain(rootView, "layoutIfNeeded");
     }
 
     var mgr = iconManager();
     var rootView = rootFolderView(mgr);
     var ok = false;
 
-    // iOS 26+ path from SpringBoardHome 26.0.1 class dump: SBRootFolderView
-    // exposes scrollAccessoryAuxiliaryView / scrollAccessoryBackgroundView /
-    // scrollAccessoryView directly.
     if (isPtr(rootView)) {
-        if (responds(rootView, "scrollAccessoryAuxiliaryView")) ok = hideSearchPillView(msgMain(rootView, "scrollAccessoryAuxiliaryView"), "scrollAccessoryAuxiliaryView") || ok;
-        if (responds(rootView, "scrollAccessoryBackgroundView")) ok = remove(msgMain(rootView, "scrollAccessoryBackgroundView"), "scrollAccessoryBackgroundView") || ok;
+        refreshRootLayout(rootView);
 
-        // Always continue into scrollAccessoryView. The auxiliary direct path
-        // can hide only the Search text on iOS 26 while leaving the Liquid
-        // Glass overlay in SBHSearchPillView/backgroundView.
-        if (responds(rootView, "scrollAccessoryView")) {
-            var scrollAccessory = msgMain(rootView, "scrollAccessoryView");
-            ok = hideAccessoryParts(scrollAccessory, "scrollAccessoryView") || ok;
-            ok = findAndHideMatching(scrollAccessory, [
-                { name: "SBHSearchPillView", cls: cls("SBHSearchPillView"), pill: true },
-                { name: "SBHomeScreenMaterialView", cls: cls("SBHomeScreenMaterialView") },
-                { name: "SBHMultiplexingWrapperGlassBackgroundView", cls: cls("SBHMultiplexingWrapperGlassBackgroundView") },
-                { name: "MTMaterialView", cls: cls("MTMaterialView") }
-            ], "scrollAccessoryView", true) || ok;
+        // iOS 26 direct path from SBRootFolderView. Avoid any deep scan here:
+        // QuickLoader has a 15s limit and remote isKind/subview walks are slow.
+        ok = hideSearchPillView(call(rootView, "scrollAccessoryAuxiliaryView", true), "scrollAccessoryAuxiliaryView") || ok;
+        ok = remove(call(rootView, "scrollAccessoryBackgroundView", true), "scrollAccessoryBackgroundView") || ok;
+
+        var accessory = call(rootView, "scrollAccessoryView", true);
+        if (isPtr(accessory)) {
+            ok = remove(call(accessory, "backgroundView", true), "scrollAccessoryView.backgroundView") || ok;
+            // Last-resort iOS 26 path: if the glass is the accessory's own layer
+            // or gets recreated after layout, hide the container too. This may
+            // also hide page dots, but it removes the persistent glass pill.
+            ok = hide(accessory, "scrollAccessoryView") || ok;
         }
-    }
 
-    // Legacy/deep fallback: find SBFolderScrollAccessoryView under folderView/rootView.
-    ok = findAndHideMatching(rootView, [
-        { name: "SBHSearchPillView", cls: cls("SBHSearchPillView"), pill: true },
-        { name: "SBFolderScrollAccessoryView", cls: cls("SBFolderScrollAccessoryView"), accessory: true }
-    ], "rootScan", false) || ok;
+        ok = hide(call(rootView, "searchPresentableView", true), "searchPresentableView") || ok;
+        ok = hide(call(rootView, "pullDownSearchView", true), "pullDownSearchView") || ok;
+    }
 
     say(ok ? "[Hide Search Pill] SUCCESS: search pill hidden." : "[Hide Search Pill] Search pill not found (possibly already hidden)." );
 })();

@@ -91,41 +91,87 @@
       <div class="tweak-card">
         <div class="tweak-name" style="margin-bottom:0.75rem;">Writing a Tweak</div>
         <div class="tweak-desc">
-          Tweaks are plain JavaScript files that run inside Cyanide's SpringBoard bridge. Use <code>@param</code> comments to declare user-configurable settings.
+          Tweaks are plain .js files that run inside JavaScriptCore through Cyanide's SpringBoard RemoteCall bridge. 64-bit pointers are passed as hex strings (e.g. <code>"0x105f2a000"</code>). Wrap your code in an IIFE:
+        </div>
+        <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">(() =&gt; {
+  log("Hello from my tweak!");
+  var cls = r_class("SBDockView");
+  var dock = r_msg2(r_msg2(cls, "sharedInstance"), "dockView");
+  r_msg2(dock, "setHidden:", 1);
+})();</pre>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Parameters</div>
+        <div class="tweak-desc">
+          Add <code>@param</code> comments at the top of your script. Cyanide parses them and generates native UI controls in Settings.
         </div>
         <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">// @param: switch | enabled | Enable Tweak | true
-// @param: slider | radius | Corner Radius | 12.0 | 0.0-30.0
-// @param: color  | tint   | Tint Color    | #FF6600
-// @param: text   | label  | Custom Label  | Hello
-
-var cls = r_class("SBDockView");
-var dock = r_msg2(r_msg2(cls, "sharedInstance"), "dockView");
-r_msg2(dock, "setHidden:", 1);</pre>
+// @param: slider | radius  | Corner Radius | 12.0 | 0.0-30.0
+// @param: color  | tint    | Tint Color    | #FF6600
+// @param: text   | label   | Custom Label  | Hello</pre>
         <div class="tweak-desc" style="font-size:0.8125rem;">
-          <strong>RemoteCall API:</strong>
-          <code>r_class(name)</code>,
-          <code>r_sel(name)</code>,
-          <code>r_nsstr(str)</code>,
-          <code>r_msg2(target, sel, arg1..arg4)</code>,
-          <code>r_msg2_main(target, sel, arg1..arg4)</code>,
-          <code>r_responds(target, sel)</code>,
-          <code>r_ivar_value(obj, name)</code>,
-          <code>r_pref_num(key)</code>,
-          <code>r_pref_bool(key)</code>,
-          <code>r_pref_str(key)</code>
-          <br><br>
-          <strong>Timers:</strong>
-          <code>setInterval(fn, ms)</code>,
-          <code>clearInterval(id)</code>,
-          <code>setTimeout(fn, ms)</code>,
-          <code>clearTimeout(id)</code>
+          Syntax: <code>// @param: type | varName | Label | default | range</code><br>
+          Types: <code>switch</code> (boolean), <code>slider</code> (float with min-max range), <code>color</code> (hex color picker), <code>text</code> (string input).
+          Variables are injected at the top of your script before it runs.
+        </div>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">RemoteCall API</div>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          These functions are injected into every JS context:
+        </div>
+        <div style="overflow-x:auto;margin-bottom:0.75rem;">
+          <table style="width:100%;font-size:0.8125rem;border-collapse:collapse;">
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>log(message)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Print to Cyanide's log console</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_class(name)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Get ObjC class pointer</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_sel(name)</code></td><td style="padding:0.4rem 0;color:var(--muted);">String → SEL</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_nsstr(str)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Allocate NSString (release when done)</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_msg2(t, s, a1..a4)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Send ObjC message</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_msg2_main(t, s, a1..a4)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Send on main thread (use for views)</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_responds(t, s)</code></td><td style="padding:0.4rem 0;color:var(--muted);">respondsToSelector check</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_ivar_value(obj, name)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Read instance variable</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_pref_num(key)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Read @param float value</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_pref_bool(key)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Read @param boolean value</td></tr>
+            <tr style="box-shadow:inset 0 0.5px 0 var(--border);"><td style="padding:0.4rem 0;"><code>r_pref_str(key)</code></td><td style="padding:0.4rem 0;color:var(--muted);">Read @param string value</td></tr>
+          </table>
+        </div>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          <strong>Timers:</strong> <code>setInterval(fn, ms)</code>, <code>clearInterval(id)</code>, <code>setTimeout(fn, ms)</code>, <code>clearTimeout(id)</code> — mapped to GCD background queues so they never block the UI.
+        </div>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Color Allocation</div>
+        <div class="tweak-desc">
+          64-bit IPC can't pass CGFloat arrays directly. Allocate colors through CIColor:
+        </div>
+        <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">var hex = "#00FFCC".replace('#','');
+var r = parseInt(hex.substring(0,2),16)/255;
+var g = parseInt(hex.substring(2,4),16)/255;
+var b = parseInt(hex.substring(4,6),16)/255;
+
+var ciColorCls = r_class("CIColor");
+var color = r_msg2(ciColorCls, "colorWithRed:green:blue:alpha:", r, g, b, 1.0);
+var uiColor = r_msg2(r_class("UIColor"), "colorWithCIColor:", color);</pre>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Tips</div>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          <strong>•</strong> Always use <code>r_msg2_main</code> for view manipulation — <code>r_msg2</code> on a background thread can crash SpringBoard.<br>
+          <strong>•</strong> Release <code>r_nsstr</code> allocations to avoid leaking memory in the SpringBoard process.<br>
+          <strong>•</strong> Use <code>r_responds</code> to check selectors before calling — iOS versions differ.<br>
+          <strong>•</strong> Test scripts locally with QuickLoader before adding them to your repo.<br>
+          <strong>•</strong> HTTPS is required for all script and repo URLs — Cyanide rejects HTTP.
         </div>
       </div>
 
       <div class="tweak-card">
         <div class="tweak-name" style="margin-bottom:0.75rem;">Setting Up a Repo</div>
         <div class="tweak-desc">
-          Host a JSON file on any HTTPS server. Users add the URL in Cyanide's Sources tab.
+          Host a JSON file on any HTTPS server. Users add the URL in Cyanide's Sources tab. No server-side code needed — GitHub Pages or any static host works.
         </div>
         <pre style="background:var(--code-bg);padding:0.75rem;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;overflow-x:auto;margin-bottom:0.75rem;color:var(--fg);">{
   "repoName": "My Repo",
@@ -145,10 +191,24 @@ r_msg2(dock, "setHidden:", 1);</pre>
         <div class="tweak-desc" style="font-size:0.8125rem;">
           <strong>Required:</strong> <code>repoName</code>, <code>author</code>, <code>tweaks[].id</code>, <code>tweaks[].name</code>, <code>tweaks[].description</code>, <code>tweaks[].version</code>, <code>tweaks[].scriptURL</code>
           <br>
-          <strong>Optional:</strong> <code>tweaks[].symbol</code> (SF Symbol name for icon), <code>tweaks[].author</code> (per-tweak author override)
-          <br><br>
-          Host on GitHub Pages: create a public repo, add your .js files and JSON index, enable Pages in Settings, and share <code>https://yourname.github.io/repo/tweaks.json</code>.
-          Bump <code>version</code> on every update — Cyanide detects updates automatically.
+          <strong>Optional:</strong> <code>tweaks[].symbol</code> (SF Symbol name for icon), <code>tweaks[].author</code> (per-tweak author override). Custom icon images planned for a future update.
+        </div>
+      </div>
+
+      <div class="tweak-card">
+        <div class="tweak-name" style="margin-bottom:0.75rem;">Hosting &amp; Updating</div>
+        <div class="tweak-desc" style="font-size:0.8125rem;">
+          <strong>GitHub Pages setup:</strong><br>
+          1. Create a public GitHub repo<br>
+          2. Add your .js tweak files and a JSON index (e.g. <code>tweaks.json</code>)<br>
+          3. Point <code>scriptURL</code> to the raw files: <code>https://yourname.github.io/repo/tweak.js</code><br>
+          4. Enable GitHub Pages in repo Settings (Source: main branch, root folder)<br>
+          5. Share the JSON URL with users<br><br>
+          <strong>Pushing updates:</strong><br>
+          1. Update the .js file at the same URL<br>
+          2. Bump the <code>version</code> string in the JSON<br>
+          3. Commit and push — Cyanide checks for updates every few hours and shows an update badge<br><br>
+          <strong>Multiple tweaks:</strong> add more entries to the <code>tweaks</code> array. Each needs a unique <code>id</code> and <code>scriptURL</code>. Use descriptive IDs like <code>"yourname.tweakname"</code> to avoid collisions.
         </div>
       </div>
     </div>

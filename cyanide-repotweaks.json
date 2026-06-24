@@ -8,6 +8,7 @@
       "description": "Hides the dock background on the home screen. Warning: this also hides any app icons placed in the dock — move them to the home screen grid before applying. Respring to restore.",
       "version": "1.0.5",
       "author": "@MinePlayer16",
+      "symbol": "dock.rectangle",
       "scriptURL": "https://zeroxjf.github.io/hide_dock.js?v=5"
     },
     {
@@ -16,6 +17,7 @@
       "description": "Zeros the MaterialKit home-indicator asset page using Cyanide's stable file-page zero path. Respring after applying so SpringBoard refreshes the asset cache. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
       "version": "1.0.2",
       "author": "zeroxjf",
+      "symbol": "line.3.horizontal",
       "scriptURL": "https://zeroxjf.github.io/hide_homebar.js?v=3"
     },
     {
@@ -24,6 +26,7 @@
       "description": "Colors the dock background/platter with a custom color. Uses guarded iOS 26+ and legacy dock paths.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
+      "symbol": "paintpalette.fill",
       "scriptURL": "https://zeroxjf.github.io/dock_color.js?v=1"
     },
     {
@@ -32,6 +35,7 @@
       "description": "Hides the home-screen search pill using iOS 26+ scroll accessory paths with legacy fallback scanning.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
+      "symbol": "magnifyingglass",
       "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=1"
     },
     {
@@ -40,6 +44,7 @@
       "description": "Adds gentle floating animations to home-screen and dock icon layers. Configurable movement, rotation, and scale.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
+      "symbol": "wind",
       "scriptURL": "https://zeroxjf.github.io/floating_icons.js?v=1"
     },
     {
@@ -48,6 +53,7 @@
       "description": "Diagnostic helper that waits, dumps visible SpringBoard window view trees to /tmp, and opens a share sheet when possible.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
+      "symbol": "ladybug.fill",
       "scriptURL": "https://zeroxjf.github.io/dump-views.js?v=1"
     }
   ]

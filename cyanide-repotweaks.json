@@ -9,6 +9,14 @@
       "version": "1.0.4",
       "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/lightsaber/hide_dock.js"
+    },
+    {
+      "id": "zeroxjf.hide-homebar",
+      "name": "Hide Home Bar",
+      "description": "Hides the bottom home indicator by zeroing the MaterialKit asset page through Cyanide's native DirtyZero helper. Run alone, then respring. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
+      "version": "1.0.0",
+      "author": "C4ndyF1sh, jailbreakdotparty, zeroxjf",
+      "scriptURL": "https://zeroxjf.github.io/hide_homebar.js"
     }
   ]
 }

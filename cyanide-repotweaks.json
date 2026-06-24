@@ -5,7 +5,7 @@
     {
       "id": "lightsaber.hide-dock",
       "name": "Hide Dock",
-      "description": "Hides the dock background on the home screen. Warning: this also hides any app icons placed in the dock — move them to the home screen grid before applying. Respring to restore.",
+      "description": "Hides the dock background on the home screen. Also hides app icons in the dock — move them to the home screen grid before applying. Respring to restore.",
       "version": "1.0.5",
       "author": "@MinePlayer16",
       "symbol": "dock.rectangle",
@@ -14,7 +14,7 @@
     {
       "id": "lightsaber.hide-homebar",
       "name": "Hide Home Bar",
-      "description": "Zeros the MaterialKit home-indicator asset page using Cyanide's stable file-page zero path. Respring after applying so SpringBoard refreshes the asset cache. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
+      "description": "Hides the bottom home indicator. Respring after applying so SpringBoard refreshes the asset cache.",
       "version": "1.0.2",
       "author": "zeroxjf",
       "symbol": "line.3.horizontal",
@@ -23,7 +23,7 @@
     {
       "id": "lightsaber.dock-color",
       "name": "Dock Color",
-      "description": "Colors the dock background/platter with a custom color. Uses guarded iOS 26+ and legacy dock paths.",
+      "description": "Colors the dock background with a custom color. Works on iOS 26 and earlier.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
       "symbol": "paintpalette.fill",
@@ -32,7 +32,7 @@
     {
       "id": "lightsaber.hide-search-pill",
       "name": "Hide Search Pill",
-      "description": "Hides the home-screen search pill using iOS 26+ scroll accessory paths with legacy fallback scanning.",
+      "description": "Hides the search pill on the home screen.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
       "symbol": "magnifyingglass",
@@ -41,7 +41,7 @@
     {
       "id": "lightsaber.floating-icons",
       "name": "Floating Icons",
-      "description": "Adds gentle floating animations to home-screen and dock icon layers. Configurable movement, rotation, and scale.",
+      "description": "Adds gentle floating animations to home-screen and dock icons. Configurable movement, rotation, and scale.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
       "symbol": "wind",
@@ -50,7 +50,7 @@
     {
       "id": "lightsaber.dump-views",
       "name": "Dump Views",
-      "description": "Diagnostic helper that waits, dumps visible SpringBoard window view trees to /tmp, and opens a share sheet when possible.",
+      "description": "Diagnostic tool that dumps visible SpringBoard view trees to /tmp.",
       "version": "1.0.0",
       "author": "@MinePlayer16",
       "symbol": "ladybug.fill",

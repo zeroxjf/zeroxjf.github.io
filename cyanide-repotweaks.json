@@ -9,6 +9,14 @@
       "version": "1.0.4",
       "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/lightsaber/hide_dock.js"
+    },
+    {
+      "id": "lightsaber.hide-homebar",
+      "name": "Hide Home Bar",
+      "description": "Zeros the MaterialKit home-indicator asset page using the DirtyZero-style method. Respring after applying so SpringBoard refreshes the asset cache. Credits: C4ndyF1sh/ZeroCalories and jailbreakdotparty/dirtyZero.",
+      "version": "1.0.0",
+      "author": "zeroxjf",
+      "scriptURL": "https://zeroxjf.github.io/hide_homebar.js"
     }
   ]
 }

@@ -23,7 +23,7 @@
       "name": "Dock Color",
       "description": "Colors the dock background/platter with a custom color. Uses guarded iOS 26+ and legacy dock paths.",
       "version": "1.0.0",
-      "author": "zeroxjf",
+      "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/dock_color.js?v=1"
     },
     {
@@ -31,7 +31,7 @@
       "name": "Hide Search Pill",
       "description": "Hides the home-screen search pill using iOS 26+ scroll accessory paths with legacy fallback scanning.",
       "version": "1.0.0",
-      "author": "zeroxjf",
+      "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=1"
     },
     {
@@ -39,7 +39,7 @@
       "name": "Floating Icons",
       "description": "Adds gentle floating animations to home-screen and dock icon layers. Configurable movement, rotation, and scale.",
       "version": "1.0.0",
-      "author": "zeroxjf",
+      "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/floating_icons.js?v=1"
     },
     {
@@ -47,7 +47,7 @@
       "name": "Dump Views",
       "description": "Diagnostic helper that waits, dumps visible SpringBoard window view trees to /tmp, and opens a share sheet when possible.",
       "version": "1.0.0",
-      "author": "zeroxjf",
+      "author": "@MinePlayer16",
       "scriptURL": "https://zeroxjf.github.io/dump-views.js?v=1"
     }
   ]

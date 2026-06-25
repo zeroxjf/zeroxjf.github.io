@@ -32,11 +32,14 @@
     {
       "id": "lightsaber.hide-search-pill",
       "name": "Hide Search Pill",
-      "description": "Hides the search pill on the home screen.",
-      "version": "1.0.5",
+      "description": "Hides the search pill on the home screen. Only tested on iOS 18 and below.",
+      "version": "1.0.6",
       "author": "@MinePlayer16",
       "symbol": "magnifyingglass",
-      "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=6"
+      "scriptURL": "https://zeroxjf.github.io/hide_searchpill.js?v=7",
+      "maxIOS": "18.x",
+      "compatibilityNote": "Only tested on iOS 18 and below.",
+      "unsupportedMessage": "Only tested on iOS 18 and below."
     },
     {
       "id": "lightsaber.floating-icons",
